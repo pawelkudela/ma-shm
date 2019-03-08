@@ -1,7 +1,12 @@
 ﻿ma-shm
 ==============================
 
-Parallel time domain spectral element method utilizing plate elements for wave propagation modelling
+Parallel time domain spectral element method utilizing flat shell elements for wave propagation modelling
+Dependencies: Matlab Parallel Computing Toolbox, gmsh
+
+Notes: 
+- gmsh binaries should be copied to \bin\external\gmsh\
+- config_matlab.m should be run first
 
 Project Organization
 --------------------
@@ -11,6 +16,8 @@ Project Organization
     ├── LICENSE
     ├── README.md
     ├── bin
+    │   └── external
+    │       └── gmsh
     ├── config
     ├── data
     │   ├── external
