@@ -57,6 +57,12 @@ r=0.005; % pzt radius
 xpzt=0.25; % pzt x coordinate
 ypzt=0.25; % pzt y coordinate
 
+% mesh parameters
+CharacteristicLengthFactor = 0.08; 
+CharacteristicLengthMin = 0.001; 
+CharacteristicLengthMax = 0.2;
+Smoothing = 1;
+
 % read template mesh file
 text = fileread([mesh_geometry_path,mesh_template,'.geo']);
 fid = fopen([mesh_geometry_path,mesh_filename,'.geo'],'w');
@@ -71,6 +77,14 @@ fprintf(fid,'xpzt=%f; \n',xpzt);
 fprintf(fid,'ypzt=%f; \n',ypzt);
 % append  template mesh file
 fprintf(fid,text);
+fprintf(fid,'\n\n');
+fprintf(fid,'Mesh.Algorithm = 6; // Frontal\n');
+fprintf(fid,'Mesh.CharacteristicLengthFactor = %f;\n',CharacteristicLengthFactor);
+fprintf(fid,'Mesh.CharacteristicLengthMin = %f;\n',CharacteristicLengthMin);
+fprintf(fid,'Mesh.CharacteristicLengthMax = %f;\n',CharacteristicLengthMax);
+fprintf(fid,'Mesh.RecombineAll = 1; // Apply recombination algorithm\n');
+fprintf(fid,'Mesh.SubdivisionAlgorithm = 1; // 1: all quadrangles\n');
+fprintf(fid,'Mesh.Smoothing = %d;',Smoothing);
 fclose(fid);
 
 % run external gmsh.exe - make mesh file from geometry file

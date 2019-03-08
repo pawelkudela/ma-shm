@@ -74,9 +74,3 @@ Physical Surface("pzt") = {1};
 Physical Surface("delam") = {2};
 //+
 Physical Surface("host") = {3};
- 
-Mesh.Algorithm = 6; // Frontal
-Mesh.CharacteristicLengthFactor = 0.08; Mesh.CharacteristicLengthMin = 0.001; Mesh.CharacteristicLengthMax = 0.2;
-Mesh.RecombineAll = 1; // Apply recombination algorithm 
-Mesh.SubdivisionAlgorithm = 1; // 1: all quadrangles
-Mesh.Smoothing = 1;
