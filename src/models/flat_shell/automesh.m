@@ -10,14 +10,15 @@ L=0.5; % plate length
 W=0.5; % plate width
 a=0.02; % delamination semi-major axis
 b=0.01; % delamination semi-minor axis
-xCenter=0.5;   % delamination x coordinate
-yCenter=0.;   % delamination y coordinate
-rotAngle = 45; % delamination rotation
+xCenter=0.2;   % delamination x coordinate
+yCenter=0.4;   % delamination y coordinate
+rotAngle = 130; % delamination rotation [0:180)
 r=0.005; % pzt radius
 xpzt=0.25; % pzt x coordinate
 ypzt=0.25; % pzt y coordinate
 
 % mesh parameters
+N = 5; % element approximation order, Number of nodes in one direction is N+1
 CharacteristicLengthFactor = 0.08; 
 CharacteristicLengthMin = 0.001; 
 CharacteristicLengthMax = 0.2;
@@ -28,8 +29,12 @@ modelfolder = 'flat_shell';
 gmsh_path = fullfile(projectroot,'bin','external','gmsh','gmsh ');
 mesh_geometry_path = fullfile(projectroot,'src','models',modelfolder,'geo',filesep);
 mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'gmsh_out',filesep);
+spec_mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'mesh',filesep);
 gmsh_options = ' -2 -format auto -v 1 -o '; % non-verbose
 %gmsh_options = ' -2 -format auto -o '; % verbose
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ExpectedMaxElementSize = CharacteristicLengthFactor*CharacteristicLengthMax*L;
+fprintf('Expected max element size: %f  [mm]\n', ExpectedMaxElementSize*1e3);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% check delam position
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,7 +57,7 @@ delta1 = B1^2-4*A3*C1;
 delta2 = B2^2-4*A2*C2;
 delta3 = B3^2-4*A3*C3;
 delta4 = B4^2-4*A2*C4;
-[delta1;delta2;delta3;delta4]
+%[delta1;delta2;delta3;delta4]
 
 delam_position='';
 if(delta1>0 && delta2<0 && delta3<0 && delta4<0)
@@ -191,6 +196,14 @@ end
 % load mesh into matlab
 run([mesh_output_path, mesh_filename,'.m']);
 plot_mesh(msh);
+disp('Quad to spectral mesh conversion...');
+[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,N);
+%plot(coords(:,1),coords(:,2),'.');
+disp('12 baskets: calculating local and global node numbers...');
+[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes);
+save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12');
+% delete gmsh out m file
+delete([mesh_output_path, mesh_filename,'.m']);
 % pause;
 % close all;
 % figfilename = 'test_mesh';
