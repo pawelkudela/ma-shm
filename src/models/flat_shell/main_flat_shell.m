@@ -1,20 +1,40 @@
-clear all;close all;   warning off;clc;
-tasks=[6];
-mode='gpu'; % options: mode='cpu';mode='gpu';
+function main_flat_shell(test_case,meshfile,mode,output_name,tasks)
+% MAIN_FLAT_SHELL   Compute wavefield by using flat shell spectral elements  
+% 
+% Syntax: main_flat_shell(test_case,meshfile,mode,output_name)
+% 
+% Inputs: 
+%    test_case - test case number (input/output number), integer
+%    meshfile - mesh filename, string
+%    mode - string , options: mode='cpu';mode='gpu';
+%    output_name - path to folder were the output data is stored, string
+%    tasks - list of task numbers in a queue (for message only), integer
+% 
+% Example: 
+%    main_flat_shell(test_case,meshfile,mode,output_name)
+%    main_flat_shell(1,'mesh1','gpu',output_name) 
+% 
+% Other m-files required: none 
+% Subfunctions: none 
+% MAT-files required: none 
+% See also: 
+% 
 
-for k_test=tasks
-try
-model_output_path = fullfile('outputs',['output',num2str(k_test)],filesep);
-if ~exist(model_output_path, 'dir')
-    mkdir(model_output_path);
-end    
+% Author: Pawel Kudela, D.Sc., Ph.D., Eng. 
+% Institute of Fluid Flow Machinery Polish Academy of Sciences 
+% Mechanics of Intelligent Structures Department 
+% email address: pk@imp.gda.pl 
+% Website: https://www.imp.gda.pl/en/research-centres/o4/o4z1/people/ 
 
+%---------------------- BEGIN CODE---------------------- 
+
+k_test=test_case;
 assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
 run(fullfile('inputs',['input',num2str(k_test)]));
-frm_int=floor(nft/(frames)); % save displacement with interval time step frm_int (frames)
+frm_int=floor(nft/(nFrames)); % save displacement with interval time step frm_int (frames)
 pztEl=[];pztnum=[];
 
-load(meshfile);
+load(meshfile); % coord nodes
 
 [fen,NofElNodes]=size(nodes);
 [NofNodes,empty]=size(coords);
@@ -71,19 +91,6 @@ end
 %% PRELIMINARY CALCULATIONS
 %disp('preliminary calculations');
 
-%%
-
-% Inc=zeros(fen,5*NofElNodes);
-% % connectivity matrix Inc by dof
-% disp('connectivity matrix...');
-%  for ne=1:fen
-%      Inc(ne,1:5:end)=5*nodes(ne,:)-4;
-%      Inc(ne,2:5:end)=5*nodes(ne,:)-3;
-%      Inc(ne,3:5:end)=5*nodes(ne,:)-2;
-%      Inc(ne,4:5:end)=5*nodes(ne,:)-1;
-%      Inc(ne,5:5:end)=5*nodes(ne,:);
-%  end
-
 %% signal
 dt=tt/nft;   % calculation time step [s]
 [t,st]=Hanning_signal(dt,nft,f_1,f_2,t_1);
@@ -93,17 +100,13 @@ dt=tt/nft;   % calculation time step [s]
 %% forces induced by the pzt actuators
 
 %Fa2=zeros(dof,1);
-%[Vx,Vzx]=Vandermonde_old(ksi,dzeta,nx,nz);
-%disp('forces...');
-
 
 %% Output file for solution
-outfile_voltage=fullfile('outputs',['output',num2str(k_test)],['voltage',num2str(k_test)]);
-outfile_displ=fullfile('outputs',['output',num2str(k_test)],['displ',num2str(k_test)]);
-outfile_time=fullfile('outputs',['output',num2str(k_test)],['time',num2str(k_test)]);
+outfile_voltage=fullfile(output_name,['voltage',num2str(k_test)]);
+outfile_displ=fullfile(output_name,['displ',num2str(k_test)]);
+outfile_time=fullfile(output_name,['time',num2str(k_test)]);
 %%
 disp('local derivatives');
-%[Nprimx,Nprimy,Nprimz]=shape3D_prim(nx,ny,nz,Qx,Qy,Qz,ksi',eta',dzeta');
 [Nprimx,Nprimy]=shape2D_prim(nx,ny,Qx,Qy,ksi',eta');
 %[N]=shape2D(nx,ny,Qx,Qy,ksi',eta');
 
@@ -425,7 +428,7 @@ end
 
 tic;minTime = Inf;
 c=0;
-t_frames = zeros(frames,1);
+t_frames = zeros(nFrames,1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -515,7 +518,7 @@ for nn=2:nft
     %% time integration
     %F3=-F+mg2.*U+Fa*st(nn)-mg.*uold-cg.*v;
     if(isempty(pztEl))
-       % F=-F+mg2.*U+Fi*st(nn)-mg.*uold-cg.*v; % force excitation
+        %F=-F+mg2.*U+Fi*st(nn)-mg.*uold-cg.*v; % force excitation
         F=-F+mg2.*U+Fi*st(nn)-mg.*uold+a1*cg.*uold; % force excitation
     else
         %F=-F+mg2.*U+Fa*st(nn)-mg.*uold-cg.*v; % piezoelectric excitation
@@ -523,9 +526,6 @@ for nn=2:nft
     end  
     %
     unew=mg0.*F;
-    v = a1*(-uold+unew);  % update velocity
-    uold=U;  
-    U = unew; 
     %% output signals
    id=0;
     for i1=1:col
@@ -545,8 +545,23 @@ for nn=2:nft
     if (mod(nn,frm_int) == 0)
         c=c+1;
         t_frames(c)=t(nn);
-        Uc=gather(U);
-        if( max(Uc)> 10*h(1)) disp('integration error'); 
+        switch field_variable
+            case 'displacement'
+                Uc=gather(U);
+            case 'velocity'
+                v = a1*(-uold+unew);  % update velocity
+                Vc=gather(v);
+            case 'acceleration'
+                anew = a0*(uold-2*U+unew); % update acceleration
+                Ac=gather(anew);
+            case 'all'
+                Uc=gather(U);
+                v = a1*(-uold+unew);  % update velocity
+                Vc=gather(v);
+                anew = a0*(uold-2*U+unew); % update acceleration
+                Ac=gather(anew);
+        end
+        if( max(U)> 10*h(1)) disp('integration error'); 
             if(isempty(pztEl))
                 save(outfile_displ,'displ');
             else
@@ -564,20 +579,87 @@ for nn=2:nft
             end
            return; 
         end 
-        
-        outfile_Ux=fullfile('outputs',['output',num2str(k_test)],['Ux_frame' ,num2str(nn)]);
-        outfile_Uy=fullfile('outputs',['output',num2str(k_test)],['Uy_frame' ,num2str(nn)]);
-        outfile_Uz=fullfile('outputs',['output',num2str(k_test)],['Uz_frame' ,num2str(nn)]);
-        outfile_Fix=fullfile('outputs',['output',num2str(k_test)],['Fix_frame' ,num2str(nn)]);
-        outfile_Fiy=fullfile('outputs',['output',num2str(k_test)],['Fiy_frame' ,num2str(nn)]);
-        
-        %save(outfile,'Uc','-ascii'); % frame output  
-        Ux = Uc(1:5:end); Fix = Uc(2:5:end); Uy = Uc(3:5:end); Fiy = Uc(4:5:end); Uz = Uc(5:5:end);
-        save(outfile_Ux,'Ux'); % frame output for global vector of Ux displacement
-        save(outfile_Uy,'Uy'); % frame output for global vector of Uy displacement
-        save(outfile_Uz,'Uz'); % frame output for global vector of Uz displacement
-        save(outfile_Fix,'Fix'); % frame output for global vector of Fix displacement
-        save(outfile_Fiy,'Fiy'); % frame output for global vector of Fiy displacement
+        % %    field_variable - string: 'displacement', 'velocity', 'acceleration' or 'all'
+        switch field_variable
+            case 'displacement'
+                outfile_Ux=fullfile(output_name,['Ux_frame' ,num2str(c)]);
+                outfile_Uy=fullfile(output_name,['Uy_frame' ,num2str(c)]);
+                outfile_Uz=fullfile(output_name,['Uz_frame' ,num2str(c)]);
+                outfile_UFix=fullfile(output_name,['UFix_frame' ,num2str(c)]);
+                outfile_UFiy=fullfile(output_name,['UFiy_frame' ,num2str(c)]);
+
+                Ux = Uc(1:5:end); UFix = Uc(2:5:end); Uy = Uc(3:5:end); UFiy = Uc(4:5:end); Uz = Uc(5:5:end);
+                save(outfile_Ux,'Ux'); % frame output for global vector of Ux displacement
+                save(outfile_Uy,'Uy'); % frame output for global vector of Uy displacement
+                save(outfile_Uz,'Uz'); % frame output for global vector of Uz displacement
+                save(outfile_UFix,'UFix'); % frame output for global vector of Fix displacement
+                save(outfile_UFiy,'UFiy'); % frame output for global vector of Fiy displacement
+            case 'velocity'      
+                outfile_Vx=fullfile(output_name,['Vx_frame' ,num2str(c)]);
+                outfile_Vy=fullfile(output_name,['Vy_frame' ,num2str(c)]);
+                outfile_Vz=fullfile(output_name,['Vz_frame' ,num2str(c)]);
+                outfile_VFix=fullfile(output_name,['VFix_frame' ,num2str(c)]);
+                outfile_VFiy=fullfile(output_name,['VFiy_frame' ,num2str(c)]);
+                
+                Vx = Vc(1:5:end); VFix = Vc(2:5:end); Vy = Vc(3:5:end); VFiy = Vc(4:5:end); Vz = Vc(5:5:end);
+                save(outfile_Vx,'Vx'); % frame output for global vector of Vx velocity
+                save(outfile_Vy,'Vy'); % frame output for global vector of Vy velocity
+                save(outfile_Vz,'Vz'); % frame output for global vector of Vz velocity
+                save(outfile_VFix,'VFix'); % frame output for global vector of VFix velocity
+                save(outfile_VFiy,'VFiy'); % frame output for global vector of VFiy velocity
+            case 'acceleration'
+                outfile_Ax=fullfile(output_name,['Ax_frame' ,num2str(c)]);
+                outfile_Ay=fullfile(output_name,['Ay_frame' ,num2str(c)]);
+                outfile_Az=fullfile(output_name,['Az_frame' ,num2str(c)]);
+                outfile_AFix=fullfile(output_name,['AFix_frame' ,num2str(c)]);
+                outfile_AFiy=fullfile(output_name,['AFiy_frame' ,num2str(c)]);
+
+                Ax = Ac(1:5:end); AFix = Ac(2:5:end); Ay = Ac(3:5:end); AFiy = Ac(4:5:end); Az = Ac(5:5:end);
+                save(outfile_Ax,'Ax'); % frame output for global vector of Ax acceleration
+                save(outfile_Ay,'Ay'); % frame output for global vector of Ay acceleration
+                save(outfile_Az,'Az'); % frame output for global vector of Az acceleration
+                save(outfile_AFix,'AFix'); % frame output for global vector of AFix acceleration
+                save(outfile_AFiy,'AFiy'); % frame output for global vector of AFiy acceleration
+            case 'all'
+                outfile_Ux=fullfile(output_name,['Ux_frame' ,num2str(c)]);
+                outfile_Uy=fullfile(output_name,['Uy_frame' ,num2str(c)]);
+                outfile_Uz=fullfile(output_name,['Uz_frame' ,num2str(c)]);
+                outfile_UFix=fullfile(output_name,['UFix_frame' ,num2str(c)]);
+                outfile_UFiy=fullfile(output_name,['UFiy_frame' ,num2str(c)]);
+
+                Ux = Uc(1:5:end); UFix = Uc(2:5:end); Uy = Uc(3:5:end); UFiy = Uc(4:5:end); Uz = Uc(5:5:end);
+                save(outfile_Ux,'Ux'); % frame output for global vector of Ux displacement
+                save(outfile_Uy,'Uy'); % frame output for global vector of Uy displacement
+                save(outfile_Uz,'Uz'); % frame output for global vector of Uz displacement
+                save(outfile_UFix,'UFix'); % frame output for global vector of Fix displacement
+                save(outfile_UFiy,'UFiy'); % frame output for global vector of Fiy displacement
+                
+                outfile_Vx=fullfile(output_name,['Vx_frame' ,num2str(c)]);
+                outfile_Vy=fullfile(output_name,['Vy_frame' ,num2str(c)]);
+                outfile_Vz=fullfile(output_name,['Vz_frame' ,num2str(c)]);
+                outfile_VFix=fullfile(output_name,['VFix_frame' ,num2str(c)]);
+                outfile_VFiy=fullfile(output_name,['VFiy_frame' ,num2str(c)]);
+                
+                Vx = Vc(1:5:end); VFix = Vc(2:5:end); Vy = Vc(3:5:end); VFiy = Vc(4:5:end); Vz = Vc(5:5:end);
+                save(outfile_Vx,'Vx'); % frame output for global vector of Vx velocity
+                save(outfile_Vy,'Vy'); % frame output for global vector of Vy velocity
+                save(outfile_Vz,'Vz'); % frame output for global vector of Vz velocity
+                save(outfile_VFix,'VFix'); % frame output for global vector of VFix velocity
+                save(outfile_VFiy,'VFiy'); % frame output for global vector of VFiy velocity
+                
+                outfile_Ax=fullfile(output_name,['Ax_frame' ,num2str(c)]);
+                outfile_Ay=fullfile(output_name,['Ay_frame' ,num2str(c)]);
+                outfile_Az=fullfile(output_name,['Az_frame' ,num2str(c)]);
+                outfile_AFix=fullfile(output_name,['AFix_frame' ,num2str(c)]);
+                outfile_AFiy=fullfile(output_name,['AFiy_frame' ,num2str(c)]);
+
+                Ax = Ac(1:5:end); AFix = Ac(2:5:end); Ay = Ac(3:5:end); AFiy = Ac(4:5:end); Az = Ac(5:5:end);
+                save(outfile_Ax,'Ax'); % frame output for global vector of Ax acceleration
+                save(outfile_Ay,'Ay'); % frame output for global vector of Ay acceleration
+                save(outfile_Az,'Az'); % frame output for global vector of Az acceleration
+                save(outfile_AFix,'AFix'); % frame output for global vector of AFix acceleration
+                save(outfile_AFiy,'AFiy'); % frame output for global vector of AFiy acceleration   
+        end
         averageTime = toc/(nn-1);
         progress = round(nn/nft*100);
         clc;
@@ -604,6 +686,8 @@ for nn=2:nft
             disp('Remaining tasks in the queue: none');
         end
     end
+    uold=U;  
+    U = unew; 
     telapsed = toc(tstart);
     minTime = min(telapsed,minTime);
 end
@@ -613,10 +697,10 @@ end
 averageTime = toc/(nft-1);
 %save(outfile_voltage,'voltage');   
 save(outfile_displ,'displ');
-t_frames_filename=fullfile('outputs',['output',num2str(k_test)],'t_frames');
+t_frames_filename=fullfile(output_name,'t_frames');
 save(t_frames_filename,'t_frames');
 TotalNofNodes=dof/3;
-save(outfile_time,'minTime','averageTime','TotalNofNodes');
+save(outfile_time,'minTime','averageTime','TotalNofNodes','t');
 switch mode
     case 'gpu'
         g = gpuDevice(1);
@@ -624,11 +708,7 @@ switch mode
     case 'cpu'
         
 end
-catch
-    fprintf('Failed test case no: %d\n', k_test);
-end
-end
 
+%---------------------- END OF CODE---------------------- 
 
-
-
+% ================ [main_flat_shell.m] ================  

@@ -1,11 +1,12 @@
-function [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,field_variable,motion,delam_surface)
+function [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,field_variable,motion,delam_surface,output_name)
 % SPEC2MESHGRID_FLAT_SHELL   Interpolate wavefield on uniform grid 
 %    wavefield is spanned on a spectral element mesh 
 %    uniform mesh is created by using meshgrid  
 % 
-% Syntax: [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,field_variable,motion,delam_surface) 
+% Syntax: [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,field_variable,motion,delam_surface,output_name) 
 % 
 % Inputs: 
+%    test_case - test case number (input/output number), integer
 %    Nx - Number of points in uniform mesh in x direction, integer 
 %    Ny - Number of points in uniform mesh in y direction, integer 
 %    field_variable - string: 'displacement', 'velocity' or 'acceleration' 
@@ -15,11 +16,13 @@ function [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,field_variable,motion
 %    3) Uz
 %    4) Fix
 %    5) Fiy
-%    6) Ux+h/2*Fix
-%    7) Uy+h/2*Fiy
-%    8) sqrt((Ux+h/2.*Fix).^2+(Uy+h/2.*Fiy).^2)
-%    9) sqrt((Ux+h/2.*Fix).^2+(Uy+h/2.*Fiy).^2 + Uz.^2)
+%    6) Ux+h/2*UFix
+%    7) Uy+h/2*UFiy
+%    8) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2)
+%    9) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2)
 %    delam_surface - string: 'upper' or 'lower', field variable interpolated by using upper or lower nodes of delam
+%    output_name - path to folder were the output data is stored, string
+%
 % Outputs: 
 %    Data - Interpolated wavefield, double, dimensions [Nx, Ny, numberOfTimeFrames], Units: m, m/s or  m/s^2 
 % 
@@ -52,7 +55,7 @@ load([meshfile(1:end-4),'_jacobians']);
 load(meshfile); % cords, nodes
 h=sum(lh);
 delamnum=[];
-frm_int=floor(nft/(frames)); 
+
 switch field_variable
     case 'displacement'
         switch motion
@@ -63,9 +66,9 @@ switch field_variable
             case 3
                 variable_name = 'Uz';
             case 4
-                variable_name = 'Fix';
+                variable_name = 'UFix';
             case 5
-                variable_name = 'Fiy';
+                variable_name = 'UFiy';
             case 6
                 variable_name = 'Ux_top';
             case 7
@@ -118,7 +121,8 @@ switch field_variable
                 variable_name = 'total_accelerations';
         end
 end
-data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),delam_surface,'.mat']);
+%data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),delam_surface,'.mat']);
+data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),delam_surface,'.mat']);
 % corner nodes
 switch nx
      case 10
@@ -138,7 +142,7 @@ switch nx
     case 3
         mc=[1,3,9,7];
 end
-Data=zeros(Ny,Nx,nft/frm_int);
+Data=zeros(Ny,Nx,nFrames);
 [fen,NofElNodes]=size(nodes);
 
 fen=fen-length(delamnum);
@@ -317,179 +321,176 @@ disp('Evaluate shape functions');
 clear N;
 clear ksi_p eta_p
 %%
-sample=0;
-for n=frm_int:frm_int:nft
-    sample=sample+1;
-    %[sample,nft/frm_int]
+for n=1:nFrames
     switch field_variable
         case 'displacement'
             switch motion
                 case 1
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ux_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
                     U=Ux;
                 case 2
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Uy_frame',num2str(n),'.mat']);
                     load(filename,'Uy'); 
                     U=Uy;
                 case 3
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uz_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Uz_frame',num2str(n),'.mat']);
                     load(filename,'Uz'); 
                     U=Uz;
                 case 4
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fix_frame',num2str(n),'.mat']);
-                    load(filename,'Fix'); 
-                    U=Fix;
+                    filename=fullfile(output_name,['UFix_frame',num2str(n),'.mat']);
+                    load(filename,'UFix'); 
+                    U=UFix;
                 case 5
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fiy_frame',num2str(n),'.mat']);
-                    load(filename,'Fiy'); 
-                    U=Fiy;
+                    filename=fullfile(output_name,['UFiy_frame',num2str(n),'.mat']);
+                    load(filename,'UFiy'); 
+                    U=UFiy;
                 case 6
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ux_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fix_frame',num2str(n),'.mat']);
-                    load(filename,'Fix'); 
-                    U=Ux+h/2.*Fix;
+                    filename=fullfile(output_name,['UFix_frame',num2str(n),'.mat']);
+                    load(filename,'UFix'); 
+                    U=Ux+h/2.*UFix;
                 case 7
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Uy_frame',num2str(n),'.mat']);
                     load(filename,'Uy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fiy_frame',num2str(n),'.mat']);
-                    load(filename,'Fiy'); 
-                    U=Uy+h/2.*Fiy;
+                    filename=fullfile(output_name,['UFiy_frame',num2str(n),'.mat']);
+                    load(filename,'UFiy'); 
+                    U=Uy+h/2.*UFiy;
                 case 8
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ux_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fix_frame',num2str(n),'.mat']);
-                    load(filename,'Fix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['UFix_frame',num2str(n),'.mat']);
+                    load(filename,'UFix'); 
+                    filename=fullfile(output_name,['Uy_frame',num2str(n),'.mat']);
                     load(filename,'Uy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fiy_frame',num2str(n),'.mat']);
-                    load(filename,'Fiy'); 
-                    U=sqrt((Ux+h/2.*Fix).^2+(Uy+h/2.*Fiy).^2);
+                    filename=fullfile(output_name,['UFiy_frame',num2str(n),'.mat']);
+                    load(filename,'UFiy'); 
+                    U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2);
                 case 9
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ux_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fix_frame',num2str(n),'.mat']);
-                    load(filename,'Fix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['UFix_frame',num2str(n),'.mat']);
+                    load(filename,'UFix'); 
+                    filename=fullfile(output_name,['Uy_frame',num2str(n),'.mat']);
                     load(filename,'Uy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Fiy_frame',num2str(n),'.mat']);
-                    load(filename,'Fiy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Uz_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['UFiy_frame',num2str(n),'.mat']);
+                    load(filename,'UFiy'); 
+                    filename=fullfile(output_name,['Uz_frame',num2str(n),'.mat']);
                     load(filename,'Uz'); 
-                    U=sqrt((Ux+h/2.*Fix).^2+(Uy+h/2.*Fiy).^2 + Uz.^2);
+                    U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2);
             end
         case 'velocity'
             switch motion
                 case 1
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vx_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
                     U=Vx;
                 case 2
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vy_frame',num2str(n),'.mat']);
                     load(filename,'Vy'); 
                     U=Vy;
                 case 3
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vz_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vz_frame',num2str(n),'.mat']);
                     load(filename,'Vz'); 
                     U=Vz;
                 case 4
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFix_frame',num2str(n),'.mat']);
                     load(filename,'VFix'); 
                     U=VFix;
                 case 5
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
                     U=VFiy;
                 case 6
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vx_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFix_frame',num2str(n),'.mat']);
                     load(filename,'VFix'); 
                     U=Vx+h/2.*VFix;
                 case 7
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vy_frame',num2str(n),'.mat']);
                     load(filename,'Vy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
                     U=Vy+h/2.*VFiy;
                 case 8
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vx_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFix_frame',num2str(n),'.mat']);
                     load(filename,'VFix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vy_frame',num2str(n),'.mat']);
                     load(filename,'Vy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
                     U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2);
                 case 9
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vx_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFix_frame',num2str(n),'.mat']);
                     load(filename,'VFix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vy_frame',num2str(n),'.mat']);
                     load(filename,'Vy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['VFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Vz_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Vz_frame',num2str(n),'.mat']);
                     load(filename,'Vz'); 
                     U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2 + Vz.^2);
             end
         case 'acceleration'
             switch motion
                 case 1
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ax_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
                     U=Ax;
                 case 2
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ay_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ay_frame',num2str(n),'.mat']);
                     load(filename,'Ay'); 
                     U=Ay;
                 case 3
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Az_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Az_frame',num2str(n),'.mat']);
                     load(filename,'Az'); 
                     U=Az;
                 case 4
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFix_frame',num2str(n),'.mat']);
                     load(filename,'AFix'); 
                     U=AFix;
                 case 5
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
                     U=AFiy;
                 case 6
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ax_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFix_frame',num2str(n),'.mat']);
                     load(filename,'AFix'); 
                     U=Ax+h/2.*AFix;
                 case 7
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ay_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ay_frame',num2str(n),'.mat']);
                     load(filename,'Ay'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
                     U=Ay+h/2.*AFiy;
                 case 8
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ax_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFix_frame',num2str(n),'.mat']);
                     load(filename,'AFix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ay_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ay_frame',num2str(n),'.mat']);
                     load(filename,'Ay'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
                     U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2);
                 case 9
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ax_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFix_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFix_frame',num2str(n),'.mat']);
                     load(filename,'AFix'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Ay_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Ay_frame',num2str(n),'.mat']);
                     load(filename,'Ay'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['AFiy_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
-                    filename=fullfile('outputs',['output',num2str(k_test)],['Az_frame',num2str(n),'.mat']);
+                    filename=fullfile(output_name,['Az_frame',num2str(n),'.mat']);
                     load(filename,'Az'); 
                     U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2 + Az.^2);
             end
@@ -500,7 +501,7 @@ for n=frm_int:frm_int:nft
     ZA=reshape(ZA,nx*ny*Nx*Ny,1);
     ZI=Ns*ZA;% interpolated values
     ZI=reshape(ZI,Nx,Ny);
-    Data(:,:,sample)=ZI;
+    Data(:,:,n)=ZI;
 
 end
 

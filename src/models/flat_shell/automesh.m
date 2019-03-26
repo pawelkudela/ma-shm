@@ -200,12 +200,13 @@ disp('Quad to spectral mesh conversion...');
 tic;
 [nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
 toc
- % Piotr Fiborek implementation
- [ksi,wx]=gll(shape_order+1); % weights and nodes distribution
- tic;
- [nodes_pl,coords_pl]=quad2spec_Fiborek(msh.POS,msh.QUADS(:,1:4),ksi) ;  
- toc
- return;
+%  % Piotr Fiborek implementation
+%  [ksi,wx]=gll(shape_order+1); % weights and nodes distribution
+%  tic;
+%  [nodes_pl,coords_pl]=quad2spec_Fiborek(msh.POS,msh.QUADS(:,1:4),ksi) ;  
+%  toc
+% split delamination nodes
+
 %plot(coords(:,1),coords(:,2),'.');
 disp('12 baskets: calculating local and global node numbers...');
 [IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes);
