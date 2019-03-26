@@ -18,7 +18,7 @@ xpzt=0.25; % pzt x coordinate
 ypzt=0.25; % pzt y coordinate
 
 % mesh parameters
-N = 5; % element approximation order, Number of nodes in one direction is N+1
+shape_order = 5; % element shape function order, Number of nodes in one direction is N+1
 CharacteristicLengthFactor = 0.08; 
 CharacteristicLengthMin = 0.001; 
 CharacteristicLengthMax = 0.2;
@@ -197,14 +197,39 @@ end
 run([mesh_output_path, mesh_filename,'.m']);
 plot_mesh(msh);
 disp('Quad to spectral mesh conversion...');
-[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,N);
+tic;
+[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
+toc
+ % Piotr Fiborek implementation
+ [ksi,wx]=gll(shape_order+1); % weights and nodes distribution
+ tic;
+ [nodes_pl,coords_pl]=quad2spec_Fiborek(msh.POS,msh.QUADS(:,1:4),ksi) ;  
+ toc
+ return;
 %plot(coords(:,1),coords(:,2),'.');
 disp('12 baskets: calculating local and global node numbers...');
 [IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes);
-save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12');
 % delete gmsh out m file
 delete([mesh_output_path, mesh_filename,'.m']);
-% pause;
+nRegions = max(msh.QUADS(:,5));
+nbElements = size(msh.QUADS,1);
+Regions = cell(nRegions,1);
+c=1;
+for k=1:nRegions
+    c1=c;
+    while(c <= nbElements && msh.QUADS(c,5)==k)
+        c=c+1;
+    end 
+    Regions{k} = c1:c-1;
+end
+pztEl = Regions{1};
+delamEl = Regions{2};
+mesh_min=msh.MIN;
+mesh_max=msh.MAX;
+save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12','mesh_min','mesh_max','shape_order');
+% save([spec_mesh_output_path,'pztEl_', mesh_filename,'.mat'],'pztEl');
+% save([spec_mesh_output_path,'delamEl_', mesh_filename,'.mat'],'delamEl');
+% % pause;
 % close all;
 % figfilename = 'test_mesh';
 % print([figfilename],'-dpng', '-r600'); 

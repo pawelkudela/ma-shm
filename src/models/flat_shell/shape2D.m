@@ -2,7 +2,7 @@ function N=shape2D(nx,ny,Qx,Qy,x,y)
  % Calculate shape functions at GLL nodes
 % nx - number of nodes in 1D shape function in x direction
 % ny - number of nodes in 1D shape function in y direction
-
+% Qx, Qy - Vandermonde matrices
 % calculate values of the shape function at point (x,y) defined in local
 % coordinates
 

@@ -2,12 +2,12 @@ function [spec_element_nodes,spec_coords] = quad2spec(q,quad_coords,N)
 % QUAD2SPEC   convert quad nodes mesh into spectral element mesh 
 %    only for linear quad elements 
 % 
-% Syntax: [output1,output2] = quad2spec(input1,input2,input3) 
+% Syntax: [spec_element_nodes,spec_coords] = quad2spec(q,quad_coords,N) 
 % 
 % Inputs: 
 %    q - Quad nodes topology (element nodes), integer, dimensions [nQuadElements, 4]
 %    quad_coords - coordinates of quad element nodes, double, dimensions [nQuadNodes, 3], Units: m 
-%    N - element approximation order, integer
+%    N - element approximation order, integer (N=3,4,5,6,7,8,9)
 % 
 % Outputs: 
 %    spec_element_nodes - spectral elements topology (element nodes), integer, dimensions [nQuadElements,(N+1)^2]
@@ -16,7 +16,7 @@ function [spec_element_nodes,spec_coords] = quad2spec(q,quad_coords,N)
 % Example: 
 %    [spec_element_nodes,spec_coords] = quad2spec(q,quad_coords,N)
 % 
-% Other m-files required: gll.m 
+% Other m-files required: gll.m, spec_nodes.m 
 % Subfunctions: none 
 % MAT-files required: none 
 % See also:
