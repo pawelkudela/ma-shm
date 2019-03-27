@@ -1,4 +1,4 @@
-function main_flat_shell(test_case,meshfile,mode,output_name,tasks)
+function t_frames=main_flat_shell(test_case,meshfile,mode,output_name,tasks)
 % MAIN_FLAT_SHELL   Compute wavefield by using flat shell spectral elements  
 % 
 % Syntax: main_flat_shell(test_case,meshfile,mode,output_name)
@@ -10,6 +10,8 @@ function main_flat_shell(test_case,meshfile,mode,output_name,tasks)
 %    output_name - path to folder were the output data is stored, string
 %    tasks - list of task numbers in a queue (for message only), integer
 % 
+% Outputs:
+%    t_frames - time vector corresponding to frames, double, dimensions [nft,1], Units: s
 % Example: 
 %    main_flat_shell(test_case,meshfile,mode,output_name)
 %    main_flat_shell(1,'mesh1','gpu',output_name) 
@@ -697,8 +699,8 @@ end
 averageTime = toc/(nft-1);
 %save(outfile_voltage,'voltage');   
 save(outfile_displ,'displ');
-t_frames_filename=fullfile(output_name,'t_frames');
-save(t_frames_filename,'t_frames');
+% t_frames_filename=fullfile(output_name,'t_frames');
+% save(t_frames_filename,'t_frames');
 TotalNofNodes=dof/3;
 save(outfile_time,'minTime','averageTime','TotalNofNodes','t');
 switch mode

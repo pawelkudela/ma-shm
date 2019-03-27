@@ -14,16 +14,33 @@ modelname = name;
 % prepare model output path
 model_output_path = prepare_model_paths('raw','num',modelfolder,modelname);
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
+figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
 tasks=[6];
 mode='gpu'; % options: mode='cpu';mode='gpu';
-meshfile='mesh/plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'; % 
+meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
 %% input for post-processing
 Nx=500;
 Ny=500;
+%% input for figures
+selected_frames = [64,128,256,512];
+%ColorMapName = 'jet';
+%ColorMapName = 'map_sunset_interp'; % zero-symmetric
+ColorMapName = 'map_burd_interp'; % zero-symmetric
+%ColorMapName = 'map_brewer_interp'; % orange-ish
+%ColorMapName = 'map_iridescent_interp'; % blue-ish
+%ColorMapName = 'map_discrete_rainbow'; % not suitable for wavefields
+caxis_cut = 0.8;
+normalization = false; % normalization to the highest value of the wavefield
+fig_width =5; % figure widht in cm
+fig_height=5; % figure height in cm
+%    ColorMapName - custom map name: 'map_sunset', 'map_sunset_interp', 'map_burd', 'map_burd_interp'
+%    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
+%%
 for test_case=tasks
     output_name = [model_output_path,filesep,num2str(test_case),'_output',filesep];
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
+    figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
     if(overwrite||(~overwrite && ~exist(output_name, 'dir')))
         fprintf([modelname,' test case: %d\n'], test_case);
         try
@@ -33,9 +50,16 @@ for test_case=tasks
             if ~exist(interim_output_name, 'dir')
                 mkdir(interim_output_name);
             end
-            main_flat_shell(test_case,meshfile,mode,output_name,tasks);
-            [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,'velocity',3,'upper',interim_output_name); % Vz 
-            [Data] = spec2meshgrid_flat_shell(test_case,Nx,Ny,'velocity',8,'upper',interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
+             if ~exist(figure_output_name, 'dir')
+                mkdir(figure_output_name);
+            end
+            t_frames=main_flat_shell(test_case,meshfile,mode,output_name,tasks);
+            t_frames_filename=fullfile(interim_output_name,'t_frames');
+            save(t_frames_filename,'t_frames');
+            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',3,'upper',output_name,interim_output_name); % Vz 
+            plot_meshgrid_frames(Data,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',8,'upper',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
+            plot_meshgrid_frames(Data,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
             delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);
