@@ -58,8 +58,8 @@ gmsh_path = fullfile(projectroot,'bin','external','gmsh','gmsh ');
 mesh_geometry_path = fullfile(projectroot,'src','models',modelfolder,'geo',filesep);
 mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'gmsh_out',filesep);
 spec_mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'mesh',filesep);
-%gmsh_options = ' -2 -format auto -v 1 -o '; % non-verbose
-gmsh_options = ' -2 -format auto -o '; % verbose
+gmsh_options = ' -2 -format auto -v 1 -o '; % non-verbose
+%gmsh_options = ' -2 -format auto -o '; % verbose
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ExpectedMaxElementSize = CharacteristicLengthFactor*CharacteristicLengthMax*L;
 fprintf('Expected max element size: %f  [mm]\n', ExpectedMaxElementSize*1e3);
@@ -228,11 +228,11 @@ run([mesh_output_path, mesh_filename,'.m']);
 plot_mesh(msh);
 disp('Quad to spectral mesh conversion...');
 %[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
-[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order);
+%[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order);
 
 %  % Piotr Fiborek implementation
 %[nodes_pl,coords_pl]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);
-% [nodes,coords,boundary_nodes]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);
+[nodes,coords,boundary_nodes]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);
 % plot(coords(boundary_nodes,1),coords(boundary_nodes,2),'m.');
 
 % delete gmsh out m file
@@ -249,7 +249,7 @@ for k=1:nRegions
     Regions{k} = c1:c-1;
 end
 pztEl = Regions{1};
-delamEl = Regions{2};
+delamEl1 = Regions{2};
 mesh_min=msh.MIN;
 mesh_max=msh.MAX;
 % split delamination nodes
@@ -257,8 +257,10 @@ NofElNodesx = shape_order +1;
 NofElNodesy = shape_order +1;
 
 %plot(coords(boundary_nodes,1),coords(boundary_nodes,2),'m.');
-[nodes,coords,den_under,den_above] = split_delam_nodes_flat_shell(nodes,coords,delamEl,NofElNodesx,NofElNodesy,boundary_nodes);
-
+[nodes,coords,den_under1,den_above1] = split_delam_nodes_flat_shell(nodes,coords,delamEl1,NofElNodesx,NofElNodesy,boundary_nodes);
+den_under{1} = den_under1;
+den_above{1} = den_above1;
+delamEl = [den_under1, den_above1];
 disp('12 baskets: calculating local and global node numbers...');
 [IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes);
 

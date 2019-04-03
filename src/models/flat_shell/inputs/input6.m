@@ -49,12 +49,12 @@ field_variable = 'velocity'; % field_variable for saving output data, string: 'd
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % properites of material layers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'number of material layers';                 lay = 4;
-'plate thickness [m]';                         lh = [4,4,4,4]/lay/1000;
+'plate thickness [m]';                         lh = [1,1,1,1]/1000;
 'stack angle sequence [deg]';              lalpha = [0,90,90,0];
 'stack matrix sequnce';                       lmat = [3,3,3,3];
 'stack fibres sequece';                        lfib = [1,1,1,1];
 'volume fraction of fibres';                   lvol=[0.192,0.192,0.192,0.192]; 
+'number of material layers';                 lay = length(lalpha);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % damping coefficient proportional to mass matrix
 etad_xy=0; % damping ratio
@@ -77,6 +77,12 @@ BC=[];
 nx=6;ny=6;nz=0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %cd ..;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% delamination
+% can be defined inside meshfile
+den_above = {}; % delamination element numbers above split layer (separate cell lists for each region of delamination)
+den_under = {}; % delamination element number below split layer (separate cell lists for each region of delamination)
+delamination_layer = []; % delamination layer counting from the top after which the nodes are splitted (another column for second delamination)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 load('mesh/pztnum_plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); %

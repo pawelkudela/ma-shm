@@ -4,8 +4,8 @@ clear all; close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Prepare output directories
 % allow overwriting existing results if true
-%overwrite=false;
-overwrite=true;
+overwrite=false;
+%overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -36,19 +36,17 @@ CharacteristicLengthMin = 0.001;
 CharacteristicLengthMax = 0.2;
 Smoothing = 1;
 %%
-i%=8;j=4; % delamination grid point (i -  rows  , j - columns)
-
 % delamination scenario grid
 [xn,yn]=meshgrid(0:n/(n-1):n,0:n/(n-1):n);
-x=xn*N/n; % coordinates in pixels
-y=yn*N/n; % coordinates in pixels
+% x=xn*N/n; % coordinates in pixels
+% y=yn*N/n; % coordinates in pixels
 xc=xn*L/n; % coordinates in meters
 yc=yn*W/n; % coordinates in meters
 % plot(x,y,'ro');
 % figure;
 % plot(xc,yc,'ro');
 % rotation angle
-
+counter = 0;
 % delamination position: only one quarter
 for j=n/2+1:n 
     for i=n/2+1:n
@@ -64,31 +62,47 @@ for j=n/2+1:n
                 a = a_set(ia);
                 if(a == b)
                     rotAngle = 0;
-                    mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)];
-                    disp(mesh_filename);
+                    mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)];             
+                    figfilename = [figure_output_path,mesh_filename];
                     image_label_filename = [image_label_path,filesep,mesh_filename];
                     delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
-                         %% RUN AUTOMESH
-                    [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-                    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
-                     %
-                    figfilename = [figure_output_path,filesep,mesh_filename];
-                    print(figfilename,'-dpng', '-r300'); 
-                    close all;
+                    if(overwrite||(~overwrite && ~exist([figfilename,'.png'], 'file')))
+                             %% RUN AUTOMESH
+                         try
+                            disp(mesh_filename);
+                            [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
+                            (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
+                             %                  
+                            print(figfilename,'-dpng', '-r300'); 
+                            close all;
+                         catch
+                            fprintf(['Meshing failed:', mesh_filename,' \n']);
+                         end
+                    else
+                        fprintf(['Mesh:', mesh_filename,' already exist\n']);
+                    end
                 else
                     for irot = 1:length(rotAngle_set)
                         rotAngle = rotAngle_set(irot);
-                        mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)]; % a, b in mm
-                        disp(mesh_filename);
+                        mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)]; % a, b in mm                       
+                        figfilename = [figure_output_path,mesh_filename];
                         image_label_filename = [image_label_path,filesep,mesh_filename];
                         delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
-                            %% RUN AUTOMESH
-                        [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-                        (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
-                         %
-                        figfilename = [figure_output_path,filesep,mesh_filename];
-                        print(figfilename,'-dpng', '-r300'); 
-                        close all;
+                        if(overwrite||(~overwrite && ~exist([figfilename,'.png'], 'file')))
+                                  %% RUN AUTOMESH
+                            try
+                                disp(mesh_filename);
+                                [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
+                                (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
+                                 %   
+                                print(figfilename,'-dpng', '-r300'); 
+                                close all;
+                            catch
+                                fprintf(['Meshing failed:', mesh_filename,' \n']);
+                            end
+                        else
+                            fprintf(['Mesh:', mesh_filename,' already exist\n']);
+                        end
                     end
                 end
             end

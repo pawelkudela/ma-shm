@@ -39,35 +39,29 @@ pztEl=[];pztnum=[];
 load(meshfile); % coord nodes
 
 [fen,NofElNodes]=size(nodes);
-[NofNodes,empty]=size(coords);
+NofNodes=size(coords,1);
+%unDelamEl=setdiff(1:fen,delamEl);
 
 dof=5*NofNodes; % number of degrees of freedom
 
 % host structure material
 [h,h1,h2,em,rhom,nim,vol,ef,rhof,nif,alpha]=lay_const(lay,lh,i_em,i_ef,i_rhom,i_rhof,i_nim,i_nif,lvol,lalpha,lmat,lfib);
 clear i_em i_ef i_rhom i_rhof i_nim i_nif lvol lalpha
-% host structure elastic constants
-[rho, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay);
+if(isempty(delamEl))
+    % host structure elastic constants for the reference case
+    [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay);
+   else
+    % host structure elastic constants for delaminated case
+    [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
+end
 
 [ksi,wx]=gll(nx); % weights and nodes distribution
 [eta,wy]=gll(ny);
-[dzeta,wz]=gll(nz);
+%[dzeta,wz]=gll(nz);
 % vandermonde approach
 [Qx]=Vandermonde(ksi,nx);
 [Qy]=Vandermonde(eta,ny);
-[Qz]=Vandermonde(dzeta,nz);
-%ne=1; % element number
-disp('elastic coefficient dependence on evironmental conditions')
-
-if(isempty(glueEl)) % no glue pzt only
-hoststrnum=setdiff([1:fen],pztnum);
-else
-pzt_bond_num=[pztnum,glueEl]; % glue and pzt
-hoststrnum=setdiff([1:fen],pzt_bond_num);
-end
-%
-
-%hoststrnum=1:fen; % no glue no pzt
+%[Qz]=Vandermonde(dzeta,nz);
 
 I=zeros(fen*NofElNodes,1);
 for ne=1:fen
@@ -77,10 +71,10 @@ for ne=1:fen
 end 
 %%
 % host structure
-IhostG=zeros(length(hoststrnum)*NofElNodes,1);
-IhostL=zeros(length(hoststrnum)*NofElNodes,1);
+IhostG=zeros(fen*NofElNodes,1);
+IhostL=zeros(fen*NofElNodes,1);
 c=0;
-for ne=hoststrnum
+for ne=1:fen
     c=c+1;
     n1=(c-1)*NofElNodes+1;
     n2=n1+NofElNodes-1;
@@ -204,6 +198,7 @@ switch mode
     case 'cpu'
         j11=J11;j21=J21;j12=J12;j22=J22;
         invj11=invJ11;invj21=invJ21;invj12=invJ12;invj22=invJ22;
+        det_jac=detJ;
         save([meshfile(1:end-4),'_jacobians'],'j11','j21','j12','j22','invj11','invj12','invj21','invj22','det_jac');
 end
 clear j11 j12 j21 j22 invj11 invj12 invj21 invj22 det_jac
@@ -384,12 +379,8 @@ mg2=a2*mg;
 mg=a0*mg;
 mg0=1./(mg+a1*cg);
 
-if(isempty(glueEl))
-    displ=zeros(nft,length(outputs));
-else
-    voltage=zeros(nft,length(PZT_sensor)*length(PZT_actuator));
-    displ=zeros(nft,length(outputs));
-end
+displ=zeros(nft,length(outputs));
+
 clear coords D V1
 switch mode
     case 'gpu'
