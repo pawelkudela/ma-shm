@@ -37,7 +37,8 @@ frm_int=floor(nft/(nFrames)); % save displacement with interval time step frm_in
 pztEl=[];pztnum=[];
 
 load(meshfile); % coord nodes
-
+nx=shape_order+1;
+ny=shape_order+1;
 [fen,NofElNodes]=size(nodes);
 NofNodes=size(coords,1);
 %unDelamEl=setdiff(1:fen,delamEl);
@@ -417,6 +418,7 @@ if(isempty(pztEl))
     %Fi(3)=1;Fi=Fi*V0; % force excitation in z direction
 else
     % pzt actuator excitation is not implemented !
+     Fa(outputs(1))=1;Fa=Fa*V0;
 end
 
 tic;minTime = Inf;

@@ -1,4 +1,4 @@
-function plot_meshgrid_frames(Data,test_case,selected_frames,figure_output_path,normalization,caxis_cut,ColorMapName,field_variable,motion,fig_width,fig_height)
+function plot_meshgrid_frames(Data,shell_surface,test_case,selected_frames,figure_output_path,normalization,caxis_cut,ColorMapName,field_variable,motion,fig_width,fig_height)
 % PLOT_MESHGRID_FRAMES   plot selected frames of wavefield 
 %    wavefield is defined on regular grid of points (meshgrid)
 %    frames are saved as png images 
@@ -10,6 +10,7 @@ function plot_meshgrid_frames(Data,test_case,selected_frames,figure_output_path,
 %             Nx - number of points in x direction
 %             Ny - number of points in y direction
 %             nFrames - number of frames
+%    shell_surface - filed variable is plotted by using top or bottom surface, string: 'top' or 'bottom'  
 %    test_case - Description, logical, dimensions [m, n], Units: m 
 %    selected_frames - list of frame numbers to plot, integer 
 %    figure_output_path - path to folder in which figures are stored
@@ -61,7 +62,7 @@ end
 Smax=max(max(max(abs(Data))));
 Smin=-Smax;
 for n=selected_frames
-    figfilename = [variable_name,'_',num2str(test_case),'_','frame',num2str(n)];
+    figfilename = [variable_name,'_',num2str(test_case),'_','frame',num2str(n),'_',shell_surface];
     if(~normalization)
         Smax=max(max(abs(Data(:,:,n))));
         Smin=-Smax;

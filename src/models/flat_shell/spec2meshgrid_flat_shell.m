@@ -1,9 +1,9 @@
-function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,delam_surface,input_name,output_name)
+function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,shell_surface,input_name,output_name)
 % SPEC2MESHGRID_FLAT_SHELL   Interpolate wavefield on uniform grid 
 %    wavefield is spanned on a spectral element mesh 
 %    uniform mesh is created by using meshgrid  
 % 
-% Syntax: [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,delam_surface,output_name) 
+% Syntax: [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,shell_surface,output_name) 
 % 
 % Inputs: 
 %    test_case - test case number (input/output number), integer
@@ -21,7 +21,8 @@ function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variab
 %    7) Uy+h/2*UFiy
 %    8) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2)
 %    9) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2)
-%    delam_surface - string: 'upper' or 'lower', field variable interpolated by using upper or lower nodes of delam
+%    shell_surface - string: 'top' or 'bottom', field variable interpolated by using nodes above or under 
+%    delamination and +h/2, -h/2, respectively
 %    input_name - path to folder were the input data is stored, string
 %    output_name - path to folder were the output data is stored, string
 %
@@ -29,7 +30,7 @@ function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variab
 %    Data - Interpolated wavefield, double, dimensions [Nx, Ny, numberOfTimeFrames], Units: m, m/s or  m/s^2 
 % 
 % Example: 
-%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,delam_surface) 
+%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,shell_surface) 
 %    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'displacement',1,'upper') 
 %    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',4,'lower') 
 % 
@@ -57,17 +58,18 @@ run(input_file);
 load([meshfile(1:end-4),'_jacobians']);
 load(meshfile); % cords, nodes
 h=sum(lh);
+
 delamnum=[];
 [variable_name] = flat_shell_variable_names(field_variable,motion);
 
-%data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),delam_surface,'.mat']);
-data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),delam_surface,'.mat']);
+%data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
+data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
 % corner nodes
-NofElNodesx =nx;
-NofElNodesy =ny;
+NofElNodesx = shape_order +1;
+NofElNodesy = shape_order +1;
 mc=[1,NofElNodesx,NofElNodesx*NofElNodesy,NofElNodesx*NofElNodesy-NofElNodesx+1];
 % % corner nodes
-% switch nx
+% switch NofElNodesx
 %      case 10
 %         mc=[1,10,100,91];
 %     case 9
@@ -87,8 +89,26 @@ mc=[1,NofElNodesx,NofElNodesx*NofElNodesy,NofElNodesx*NofElNodesy-NofElNodesx+1]
 % end
 Data=zeros(Ny,Nx,nFrames);
 [fen,NofElNodes]=size(nodes);
-
-fen=fen-length(delamnum);
+unDelamEl=setdiff(1:fen,delamEl);
+if(isempty(delamEl))
+    ne=1:fen;
+else
+    ne=[];
+    switch shell_surface
+        case 'top'
+            for k=1:length(den_above)
+                ne=[ne,den_above{k}];
+            end
+            ne=union(unDelamEl,ne);
+            fen=length(ne);
+        case 'bottom'
+            for k=1:length(den_under)
+                ne=[ne,den_under{k}];
+            end
+            ne=union(unDelamEl,ne);
+            fen=length(ne);
+    end
+end
 
 L=max(coords(:,1))-min(coords(:,1))-2*Eps;
 xi=min(coords(:,1))+Eps:L/(Nx-1):max(coords(:,1))-Eps;
@@ -97,9 +117,9 @@ yi=min(coords(:,2))+Eps:B/(Ny-1):max(coords(:,2))-Eps;
 [XI,YI]=meshgrid(xi,yi);
 xp=reshape(XI,1,Nx*Ny);
 yp=reshape(YI,1,Nx*Ny);
-%ZA=zeros(nx*ny,Nx*Ny);
+%ZA=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 
-ne=1:fen;
+
 
 %%
 % extract corner nodes of all elements
@@ -177,8 +197,8 @@ end
 disp('Calculate local values of ksi and eta for each point');
 %% jacobians approach
 
-[ksi,wx]=gll(nx); % weights and nodes distribution
-[eta,wy]=gll(ny);
+[ksi,wx]=gll(NofElNodesx); % weights and nodes distribution
+[eta,wy]=gll(NofElNodesy);
 
 % see: M. Li, A. Wittek, K. Miller: Efficient Inverse Isoparametric Mapping Algorithm for Whole-Body
 % Computed Tomography Registration Using Deformations Predicted by Nonlinear Finite Element Modeling
@@ -195,22 +215,22 @@ clear invj11 invj12 invj21 invj22 j11 j12 j21 j22;
 % n= 48451;
 % ne1=elem_index(n);
 % plot(xp(n),yp(n),'ro');hold on; plot(x(:,ne1),y(:,ne1),'b');plot(x(1,ne1),y(1,ne1),'go');
-[Q]=Vandermonde2D(ksi,eta,nx,ny);
-N=shape2Dp(nx,ny,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
+[Q]=Vandermonde2D(ksi,eta,NofElNodesx,NofElNodesy);
+N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
 [indxi,indxj]=find(N);
-Ns=sparse(indxj,[1:nx*ny*Nx*Ny],reshape(N,nx*ny*Nx*Ny,1));
+Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1));
 % coordinates of element nodes
-xe=zeros(nx*ny,Nx*Ny);
-ye=zeros(nx*ny,Nx*Ny);
-for k=1:nx*ny
+xe=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
+ye=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
+for k=1:NofElNodesx*NofElNodesy
     xe(k,:)=coords(nodes(elem_index(:,1),k),1);
     ye(k,:)=coords(nodes(elem_index(:,1),k),2);
 end
-xe=reshape(xe,nx*ny*Nx*Ny,1);
-ye=reshape(ye,nx*ny*Nx*Ny,1);
+xe=reshape(xe,NofElNodesx*NofElNodesy*Nx*Ny,1);
+ye=reshape(ye,NofElNodesx*NofElNodesy*Nx*Ny,1);
 x1=Ns*xe;% interpolated values
 y1=Ns*ye;% interpolated values
-% plot(coords(nodes(ne1,1:nx*ny),1),coords(nodes(ne1,1:nx*ny),2),'c.');
+% plot(coords(nodes(ne1,1:NofElNodesx*NofElNodesy),1),coords(nodes(ne1,1:NofElNodesx*NofElNodesy),2),'c.');
 % plot(x1(n),y1(n),'mx');
 % errors
 % e=sqrt((xp'-x1).^2+(yp'-y1).^2);
@@ -226,10 +246,10 @@ for k=1:nIterations
     x0=x1;
     y0=y1;
     % shape function derivatives
-    [Npx,Npy]=shape_derivatives2Dp(nx,ny,Q,ksi0,eta0);
+    [Npx,Npy]=shape_derivatives2Dp(NofElNodesx,NofElNodesy,Q,ksi0,eta0);
     [indxi,indxj]=find(Npx);
-    Npx=sparse(indxj,[1:nx*ny*Nx*Ny],reshape(Npx,nx*ny*Nx*Ny,1));
-    Npy=sparse(indxj,[1:nx*ny*Nx*Ny],reshape(Npy,nx*ny*Nx*Ny,1));
+    Npx=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npx,NofElNodesx*NofElNodesy*Nx*Ny,1));
+    Npy=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npy,NofElNodesx*NofElNodesy*Nx*Ny,1));
     % jacobians
     J11=Npx*xe;
     J12=Npy*xe;
@@ -240,9 +260,9 @@ for k=1:nIterations
     ksi_p=ksi0+invJ11.*(xp'-x0) +invJ12.*(yp'-y0);
     eta_p=eta0+invJ21.*(xp'-x0)+invJ22.*(yp'-y0);
     
-    N=shape2Dp(nx,ny,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
+    N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
     [indxi,indxj]=find(N);
-    Ns=sparse(indxj,[1:nx*ny*Nx*Ny],reshape(N,nx*ny*Nx*Ny,1));
+    Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1));
     x1=Ns*xe;% interpolated values
     y1=Ns*ye;% interpolated values
     %plot(x1(n),y1(n),'kx');
@@ -293,13 +313,23 @@ for n=1:nFrames
                     load(filename,'Ux'); 
                     filename=fullfile(input_name,['UFix_frame',num2str(n),'.mat']);
                     load(filename,'UFix'); 
-                    U=Ux+h/2.*UFix;
+                    switch shell_surface
+                        case 'top'
+                            U=Ux+h/2.*UFix;
+                        case 'bottom'
+                            U=Ux-h/2.*UFix;
+                    end
                 case 7
                     filename=fullfile(input_name,['Uy_frame',num2str(n),'.mat']);
                     load(filename,'Uy'); 
                     filename=fullfile(input_name,['UFiy_frame',num2str(n),'.mat']);
                     load(filename,'UFiy'); 
-                    U=Uy+h/2.*UFiy;
+                    switch shell_surface
+                        case 'top'
+                            U=Uy+h/2.*UFiy;
+                        case 'bottom'
+                            U=Uy-h/2.*UFiy;
+                    end
                 case 8
                     filename=fullfile(input_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
@@ -309,7 +339,12 @@ for n=1:nFrames
                     load(filename,'Uy'); 
                     filename=fullfile(input_name,['UFiy_frame',num2str(n),'.mat']);
                     load(filename,'UFiy'); 
-                    U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2);
+                        case 'bottom'
+                            U=sqrt((Ux-h/2.*UFix).^2+(Uy-h/2.*UFiy).^2);
+                    end
                 case 9
                     filename=fullfile(input_name,['Ux_frame',num2str(n),'.mat']);
                     load(filename,'Ux'); 
@@ -321,7 +356,12 @@ for n=1:nFrames
                     load(filename,'UFiy'); 
                     filename=fullfile(input_name,['Uz_frame',num2str(n),'.mat']);
                     load(filename,'Uz'); 
-                    U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2);
+                        case 'bottom'
+                            U=sqrt((Ux-h/2.*UFix).^2+(Uy-h/2.*UFiy).^2 + Uz.^2);
+                    end
             end
         case 'velocity'
             switch motion
@@ -350,13 +390,23 @@ for n=1:nFrames
                     load(filename,'Vx'); 
                     filename=fullfile(input_name,['VFix_frame',num2str(n),'.mat']);
                     load(filename,'VFix'); 
-                    U=Vx+h/2.*VFix;
+                    switch shell_surface
+                        case 'top'
+                            U=Vx+h/2.*VFix;
+                        case 'bottom'
+                             U=Vx-h/2.*VFix;
+                    end
                 case 7
                     filename=fullfile(input_name,['Vy_frame',num2str(n),'.mat']);
                     load(filename,'Vy'); 
                     filename=fullfile(input_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
-                    U=Vy+h/2.*VFiy;
+                    switch shell_surface
+                        case 'top'
+                            U=Vy+h/2.*VFiy;
+                        case 'bottom'
+                            U=Vy-h/2.*VFiy;
+                    end
                 case 8
                     filename=fullfile(input_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
@@ -366,7 +416,12 @@ for n=1:nFrames
                     load(filename,'Vy'); 
                     filename=fullfile(input_name,['VFiy_frame',num2str(n),'.mat']);
                     load(filename,'VFiy'); 
-                    U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2);
+                        case 'bottom'
+                            U=sqrt((Vx-h/2.*VFix).^2+(Vy-h/2.*VFiy).^2);
+                    end
                 case 9
                     filename=fullfile(input_name,['Vx_frame',num2str(n),'.mat']);
                     load(filename,'Vx'); 
@@ -378,7 +433,12 @@ for n=1:nFrames
                     load(filename,'VFiy'); 
                     filename=fullfile(input_name,['Vz_frame',num2str(n),'.mat']);
                     load(filename,'Vz'); 
-                    U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2 + Vz.^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2 + Vz.^2);
+                        case 'bottom'
+                            U=sqrt((Vx-h/2.*VFix).^2+(Vy-h/2.*VFiy).^2 + Vz.^2);
+                    end
             end
         case 'acceleration'
             switch motion
@@ -407,13 +467,23 @@ for n=1:nFrames
                     load(filename,'Ax'); 
                     filename=fullfile(input_name,['AFix_frame',num2str(n),'.mat']);
                     load(filename,'AFix'); 
-                    U=Ax+h/2.*AFix;
+                    switch shell_surface
+                        case 'top'
+                            U=Ax+h/2.*AFix;
+                        case 'bottom'
+                            U=Ax-h/2.*AFix;
+                    end
                 case 7
                     filename=fullfile(input_name,['Ay_frame',num2str(n),'.mat']);
                     load(filename,'Ay'); 
                     filename=fullfile(input_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
-                    U=Ay+h/2.*AFiy;
+                    switch shell_surface
+                        case 'top'
+                            U=Ay+h/2.*AFiy;
+                        case 'bottom'
+                            U=Ay-h/2.*AFiy;
+                    end
                 case 8
                     filename=fullfile(input_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
@@ -423,7 +493,12 @@ for n=1:nFrames
                     load(filename,'Ay'); 
                     filename=fullfile(input_name,['AFiy_frame',num2str(n),'.mat']);
                     load(filename,'AFiy'); 
-                    U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2);
+                        case 'bottom'
+                            U=sqrt((Ax-h/2.*AFix).^2+(Ay-h/2.*AFiy).^2);
+                    end
                 case 9
                     filename=fullfile(input_name,['Ax_frame',num2str(n),'.mat']);
                     load(filename,'Ax'); 
@@ -435,13 +510,17 @@ for n=1:nFrames
                     load(filename,'AFiy'); 
                     filename=fullfile(input_name,['Az_frame',num2str(n),'.mat']);
                     load(filename,'Az'); 
-                    U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2 + Az.^2);
+                    switch shell_surface
+                        case 'top'
+                            U=sqrt((Ax+h/2.*AFix).^2+(Ay+h/2.*AFiy).^2 + Az.^2);
+                        case 'bottom'
+                            U=sqrt((Ax-h/2.*AFix).^2+(Ay-h/2.*AFiy).^2 + Az.^2);
+                    end
             end
     end
-    
-
-    ZA=U(nodes(elem_index,1:nx*ny))'; 
-    ZA=reshape(ZA,nx*ny*Nx*Ny,1);
+   
+    ZA=U(nodes(elem_index,1:NofElNodesx*NofElNodesy))'; 
+    ZA=reshape(ZA,NofElNodesx*NofElNodesy*Nx*Ny,1);
     ZI=Ns*ZA;% interpolated values
     ZI=reshape(ZI,Nx,Ny);
     Data(:,:,n)=ZI;

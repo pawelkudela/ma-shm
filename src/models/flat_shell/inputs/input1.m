@@ -68,16 +68,6 @@ V0=10; %[V] peak voltage
 %% boundary conditions
 % global b.c. vector with blocked degrees of freedom
 BC=[];
-%% mesh
-%meshfile='mesh/plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'; % 
-% meshfile contains two matrices: coords and nodes and list of vectors with
-% indices in local and global level
-% element type: number of nodes in x, y and z direction respectively
-% must be compatible with the mesh provided !
-nx=6;ny=6;nz=0;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%cd ..;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% delamination
 % can be defined inside meshfile
 delamination_layer = [2]; % delamination layer counting from the top after which the nodes are splitted (another column for second delamination)
