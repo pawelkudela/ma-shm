@@ -11,17 +11,24 @@ currentFile = mfilename('fullpath');
 idx = strfind( pathstr,filesep );
 modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
+image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam1');
 % prepare model output path
 model_output_path = prepare_model_paths('raw','num',modelfolder,modelname);
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
+% load mesh parameters
+load([image_label_path,filesep,'mesh_parameters']);
+NofMeshes = length(mesh_parameters);
+% input for constant parameters
+input_no = 2;
 %tasks=[6];
 %tasks=[1];
-tasks=[2];
+tasks=[41];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 %meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
-meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
+%meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
+
 %% input for post-processing
 Nx=500;
 Ny=500;
@@ -42,6 +49,7 @@ fig_height=5; % figure height in cm
 %    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
 %%
 for test_case=tasks
+    meshfile = fullfile('mesh',mesh_parameters(test_case).meshfile);
     output_name = [model_output_path,filesep,num2str(test_case),'_output',filesep];
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
     figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
@@ -58,7 +66,7 @@ for test_case=tasks
                 mkdir(figure_output_name);
              end
             %% RUN MODEL
-            t_frames=main_flat_shell(test_case,meshfile,mode,output_name,tasks);
+            t_frames=main_flat_shell(test_case,input_no,meshfile,mode,output_name,tasks);
             %
             t_frames_filename=fullfile(interim_output_name,'t_frames');
             save(t_frames_filename,'t_frames');

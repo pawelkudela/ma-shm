@@ -45,12 +45,12 @@ yc=yn*W/n; % coordinates in meters
 % plot(x,y,'ro');
 % figure;
 % plot(xc,yc,'ro');
-% rotation angle
+mesh_parameters = struct('position_no',{},'xCenter',{},'yCenter',{},'a',{},'b',{},'rotAngle',{},'meshfile',{});
 counter = 0;
 % delamination position: only one quarter
 for j=n/2+1:n 
     for i=n/2+1:n
-        m=(j-1)*n+i; % delamination position number
+        position_no=(j-1)*n+i; % delamination position number
         % coordinates of delamination position
         xCenter = xc(j,i);
         yCenter = yc(j,i);    
@@ -61,8 +61,16 @@ for j=n/2+1:n
             for ia=1:length(a_set)
                 a = a_set(ia);
                 if(a == b)
+                    counter = counter + 1;
                     rotAngle = 0;
-                    mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)];             
+                    mesh_filename = ['m_',num2str(counter),'_delam1_position_no_',num2str(position_no),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)]; 
+                    mesh_parameters(counter).position_no = position_no;
+                    mesh_parameters(counter).xCenter = xCenter;
+                    mesh_parameters(counter).yCenter = yCenter;
+                    mesh_parameters(counter).a = a;
+                    mesh_parameters(counter).b = b;
+                    mesh_parameters(counter).rotAngle = rotAngle;
+                    mesh_parameters(counter).meshfile = mesh_filename;
                     figfilename = [figure_output_path,mesh_filename];
                     image_label_filename = [image_label_path,filesep,mesh_filename];
                     delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
@@ -82,9 +90,17 @@ for j=n/2+1:n
                         fprintf(['Mesh:', mesh_filename,' already exist\n']);
                     end
                 else
-                    for irot = 1:length(rotAngle_set)
+                    for irot = 1:length(rotAngle_set) % rotation angle
+                        counter = counter + 1;
                         rotAngle = rotAngle_set(irot);
-                        mesh_filename = ['delam1_position_no_',num2str(m),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)]; % a, b in mm                       
+                        mesh_filename = ['m_',num2str(counter),'_delam1_position_no_',num2str(position_no),'_a_',num2str(a*1e3),'mm_b_',num2str(b*1e3),'mm_angle_',num2str(rotAngle)]; % a, b in mm                       
+                        mesh_parameters(counter).position_no = position_no;
+                        mesh_parameters(counter).xCenter = xCenter;
+                        mesh_parameters(counter).yCenter = yCenter;
+                        mesh_parameters(counter).a = a;
+                        mesh_parameters(counter).b = b;
+                        mesh_parameters(counter).rotAngle = rotAngle;
+                        mesh_parameters(counter).meshfile = mesh_filename;
                         figfilename = [figure_output_path,mesh_filename];
                         image_label_filename = [image_label_path,filesep,mesh_filename];
                         delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
@@ -109,3 +125,4 @@ for j=n/2+1:n
         end
     end
 end
+save([image_label_path,filesep,'mesh_parameters'],'mesh_parameters');

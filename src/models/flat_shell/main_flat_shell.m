@@ -1,10 +1,11 @@
-function t_frames=main_flat_shell(test_case,meshfile,mode,output_name,tasks)
+function t_frames=main_flat_shell(test_case,input_no,meshfile,mode,output_name,tasks)
 % MAIN_FLAT_SHELL   Compute wavefield by using flat shell spectral elements  
 % 
 % Syntax: main_flat_shell(test_case,meshfile,mode,output_name)
 % 
 % Inputs: 
-%    test_case - test case number (input/output number), integer
+%    test_case - test case number (input/output number, variable parameters), integer
+%    input_no - input file number (file with constant parameters)
 %    meshfile - mesh filename, string
 %    mode - string , options: mode='cpu';mode='gpu';
 %    output_name - path to folder were the output data is stored, string
@@ -30,9 +31,8 @@ function t_frames=main_flat_shell(test_case,meshfile,mode,output_name,tasks)
 
 %---------------------- BEGIN CODE---------------------- 
 
-k_test=test_case;
 assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
-run(fullfile('inputs',['input',num2str(k_test)]));
+run(fullfile('inputs',['input',num2str(input_no)]));
 frm_int=floor(nft/(nFrames)); % save displacement with interval time step frm_int (frames)
 pztEl=[];pztnum=[];
 
@@ -99,9 +99,9 @@ dt=tt/nft;   % calculation time step [s]
 %Fa2=zeros(dof,1);
 
 %% Output file for solution
-outfile_voltage=fullfile(output_name,['voltage',num2str(k_test)]);
-outfile_displ=fullfile(output_name,['displ',num2str(k_test)]);
-outfile_time=fullfile(output_name,['time',num2str(k_test)]);
+outfile_voltage=fullfile(output_name,['voltage',num2str(test_case)]);
+outfile_displ=fullfile(output_name,['displ',num2str(test_case)]);
+outfile_time=fullfile(output_name,['time',num2str(test_case)]);
 %%
 disp('local derivatives');
 [Nprimx,Nprimy]=shape2D_prim(nx,ny,Qx,Qy,ksi',eta');
@@ -658,7 +658,7 @@ for nn=2:nft
         averageTime = toc/(nn-1);
         progress = round(nn/nft*100);
         clc;
-        message1 = sprintf('Task %d progress: %d%%',k_test,progress);
+        message1 = sprintf('Task %d progress: %d%%',test_case,progress);
         disp(message1);
         expected_duration_seconds = (nft-nn)*averageTime; 
         s = seconds(expected_duration_seconds);
@@ -667,7 +667,7 @@ for nn=2:nft
         disp('Expected finish time: ');
         disp(t_expected);
         for jj=1:length(tasks)
-            if(k_test==tasks(jj))
+            if(test_case==tasks(jj))
                 break;
             end
         end

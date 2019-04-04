@@ -56,6 +56,7 @@ load project_paths projectroot src_path;
 
 gmsh_path = fullfile(projectroot,'bin','external','gmsh','gmsh ');
 mesh_geometry_path = fullfile(projectroot,'src','models',modelfolder,'geo',filesep);
+mesh_template_geometry_path = fullfile(projectroot,'src','models',modelfolder,'geo_templates',filesep);
 mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'gmsh_out',filesep);
 spec_mesh_output_path = fullfile(projectroot,'src','models',modelfolder,'mesh',filesep);
 gmsh_options = ' -2 -format auto -v 1 -o '; % non-verbose
@@ -192,7 +193,7 @@ gmsh_command = [gmsh_path, mesh_geometry_path, mesh_filename,'.geo', gmsh_option
 
 
 % read template mesh file
-text = fileread([mesh_geometry_path,mesh_template,'.geo']);
+text = fileread([mesh_template_geometry_path,mesh_template,'.geo']);
 fid = fopen([mesh_geometry_path,mesh_filename,'.geo'],'w');
 fprintf(fid,'SetFactory("OpenCASCADE");\n');
 fprintf(fid,'L=%f; \n',L);
@@ -207,6 +208,7 @@ fprintf(fid,'xpzt=%f; \n',xpzt);
 fprintf(fid,'ypzt=%f; \n',ypzt);
 % append  template mesh file
 fprintf(fid,text);
+% append meshing algorithm parameters
 fprintf(fid,'\n\n');
 fprintf(fid,'Mesh.Algorithm = 6; // Frontal\n');
 fprintf(fid,'Mesh.CharacteristicLengthFactor = %f;\n',CharacteristicLengthFactor);
