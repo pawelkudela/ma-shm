@@ -31,8 +31,8 @@ function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variab
 % 
 % Example: 
 %    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,shell_surface) 
-%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'displacement',1,'upper') 
-%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',4,'lower') 
+%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'displacement',1,'top') 
+%    [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',4,'bottom') 
 % 
 % Other m-files required: gll.m flat_shell_variable_names.m shape2Dp.m shape_derivatives2Dp.m
 %                                Vandermonde2D.m
@@ -59,7 +59,7 @@ load([meshfile(1:end-4),'_jacobians']);
 load(meshfile); % cords, nodes
 h=sum(lh);
 
-delamnum=[];
+%delamnum=[];
 [variable_name] = flat_shell_variable_names(field_variable,motion);
 
 %data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
@@ -93,21 +93,17 @@ unDelamEl=setdiff(1:fen,delamEl);
 if(isempty(delamEl))
     ne=1:fen;
 else
-    ne=[];
     switch shell_surface
         case 'top'
             for k=1:length(den_above)
-                ne=[ne,den_above{k}];
+                fen=fen-length(den_above{k});
             end
-            ne=union(unDelamEl,ne);
-            fen=length(ne);
         case 'bottom'
             for k=1:length(den_under)
-                ne=[ne,den_under{k}];
-            end
-            ne=union(unDelamEl,ne);
-            fen=length(ne);
+                fen=fen-length(den_under{k});
+            end 
     end
+    ne=1:fen;
 end
 
 L=max(coords(:,1))-min(coords(:,1))-2*Eps;
@@ -205,10 +201,10 @@ disp('Calculate local values of ksi and eta for each point');
 % Journal of Biomechanical Engineering, Vol. 136 / 084503-1, 2014.
 ksi0=repmat(ksi(1),[Nx*Ny,1]);
 eta0=repmat(eta(1),[Nx*Ny,1]);
-n1=(elem_index(:,1)-1)*NofElNodes+1;
 x0=x(1,elem_index(:,1))';
 y0=y(1,elem_index(:,1))';
 % first iteration
+n1=((elem_index(:,1))-1)*NofElNodes+1;
 ksi_p=ksi0+invj11(n1).*(xp'-x0) +invj12(n1).*(yp'-y0);
 eta_p=eta0+invj21(n1).*(xp'-x0)+invj22(n1).*(yp'-y0);
 clear invj11 invj12 invj21 invj22 j11 j12 j21 j22;
@@ -223,8 +219,8 @@ Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNod
 xe=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 ye=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 for k=1:NofElNodesx*NofElNodesy
-    xe(k,:)=coords(nodes(elem_index(:,1),k),1);
-    ye(k,:)=coords(nodes(elem_index(:,1),k),2);
+    xe(k,:)=coords(nodes((elem_index(:,1)),k),1);
+    ye(k,:)=coords(nodes((elem_index(:,1)),k),2);
 end
 xe=reshape(xe,NofElNodesx*NofElNodesy*Nx*Ny,1);
 ye=reshape(ye,NofElNodesx*NofElNodesy*Nx*Ny,1);
@@ -283,6 +279,17 @@ I1=find(ksi_p<-1); if(I1) ksio_p(I1)=-1; end
 disp('Evaluate shape functions');
 clear N;
 clear ksi_p eta_p
+switch shell_surface
+    case 'top'
+        nodes_above = [];
+        nodes_under = [];
+        for k=1:length(den_above)
+            nodes_above = [nodes_above,nodes(den_above{k},:)];     
+        end
+        for k=1:length(den_under)
+            nodes_under = [nodes_under,nodes(den_under{k},:)];     
+        end
+end
 %%
 for n=1:nFrames
     switch field_variable
@@ -518,7 +525,10 @@ for n=1:nFrames
                     end
             end
     end
-   
+    switch shell_surface
+        case 'top'
+            U(nodes_under) = U(nodes_above); % overwrite values of bottom part of delamination by upper part
+    end
     ZA=U(nodes(elem_index,1:NofElNodesx*NofElNodesy))'; 
     ZA=reshape(ZA,NofElNodesx*NofElNodesy*Nx*Ny,1);
     ZI=Ns*ZA;% interpolated values
