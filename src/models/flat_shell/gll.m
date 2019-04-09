@@ -32,5 +32,8 @@ switch n
     case 2;
         ksi(1)=-1;ksi(2)=1;
         wi(1)=1;wi(2)=1;
-    otherwise disp('Chosen number of nodes is not available'); w=[]; ksi=[];return;
+    case 1
+        ksi(1)=0;
+        w(1) =1;
+    %otherwise disp('Chosen number of nodes is not available'); w=[]; ksi=[];return;
 end;

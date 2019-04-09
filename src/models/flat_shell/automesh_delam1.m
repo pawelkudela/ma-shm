@@ -4,8 +4,8 @@ clear all; close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Prepare output directories
 % allow overwriting existing results if true
-overwrite=false;
-%overwrite=true;
+%overwrite=false;
+overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -78,11 +78,8 @@ for j=n/2+1:n
                              %% RUN AUTOMESH
                          try
                             disp(mesh_filename);
-                            [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-                            (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
-                             %                  
-                            print(figfilename,'-dpng', '-r300'); 
-                            close all;
+                            [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+                            (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename);
                          catch
                             fprintf(['Meshing failed:', mesh_filename,' \n']);
                          end
@@ -104,15 +101,12 @@ for j=n/2+1:n
                         figfilename = [figure_output_path,mesh_filename];
                         image_label_filename = [image_label_path,filesep,mesh_filename];
                         delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
-                        if(overwrite||(~overwrite && ~exist([figfilename,'.png'], 'file')))
+                        if(overwrite||(~overwrite && ~exist([mesh,filesep,mesh_filename,'.mat'], 'file')))
                                   %% RUN AUTOMESH
                             try
                                 disp(mesh_filename);
-                                [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-                                (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder);
-                                 %   
-                                print(figfilename,'-dpng', '-r300'); 
-                                close all;
+                                [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+                                (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename);
                             catch
                                 fprintf(['Meshing failed:', mesh_filename,' \n']);
                             end

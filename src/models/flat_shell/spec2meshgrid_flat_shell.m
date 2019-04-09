@@ -1,4 +1,4 @@
-function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variable,motion,shell_surface,input_name,output_name)
+function [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,field_variable,motion,shell_surface,input_name,output_name)
 % SPEC2MESHGRID_FLAT_SHELL   Interpolate wavefield on uniform grid 
 %    wavefield is spanned on a spectral element mesh 
 %    uniform mesh is created by using meshgrid  
@@ -7,6 +7,7 @@ function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variab
 % 
 % Inputs: 
 %    test_case - test case number (input/output number), integer
+%    input_no - input file number (file with constant parameters)
 %    meshfile - mesh filename, string
 %    Nx - Number of points in uniform mesh in x direction, integer 
 %    Ny - Number of points in uniform mesh in y direction, integer 
@@ -51,9 +52,8 @@ function [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,field_variab
 
 %---------------------- BEGIN CODE---------------------- 
 
-k_test=test_case;
 Eps=1e-8;
-input_file = fullfile('inputs',['input',num2str(k_test)]);
+input_file = fullfile('inputs',['input',num2str(input_no)]);
 run(input_file); 
 load([meshfile(1:end-4),'_jacobians']);
 load(meshfile); % cords, nodes
@@ -62,8 +62,8 @@ h=sum(lh);
 %delamnum=[];
 [variable_name] = flat_shell_variable_names(field_variable,motion);
 
-%data_filename=fullfile('outputs',['\output',num2str(k_test)],['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
-data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(k_test),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
+%data_filename=fullfile('outputs',['\output',num2str(test_case)],['\flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
+data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
 % corner nodes
 NofElNodesx = shape_order +1;
 NofElNodesy = shape_order +1;

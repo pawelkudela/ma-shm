@@ -1,10 +1,10 @@
-function [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder)
+function [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
 % AUTOMESH_DELAM   automatic mesh generation including 1 delamination region 
 %    it uses gmsh external software 
 % 
-% Syntax: [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-%    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder)
+% Syntax: [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+%   (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
 % 
 % Inputs: 
 %    L - plate length, double, Units: m 
@@ -24,19 +24,20 @@ function [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,I
 %    Smoothing - see gmsh manual
 %    mesh_filename - file name for mesh, string
 %    modelfolder - corresponding model folder name
+%    figfilename - file name for png figure of mesh
 % 
 % Outputs: 
 %    nodes - nodes of spectral elements (topology), integer, dimensions [NofElements, NofNodes] 
 %    coords - coordinates of spectral element nodes, double, dimensions [NofNodes, 3], Units: m 
 %    den_under - delaminated element numbers under split interface
 %    den_above - delaminated element numbers above split interface
-%    IGi,ILi - global and corresponding local node number for parallel computation
+%    I_G,I_L - global and corresponding local node number for parallel computation
 % 
 % Example: 
-%    [nodes,coords,den_under,den_above,IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = automesh_delam...
-%    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder)
+%    [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+%   (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
 % 
-% Other m-files required: quad2spec_boundary.m, split_delam_nodes_flat_shell.m, parallel_LG_nodes_Modified_Zb.m 
+% Other m-files required: quad2spectral_Fiborek.m, split_delam_nodes_flat_shell.m, nodesMaps_Fiborek.m 
 % Subfunctions: none 
 % MAT-files required: none 
 % geo-files required: all delam1*.geo in geo folder
@@ -228,6 +229,8 @@ end
 % load mesh into matlab
 run([mesh_output_path, mesh_filename,'.m']);
 plot_mesh(msh);
+print(figfilename,'-dpng', '-r300'); 
+close all;
 disp('Quad to spectral mesh conversion...');
 %[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
 %[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order);
@@ -264,9 +267,12 @@ den_under{1} = den_under1;
 den_above{1} = den_above1;
 delamEl = [den_under1, den_above1];
 disp('12 baskets: calculating local and global node numbers...');
-[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes);
+%[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes); % Zhibo implementation
+n_z=1; % number of nodes in thickness direction
+[I_G,I_L]=nodesMaps_Fiborek(nodes,size(coords,1),shape_order,n_z); % Piotr Fiborek implementation
 
-save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12','mesh_min','mesh_max','shape_order','den_under','den_above');
+%save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12','mesh_min','mesh_max','shape_order','den_under','den_above');
+save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','I_G','I_L','mesh_min','mesh_max','shape_order','den_under','den_above');
 
 %---------------------- END OF CODE---------------------- 
 

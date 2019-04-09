@@ -71,13 +71,15 @@ for test_case=tasks
             t_frames_filename=fullfile(interim_output_name,'t_frames');
             save(t_frames_filename,'t_frames');
             %% RUN POSTPROCESSING
-            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',3,shell_surface,output_name,interim_output_name); % Vz 
+            % out-of-plane
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,shell_surface,output_name,interim_output_name); % Vz 
             plot_meshgrid_frames(Data,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
-            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
-            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',8,shell_surface,output_name,interim_output_name); % sqrt((Vx-h/2.*VFix).^2+(Vy-h/2.*VFiy).^2)
-            plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
-            [Data] = spec2meshgrid_flat_shell(test_case,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
+            % in-plane
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,shell_surface,output_name,interim_output_name); % sqrt((Vx-h/2.*VFix).^2+(Vy-h/2.*VFiy).^2)
+            plot_meshgrid_frames(Data,'top',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
             %delete([output_name,'*frame*']); % delete frames
         catch

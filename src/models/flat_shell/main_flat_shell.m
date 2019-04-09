@@ -56,13 +56,17 @@ if(isempty(delamEl))
     [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
 end
 
+nz=3;
+pzt_thickness =0.5/1000; % pzt thickness [m]
+%[nodes2,coords2]=connect_pzt3D_to_plate_fun(nx,ny,nz,pztEl,nodes,coords,pzt_thickness);
+
 [ksi,wx]=gll(nx); % weights and nodes distribution
 [eta,wy]=gll(ny);
-%[dzeta,wz]=gll(nz);
+[dzeta,wz]=gll(nz);
 % vandermonde approach
 [Qx]=Vandermonde(ksi,nx);
 [Qy]=Vandermonde(eta,ny);
-%[Qz]=Vandermonde(dzeta,nz);
+[Qz]=Vandermonde(dzeta,nz);
 
 I=zeros(fen*NofElNodes,1);
 for ne=1:fen
@@ -95,8 +99,133 @@ dt=tt/nft;   % calculation time step [s]
 %  plot(t,st);pause(1);
  
 %% forces induced by the pzt actuators
-
+pztnum=reshape(pztEl,1,[]);
+%pztnum=[];
+c=0;
+PZT_actuator=[];
+PZT_sensor=[];
+for ne=1:1
+   c=c+1;
+   PZT_actuator(c).pztEl=[pztEl(ne,:)]; % list of element numbers for pzt no c
+end
+c=0;
+for ne=1:1
+   c=c+1;
+   PZT_sensor(c).pztEl=[pztEl(c,:)]; % 
+end
+% piezoelectric constants
+[Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT);
+% Qpzt - elastic coefficients under constant electric field
+% epzt - matrix of piezoelectric coupling constants (voltage constants)
+% gpzt - permittivity matrix in stress-charge form
 %Fa2=zeros(dof,1);
+
+[Vx,Vzx]=Vandermonde_old(ksi,dzeta,nx,nz);
+
+% disp('forces...');
+% NofElNodes2=nx*ny*nz;
+% % commented code also works if only one layer of elements is used for pzt
+% % modelling
+% % for j=1:length(PZT_actuator)
+% %     for ne=PZT_actuator(j).pztEl
+% %         [kufi,kfifi]=coupl3D_v2(epzt,gpzt,coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
+% %         kfiu=kufi';
+% %         [fa,fi]=Forces_actuator_mex2(V0,kfiu,kfifi,nx,nz);    
+% %         Fa(Inc(ne,:))=Fa(Inc(ne,:))+fa; % assembly
+% %     end
+% % end
+% if(isempty(pztEl))
+% else
+% for j=1:length(PZT_actuator)
+%     ne=PZT_actuator(j).pztEl;
+%     nodespzt=nodes2(ne,:);
+% %     [p,nodespzt]=remove_free_spec_nodes(coords,nodespzt);
+%     % electric boundary conditions for sensor in open circuit
+%     
+%     EBC0=nodespzt(:,1:nx*ny);   
+%     EBCI=nodespzt(:,nx*ny+1:end-nx*ny);   
+%     EBCN=nodespzt(:,end-nx*ny+1:end);
+%     %EBCN=reshape(EBCN,[],1);
+%     %EBCN=setxor(EBCN,nodespzt(12,end-nx*ny+1:end)'); % no voltage on top of el 12
+%     %EBC0=reshape(EBC0,1,[]);
+%     %EBC0=[EBC0,nodespzt(12,end-nx*ny+1:end)];  % grounding on top of el 12
+%     
+%     EBC0=unique(EBC0);
+%     EBCI=unique(EBCI);
+%     EBCN=unique(EBCN);
+%     EBC0=reshape(EBC0,1,[]);
+%     EBCI=reshape(EBCI,1,[]);
+%     EBCN=reshape(EBCN,1,[]);
+%     BC03=zeros(1,3*length(EBC0));
+%     BC03(1:3:end)=3*EBC0-2;
+%     BC03(2:3:end)=3*EBC0-1;
+%     BC03(3:3:end)=3*EBC0-0;
+% 
+%     BCI3=zeros(1,3*length(EBCI));
+%     BCI3(1:3:end)=3*EBCI-2;
+%     BCI3(2:3:end)=3*EBCI-1;
+%     BCI3(3:3:end)=3*EBCI-0;
+% 
+%     BCN3=zeros(1,3*length(EBCN));
+%     BCN3(1:3:end)=3*EBCN-2;
+%     BCN3(2:3:end)=3*EBCN-1;
+%     BCN3(3:3:end)=3*EBCN-0;
+%     % assembly
+% %     dofpzt=3*NofNodes2;
+% %     Kfifi=sparse(dofpzt/3,dofpzt/3);
+% %     Kfiu=sparse(dofpzt/3,dofpzt);
+%     Incpzt=zeros(length(PZT_sensor(j).pztEl),3*NofElNodes2);
+%     
+%     Incpzt(:,1:3:end)=3*nodespzt(:,:)-2;
+%     Incpzt(:,2:3:end)=3*nodespzt(:,:)-1;
+%     Incpzt(:,3:3:end)=3*nodespzt(:,:)-0;
+%     cpzt=0;
+%     for ne=PZT_actuator(j).pztEl       
+%         cpzt=cpzt+1;
+%         %[kfiu,kfifi]=couplingPZT3D_new_mex2(coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),ksi,wx,nx,epzt,gpzt,Vx,dzeta,wz,nz,Vzx);
+%         %[kufi,kfifi]=coupl3D_v2(epzt,gpzt,coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
+%         [kufi,kfifi]=coupl3D_global(epzt,gpzt,coords2(nodes2(ne,:),1),coords2(nodes2(ne,:),2),(coords2(nodes2(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
+% 
+%         kfiu=sparse(kufi');kfifi=sparse(kfifi);
+% %         [iout]=dofs3D(Incpzt,cpzt,dofpzt,NofElNodes2);
+% %         [iout2]=dofs3Dfifi(nodespzt,cpzt,dofpzt/3,NofElNodes2);
+% %         Kfiu=Kfiu+iout2'*kfiu*iout;
+% %         Kfifi=Kfifi+iout2'*kfifi*iout2;
+%        KfiuA=[kfiu(EBCI,BC03),kfiu(EBCI,BCI3),kfiu(EBCI,BCN3)];% actuator BC
+%        KfifiA=kfifi(EBCI,EBCI); % actuator 
+%        Kfifiin=kfifi(EBCI,EBCN);
+%        V1=zeros(size(kfifi,1),1);
+%        V1(EBCN,1)=V0; % top
+%        V1(EBC0,1)=0; % bottom
+%        Fetemp=Kfifiin*V1(EBCN);
+%        fiAi=-KfifiA\Fetemp; % induced potential
+%        FiA=zeros(size(kfifi,1),1);
+%        %FiA=[V1(EBC0);fiAi;V1(EBCN)]; % potenitial together with applied voltage
+%        FiA(EBCN)=V0;
+%        FiA(EBCI)=fiAi;
+%        FaL=kfiu'*FiA; % local forces in pzt actuator j
+%        BN=[BC03';BCI3';BCN3'];
+%        PZT_actuator(j).BN=BN;
+%       Fa(BN)=FaL(BN); % global forces from pzt actuator j
+%    end
+%    
+%   
+% 
+%     
+% end
+% end
+% Fa=full(Fa);
+% %Fa(1:3:end)=Fa(1:3:end)*10;
+% %Fa(2:3:end)=Fa(2:3:end)*10;
+% clear FaL Fetemp
+% switch mode
+%     case 'gpu'
+%     %Fa=gdouble(Fa); geval(Fa);
+%     Fa = gpuArray(Fa);
+%     case 'cpu'
+%         
+% end
+% %Fa2=zeros(dof,1);
 
 %% Output file for solution
 outfile_voltage=fullfile(output_name,['voltage',num2str(test_case)]);
@@ -151,13 +280,13 @@ clear Nys;
 clear indxi indxj indyi indyj;
 X=zeros(fen*NofElNodes,1);
 Y=zeros(fen*NofElNodes,1);
-%Z=zeros(fen*NofElNodes,1);
+Z=zeros(fen*NofElNodes,1);
 for ne=1:fen
     n1=(ne-1)*NofElNodes+1;
     n2=n1+NofElNodes-1;
     X(n1:n2)=coords(nodes(ne,:),1);
     Y(n1:n2)=coords(nodes(ne,:),2);
-    %Z(n1:n2)=coords(nodes(ne,:),3);
+    Z(n1:n2)=coords(nodes(ne,:),3);
 end
 switch mode
     case 'gpu'
@@ -166,21 +295,58 @@ switch mode
  
     X=gpuArray(X);
     Y=gpuArray(Y);
-    %Z=gpuArray(Z);
+    Z=gpuArray(Z);
     case 'cpu'
         
 end
 disp('jacobians'); 
 J11=Npx*X;
 J21=Npx*Y;
-%J31=Npx*Z;
+J31=Npx*Z;
 J12=Npy*X;
 J22=Npy*Y;
-%J32=Npy*Z;
+J32=Npy*Z;
+% normal vector
+v31=J21.*J32-J22.*J31; 
+v32=J12.*J31-J11.*J32;
+v33=J11.*J22-J12.*J21;  
+y0=v31.*v31+v32.*v32+v33.*v33;
+ys=sqrt(y0);
+v31=v31./ys;
+v32=v32./ys;
+v33=v33./ys;
+%/*v1 vector*/
+%v11=J11;
+%v12=J21;
+%v13=J31;
+v11=J11.*J22-J12.*J21;
+v12=zeros(fen*NofElNodes,1);
+v13=J22.*J31-J21.*J32;
+y0=v11.*v11+v12.*v12+v13.*v13; 
+ys=sqrt(y0);
+v11=v11./ys;
+v12=v12./ys;
+v13=v13./ys;
+%/*cross product v2=v3xv1*/
+% v21=(J12.*J31-J11.*J32).*J31-J21.*(J11.*J22-J12.*J21);
+% v22=(J11.*J22-J12.*J21).*J11-J31.*(J21.*J32-J22.*J31);
+% v23=(J21.*J32-J22.*J31).*J21-J11.*(J12.*J31-J11.*J32);
+v21=v32.*v13-v33.*v12;
+v22=-v31.*v13+v33.*v11;
+v23=v31.*v12-v32.*v11;
+y0=v21.*v21+v22.*v22+v23.*v23;
+ys=sqrt(y0);
+v21=v21./ys;
+v22=v22./ys;
+v23=v23./ys;
+
+th11=v11;th12=v21;th13=v31;
+th21=v12;th22=v22;th23=v32;
+th31=v13;th32=v23;th33=v33;
 
 
-clear X Y
-%clear Z
+% clear X Y
+% clear Z
 clear Indxi Indxj Indyi Indyj
 
 %
@@ -302,8 +468,8 @@ switch mode
 end
 
 %% Pre Main       
-[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = global_local_12baskets_5dofs(IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12,mode);
-
+%[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12] = global_local_12baskets_5dofs(IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12,mode);
+[I_G_dofs,I_L_dofs] = global_local_12baskets_5dofs_v2(I_G,I_L,mode);
 %% mass matrix
 disp('assembly mass matrix');
 %
@@ -325,18 +491,9 @@ switch assembly
         mgL(3:5:end)=WWDetJ.*m11; % mass matrix (global node numbering -y direction)
         mgL(4:5:end)=WWDetJ.*I11; % mass matrix (global node numbering -fiy direction)
         mgL(5:5:end)=WWDetJ.*m11; % mass matrix (global node numbering -z direction)
-        mg(IG1)=mg(IG1)+mgL(IL1); 
-        mg(IG2)=mg(IG2)+mgL(IL2); 
-        mg(IG3)=mg(IG3)+mgL(IL3); 
-        mg(IG4)=mg(IG4)+mgL(IL4); 
-        mg(IG5)=mg(IG5)+mgL(IL5); 
-        mg(IG6)=mg(IG6)+mgL(IL6); 
-        mg(IG7)=mg(IG7)+mgL(IL7); 
-        mg(IG8)=mg(IG8)+mgL(IL8); 
-        mg(IG9)=mg(IG9)+mgL(IL9); 
-        mg(IG10)=mg(IG10)+mgL(IL10); 
-        mg(IG11)=mg(IG11)+mgL(IL11); 
-        mg(IG12)=mg(IG12)+mgL(IL12); 
+        for ibasket=1:12
+            mg(I_G_dofs(:,ibasket))=mg(I_G_dofs(:,ibasket))+mgL(I_L_dofs(:,ibasket)); 
+        end
 end 
 clear m mgL;
 %
@@ -346,7 +503,68 @@ clear m mgL;
 %%
 Npxt=Npx';
 Npyt=Npy';
-
+%%
+% % scale = 0.5;
+% 
+% % figure;
+% Pfix=zeros(fen*NofElNodes,1);
+% Pfiy=zeros(fen*NofElNodes,1);
+% for ne=pztEl
+%     n1=(ne-1)*NofElNodes+1;
+%     n2=n1+NofElNodes-1;
+%     Pfix(n1:n2) =1;
+%     Pfiy(n1:n2) =1;
+% end
+% % 
+% % % Px = ((Npx*Pfix).*invJ11 +  (Npy*Pfix).*invJ12);
+% % % Py = ((Npx*Pfiy).*invJ21 +  (Npy*Pfiy).*invJ22);
+% % Px = ((Npxt)*invJ11 +  (Npyt)*invJ12);
+% % Py = ((Npxt)*invJ21 +  (Npyt)*invJ22);
+% % % Px = ((Npx*Pfix).*invJ11 +  (Npy*Pfix).*invJ12).*WWDetJ;
+% % % Py = ((Npx*Pfiy).*invJ21 +  (Npy*Pfiy).*invJ22).*WWDetJ;
+% Px = ((Npxt*Pfix).*invJ11 +  (Npyt*Pfix).*invJ12).*WWDetJ;
+% Py = ((Npxt*Pfiy).*invJ21 +  (Npyt*Pfiy).*invJ22).*WWDetJ;
+% % Px=gpuArray(Px);
+% % Py=gpuArray(Py);
+% % for ne=pztEl
+% %     n1=(ne-1)*NofElNodes+1;
+% %     n2=n1+NofElNodes-1;
+% %    
+% %     plot(X(n1:n2),Y(n1:n2),'k.');
+% %     quiver(X(n1:n2),Y(n1:n2),Px(n1:n2),Py(n1:n2),scale,'r');
+% % %     quiver(X(n1:n2),Y(n1:n2),J11(n1:n2),J12(n1:n2),scale,'r');
+% % %     quiver(X(n1:n2),Y(n1:n2),J21(n1:n2),J22(n1:n2),scale,'b');
+% % %     quiver(X(n1:n2),Y(n1:n2),J11(n1:n2),J22(n1:n2),scale,'m');
+% % %      quiver(X(n1:n2),Y(n1:n2),v11(n1:n2),v12(n1:n2),scale,'r');
+% % %      quiver(X(n1:n2),Y(n1:n2),v21(n1:n2),v22(n1:n2),scale,'b');
+% % %     quiver(X(n1:n2),Y(n1:n2),v21(n1:n2),v22(n1:n2),scale,'g');
+% %  %   quiver(X(n1:n2),Y(n1:n2),v11(n1:n2)+v12(n1:n2),v21(n1:n2)+v22(n1:n2),scale,'b');
+% %     hold on;
+% % end
+% %    plot(X(n1:n2),Y(n1:n2),'k');
+% % axis equal;
+% % J11(n1)
+% % J12(n1)
+% % v11(n1)
+% % v12(n1)
+% % v21(n1)
+% % v22(n1)
+% % v31(n1)
+% % v32(n1)
+% scale = 0.5;
+% %max(Fa)
+% for ne=1:pztEl
+%     n1=(ne-1)*NofElNodes+1;
+%     n2=n1+NofElNodes-1;
+%     Ix=3*nodes(ne,:)-2;
+%     Iy=3*nodes(ne,:)-1;
+%     plot(X(n1:n2),Y(n1:n2),'k.');
+%     hold on
+%     quiver(X(n1:n2),Y(n1:n2),Px(n1:n2),Py(n1:n2),scale,'r');
+%     %quiver(X(n1:n2)',Y(n1:n2)',Fa(Ix),Fa(Iy),scale,'r');
+% end
+% axis equal;
+% return;
 
 %% Initial calculation - central difference scheme
 a0 = 1/(dt^2);
@@ -391,8 +609,8 @@ switch mode
     n1=zeros(1,1,'double','gpuArray');
     n2=zeros(1,1,'double','gpuArray');
     case 'cpu'
-    IG=[IG1;IG2;IG3;IG4;IG5;IG6;IG7;IG8;IG9;IG10;IG11;IG12];
-    IL=[IL1;IL2;IL3;IL4;IL5;IL6;IL7;IL8;IL9;IL10;IL11;IL12];
+%     IG=[IG1;IG2;IG3;IG4;IG5;IG6;IG7;IG8;IG9;IG10;IG11;IG12];
+%     IL=[IL1;IL2;IL3;IL4;IL5;IL6;IL7;IL8;IL9;IL10;IL11;IL12];
 end
 %
 % global vector of forces induced by the actuator or nodal force excitation
@@ -497,18 +715,21 @@ for nn=2:nft
         F2(5:5:end)=fw;
         clear fu fv fw
         %
-        F(IG1)=F(IG1)+F2(IL1);
-        F(IG2)=F(IG2)+F2(IL2);
-        F(IG3)=F(IG3)+F2(IL3);
-        F(IG4)=F(IG4)+F2(IL4);
-        F(IG5)=F(IG5)+F2(IL5);
-        F(IG6)=F(IG6)+F2(IL6);
-        F(IG7)=F(IG7)+F2(IL7);
-        F(IG8)=F(IG8)+F2(IL8);
-        F(IG9)=F(IG9)+F2(IL9);
-        F(IG10)=F(IG10)+F2(IL10);
-        F(IG11)=F(IG11)+F2(IL11);
-        F(IG12)=F(IG12)+F2(IL12);
+        for ibasket=1:12
+            F(I_G_dofs(:,ibasket))=F(I_G_dofs(:,ibasket))+F2(I_L_dofs(:,ibasket)); 
+        end
+%         F(IG1)=F(IG1)+F2(IL1);
+%         F(IG2)=F(IG2)+F2(IL2);
+%         F(IG3)=F(IG3)+F2(IL3);
+%         F(IG4)=F(IG4)+F2(IL4);
+%         F(IG5)=F(IG5)+F2(IL5);
+%         F(IG6)=F(IG6)+F2(IL6);
+%         F(IG7)=F(IG7)+F2(IL7);
+%         F(IG8)=F(IG8)+F2(IL8);
+%         F(IG9)=F(IG9)+F2(IL9);
+%         F(IG10)=F(IG10)+F2(IL10);
+%         F(IG11)=F(IG11)+F2(IL11);
+%         F(IG12)=F(IG12)+F2(IL12);
  end
     %% time integration
     %F3=-F+mg2.*U+Fa*st(nn)-mg.*uold-cg.*v;
@@ -676,7 +897,7 @@ for nn=2:nft
             remaining_tasks =tasks(jj+1:length(tasks));
             message2 = sprintf('%d remaining tasks in the queue: ',no_of_remaining_tasks);
             disp(message2);
-            disp(remaining_tasks);
+            %disp(remaining_tasks);
         else
             disp('Remaining tasks in the queue: none');
         end

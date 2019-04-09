@@ -74,4 +74,35 @@ delamination_layer = [1]; % delamination layer counting from the top after which
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% additional outputs
 outputs=[25];
+%% pzt properties
+% Navy I 840
+ YE11=8e10; %[N/m^2] youngs modulus at constant electric field
+ YE33=6.8e10; %[N/m^2] youngs modulus at constant electric field
+ nu11=0.31; % Poisson ratio - assumed
 
+ Spzt=[ 1/YE11      -nu11/YE11    -nu11/YE33   0           0        0;
+       -nu11/YE11   1/YE11      -nu11/YE33     0           0        0;
+       -nu11/YE33    -nu11/YE33    1/YE33      0           0        0;
+        0              0           0       (1+nu11)/YE33   0        0;
+        0              0           0           0     (1+nu11)/YE33   0;
+        0              0           0           0         0    (1+nu11)/YE11];%[m^2/N] efunda
+
+% matrix of piezoelectric coupling constants - charge constants
+% http://www.americanpiezo.com/apc-materials/piezoelectric-properties.html
+% Navy I 840
+      %sx    sy  sz  sxz syz sxy
+dp=  [ 0     0   0   0   480 0;
+       0     0   0   480 0   0;
+      -175 -175  290 0   0   0]*10^-12;%[C/N] or [m/V]
+% voltage constants
+      %sx    sy  sz  sxz syz sxy
+gp=  [ 0     0   0   0   38 0;
+       0     0   0   38 0   0;
+      -12.4 -12.4  26.5 0   0   0]*10^-3;%[m^2/C] or [Vm/N] 
+% gpzt must be calculated   ???
+% permittivity matrix (strain-charge form)
+epsT=   [dp(1,5)/gp(1,5)    0                  0;
+        0              dp(1,5)/gp(1,5)       0;
+        0                 0              dp(3,3)/gp(3,3)]; %[F/m]
+% density
+rho_pzt=7600;%[kg/m3]
