@@ -211,6 +211,33 @@ end
 % mass matrix components %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 m11(ipztEl)=m11(ipztEl)+rho_pzt*(pzt_thickness);
 J11(ipztEl)=J11(ipztEl)+rho_pzt*((h/2+pzt_thickness/2)^3-(h/2)^3)/3;
+ % stiffness matrix components %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+h2_=h/2+pzt_thickness/2;
+h1_=h/2; 
+a44(ipztEl)=a44(ipztEl)+Qpzt(4,4)*5/4*(h2_-h1_-4/3*(h2_^3-h1_^3)/(h+pzt_thickness)^2);
+a45(ipztEl)=a45(ipztEl)+Qpzt(4,5)*5/4*(h2_-h1_-4/3*(h2_^3-h1_^3)/(h+pzt_thickness)^2);
+a55(ipztEl)=a55(ipztEl)+Qpzt(5,5)*5/4*(h2_-h1_-4/3*(h2_^3-h1_^3)/(h+pzt_thickness)^2);
+
+a11(ipztEl)=a11(ipztEl)+Qpzt(1,1)*(h2_-h1_);
+a12(ipztEl)=a12(ipztEl)+Qpzt(1,2)*(h2_-h1_);
+a16(ipztEl)=a16(ipztEl)+Qpzt(1,6)*(h2_-h1_);
+a22(ipztEl)=a22(ipztEl)+Qpzt(2,2)*(h2_-h1_);
+a26(ipztEl)=a26(ipztEl)+Qpzt(2,6)*(h2_-h1_);
+a66(ipztEl)=a66(ipztEl)+Qpzt(6,6)*(h2_-h1_);
+
+b11(ipztEl)=b11(ipztEl)+Qpzt(1,1)*(h2_^2-h1_^2)/2;
+b12(ipztEl)=b12(ipztEl)+Qpzt(1,2)*(h2_^2-h1_^2)/2;
+b16(ipztEl)=b16(ipztEl)+Qpzt(1,6)*(h2_^2-h1_^2)/2;
+b22(ipztEl)=b22(ipztEl)+Qpzt(2,2)*(h2_^2-h1_^2)/2;
+b26(ipztEl)=b26(ipztEl)+Qpzt(2,6)*(h2_^2-h1_^2)/2;
+b66(ipztEl)=b66(ipztEl)+Qpzt(6,6)*(h2_^2-h1_^2)/2;
+
+d11(ipztEl)=d11(ipztEl)+Qpzt(1,1)*(h2_^3-h1_^3)/3;
+d12(ipztEl)=d12(ipztEl)+Qpzt(1,2)*(h2_^3-h1_^3)/3;
+d16(ipztEl)=d16(ipztEl)+Qpzt(1,6)*(h2_^3-h1_^3)/3;
+d22(ipztEl)=d22(ipztEl)+Qpzt(2,2)*(h2_^3-h1_^3)/3;
+d26(ipztEl)=d26(ipztEl)+Qpzt(2,6)*(h2_^3-h1_^3)/3;
+d66(ipztEl)=d66(ipztEl)+Qpzt(6,6)*(h2_^3-h1_^3)/3;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % End of composite.m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
