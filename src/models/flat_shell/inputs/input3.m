@@ -79,7 +79,7 @@ outputs=[25];
  YE11=8e10; %[N/m^2] youngs modulus at constant electric field
  YE33=6.8e10; %[N/m^2] youngs modulus at constant electric field
  nu11=0.31; % Poisson ratio - assumed
-% elastic compliance matrix
+
  Spzt=[ 1/YE11      -nu11/YE11    -nu11/YE33   0           0        0;
        -nu11/YE11   1/YE11      -nu11/YE33     0           0        0;
        -nu11/YE33    -nu11/YE33    1/YE33      0           0        0;
@@ -93,12 +93,12 @@ outputs=[25];
       %sx    sy  sz  sxz syz sxy
 dp=  [ 0     0   0   0   480 0;
        0     0   0   480 0   0;
-      -175 -175  290 0   0   0]*10^-12;%[C/N] or [m/V]
+      -175 -175/2  290 0   0   0]*10^-12;%[C/N] or [m/V]
 % voltage constants
       %sx    sy  sz  sxz syz sxy
 gp=  [ 0     0   0   0   38 0;
        0     0   0   38 0   0;
-      -12.4 -12.4  26.5 0   0   0]*10^-3;%[m^2/C] or [Vm/N] 
+      -12.4 -12.4/2  26.5 0   0   0]*10^-3;%[m^2/C] or [Vm/N] 
 % gpzt must be calculated   ???
 % permittivity matrix (strain-charge form)
 epsT=   [dp(1,5)/gp(1,5)    0                  0;
@@ -107,4 +107,4 @@ epsT=   [dp(1,5)/gp(1,5)    0                  0;
 % density
 rho_pzt=7600;%[kg/m3]
 pzt_thickness =0.5/1000; % pzt thickness [m]
-theta_pzt = 0; % rotation angle of pzt [deg]
+theta_pzt = 30; % rotation angle of pzt [deg]

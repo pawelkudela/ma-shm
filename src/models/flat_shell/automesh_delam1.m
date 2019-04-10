@@ -74,7 +74,7 @@ for j=n/2+1:n
                     figfilename = [figure_output_path,mesh_filename];
                     image_label_filename = [image_label_path,filesep,mesh_filename];
                     delam_image_label(N,xCenter*N/L,yCenter*N/W,a*N/L,b*N/W,rotAngle,image_label_filename);
-                    if(overwrite||(~overwrite && ~exist([figfilename,'.png'], 'file')))
+                    if(overwrite||(~overwrite && ~exist([mesh,filesep,mesh_filename,'.mat'], 'file')))
                              %% RUN AUTOMESH
                          try
                             disp(mesh_filename);

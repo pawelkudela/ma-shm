@@ -34,7 +34,7 @@ function t_frames=main_flat_shell(test_case,input_no,meshfile,mode,output_name,t
 assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
 run(fullfile('inputs',['input',num2str(input_no)]));
 frm_int=floor(nft/(nFrames)); % save displacement with interval time step frm_int (frames)
-pztEl=[];pztnum=[];
+%pztEl=[];pztnum=[];
 
 load(meshfile); % coord nodes
 nx=shape_order+1;
@@ -53,12 +53,20 @@ if(isempty(delamEl))
     [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay);
    else
     % host structure elastic constants for delaminated case
-    [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
+    if(isempty(pztEl))
+        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
+    else
+        % piezoelectric constants
+        [Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT,theta_pzt);
+        % Qpzt - elastic coefficients under constant electric field
+        % epzt - matrix of piezoelectric coupling constants (voltage constants)
+        % gpzt - permittivity matrix in stress-charge form
+        % theta_pzt - rotation angle of pzt [deg]
+        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam_pzt(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes,rho_pzt,pzt_thickness,Qpzt,pztEl);
+    end
 end
 
 nz=3;
-pzt_thickness =0.5/1000; % pzt thickness [m]
-%[nodes2,coords2]=connect_pzt3D_to_plate_fun(nx,ny,nz,pztEl,nodes,coords,pzt_thickness);
 
 [ksi,wx]=gll(nx); % weights and nodes distribution
 [eta,wy]=gll(ny);
@@ -99,7 +107,8 @@ dt=tt/nft;   % calculation time step [s]
 %  plot(t,st);pause(1);
  
 %% forces induced by the pzt actuators
-pztnum=reshape(pztEl,1,[]);
+%pztnum=reshape(pztEl,1,[]);
+
 %pztnum=[];
 c=0;
 PZT_actuator=[];
@@ -113,120 +122,127 @@ for ne=1:1
    c=c+1;
    PZT_sensor(c).pztEl=[pztEl(c,:)]; % 
 end
-% piezoelectric constants
-[Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT);
-% Qpzt - elastic coefficients under constant electric field
-% epzt - matrix of piezoelectric coupling constants (voltage constants)
-% gpzt - permittivity matrix in stress-charge form
-%Fa2=zeros(dof,1);
+
+
 
 [Vx,Vzx]=Vandermonde_old(ksi,dzeta,nx,nz);
 
 % disp('forces...');
 % NofElNodes2=nx*ny*nz;
-% % commented code also works if only one layer of elements is used for pzt
-% % modelling
-% % for j=1:length(PZT_actuator)
-% %     for ne=PZT_actuator(j).pztEl
-% %         [kufi,kfifi]=coupl3D_v2(epzt,gpzt,coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
-% %         kfiu=kufi';
-% %         [fa,fi]=Forces_actuator_mex2(V0,kfiu,kfifi,nx,nz);    
-% %         Fa(Inc(ne,:))=Fa(Inc(ne,:))+fa; % assembly
-% %     end
-% % end
-% if(isempty(pztEl))
-% else
-% for j=1:length(PZT_actuator)
-%     ne=PZT_actuator(j).pztEl;
-%     nodespzt=nodes2(ne,:);
-% %     [p,nodespzt]=remove_free_spec_nodes(coords,nodespzt);
-%     % electric boundary conditions for sensor in open circuit
-%     
-%     EBC0=nodespzt(:,1:nx*ny);   
-%     EBCI=nodespzt(:,nx*ny+1:end-nx*ny);   
-%     EBCN=nodespzt(:,end-nx*ny+1:end);
-%     %EBCN=reshape(EBCN,[],1);
-%     %EBCN=setxor(EBCN,nodespzt(12,end-nx*ny+1:end)'); % no voltage on top of el 12
-%     %EBC0=reshape(EBC0,1,[]);
-%     %EBC0=[EBC0,nodespzt(12,end-nx*ny+1:end)];  % grounding on top of el 12
-%     
-%     EBC0=unique(EBC0);
-%     EBCI=unique(EBCI);
-%     EBCN=unique(EBCN);
-%     EBC0=reshape(EBC0,1,[]);
-%     EBCI=reshape(EBCI,1,[]);
-%     EBCN=reshape(EBCN,1,[]);
-%     BC03=zeros(1,3*length(EBC0));
-%     BC03(1:3:end)=3*EBC0-2;
-%     BC03(2:3:end)=3*EBC0-1;
-%     BC03(3:3:end)=3*EBC0-0;
-% 
-%     BCI3=zeros(1,3*length(EBCI));
-%     BCI3(1:3:end)=3*EBCI-2;
-%     BCI3(2:3:end)=3*EBCI-1;
-%     BCI3(3:3:end)=3*EBCI-0;
-% 
-%     BCN3=zeros(1,3*length(EBCN));
-%     BCN3(1:3:end)=3*EBCN-2;
-%     BCN3(2:3:end)=3*EBCN-1;
-%     BCN3(3:3:end)=3*EBCN-0;
-%     % assembly
-% %     dofpzt=3*NofNodes2;
-% %     Kfifi=sparse(dofpzt/3,dofpzt/3);
-% %     Kfiu=sparse(dofpzt/3,dofpzt);
-%     Incpzt=zeros(length(PZT_sensor(j).pztEl),3*NofElNodes2);
-%     
-%     Incpzt(:,1:3:end)=3*nodespzt(:,:)-2;
-%     Incpzt(:,2:3:end)=3*nodespzt(:,:)-1;
-%     Incpzt(:,3:3:end)=3*nodespzt(:,:)-0;
-%     cpzt=0;
-%     for ne=PZT_actuator(j).pztEl       
-%         cpzt=cpzt+1;
-%         %[kfiu,kfifi]=couplingPZT3D_new_mex2(coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),ksi,wx,nx,epzt,gpzt,Vx,dzeta,wz,nz,Vzx);
-%         %[kufi,kfifi]=coupl3D_v2(epzt,gpzt,coords(nodes(ne,:),1),coords(nodes(ne,:),2),(coords(nodes(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
-%         [kufi,kfifi]=coupl3D_global(epzt,gpzt,coords2(nodes2(ne,:),1),coords2(nodes2(ne,:),2),(coords2(nodes2(ne,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
-% 
-%         kfiu=sparse(kufi');kfifi=sparse(kfifi);
-% %         [iout]=dofs3D(Incpzt,cpzt,dofpzt,NofElNodes2);
-% %         [iout2]=dofs3Dfifi(nodespzt,cpzt,dofpzt/3,NofElNodes2);
-% %         Kfiu=Kfiu+iout2'*kfiu*iout;
-% %         Kfifi=Kfifi+iout2'*kfifi*iout2;
-%        KfiuA=[kfiu(EBCI,BC03),kfiu(EBCI,BCI3),kfiu(EBCI,BCN3)];% actuator BC
-%        KfifiA=kfifi(EBCI,EBCI); % actuator 
-%        Kfifiin=kfifi(EBCI,EBCN);
-%        V1=zeros(size(kfifi,1),1);
-%        V1(EBCN,1)=V0; % top
-%        V1(EBC0,1)=0; % bottom
-%        Fetemp=Kfifiin*V1(EBCN);
-%        fiAi=-KfifiA\Fetemp; % induced potential
-%        FiA=zeros(size(kfifi,1),1);
-%        %FiA=[V1(EBC0);fiAi;V1(EBCN)]; % potenitial together with applied voltage
-%        FiA(EBCN)=V0;
-%        FiA(EBCI)=fiAi;
-%        FaL=kfiu'*FiA; % local forces in pzt actuator j
-%        BN=[BC03';BCI3';BCN3'];
-%        PZT_actuator(j).BN=BN;
-%       Fa(BN)=FaL(BN); % global forces from pzt actuator j
-%    end
-%    
-%   
-% 
-%     
-% end
-% end
-% Fa=full(Fa);
-% %Fa(1:3:end)=Fa(1:3:end)*10;
-% %Fa(2:3:end)=Fa(2:3:end)*10;
-% clear FaL Fetemp
-% switch mode
-%     case 'gpu'
-%     %Fa=gdouble(Fa); geval(Fa);
-%     Fa = gpuArray(Fa);
-%     case 'cpu'
-%         
-% end
-% %Fa2=zeros(dof,1);
+if(isempty(pztEl))
+else
+    Fa=zeros(dof,1);
+    
+for j=1:length(PZT_actuator)
+    FaxG=zeros(max(max(nodes)),1);
+    FayG=zeros(max(max(nodes)),1);
+    [nodespzt,coordspzt]=connect_pzt3D_to_plate_fun(nx,ny,nz,PZT_actuator(j).pztEl,nodes,coords,pzt_thickness,h);
+    %     [p,nodespzt]=remove_free_spec_nodes(coords,nodespzt);
+    % electric boundary conditions for sensor in open circuit
+    
+    EBC0=nodespzt(:,1:nx*ny);
+    EBCI=nodespzt(:,nx*ny+1:end-nx*ny);
+    EBCN=nodespzt(:,end-nx*ny+1:end);
+    
+    EBC0=unique(EBC0);
+    EBCI=unique(EBCI);
+    EBCN=unique(EBCN);
+    EBC0=reshape(EBC0,1,[]);
+    EBCI=reshape(EBCI,1,[]);
+    EBCN=reshape(EBCN,1,[]);
+    BC03=zeros(1,3*length(EBC0));
+    BC03(1:3:end)=3*EBC0-2;
+    BC03(2:3:end)=3*EBC0-1;
+    BC03(3:3:end)=3*EBC0-0;
+    
+    BCI3=zeros(1,3*length(EBCI));
+    BCI3(1:3:end)=3*EBCI-2;
+    BCI3(2:3:end)=3*EBCI-1;
+    BCI3(3:3:end)=3*EBCI-0;
+    
+    BCN3=zeros(1,3*length(EBCN));
+    BCN3(1:3:end)=3*EBCN-2;
+    BCN3(2:3:end)=3*EBCN-1;
+    BCN3(3:3:end)=3*EBCN-0;
+    % assembly
+    NofNodes = max(max(nodespzt));
+    dofpzt=NofNodes*3;
+    Kfifi=sparse(NofNodes,NofNodes);
+    Kfiu=sparse(NofNodes,dofpzt);
+    Incpzt=zeros(length(PZT_sensor(j).pztEl),3*nx*ny*nz);
+    
+    Incpzt(:,1:3:end)=3*nodespzt(:,:)-2;
+    Incpzt(:,2:3:end)=3*nodespzt(:,:)-1;
+    Incpzt(:,3:3:end)=3*nodespzt(:,:)-0;
+    cpzt=0;
+    for ne=PZT_actuator(j).pztEl
+        cpzt=cpzt+1;
+        [kufi,kfifi]=coupl3D_global(epzt,gpzt,coordspzt(nodespzt(cpzt,:),1),coordspzt(nodespzt(cpzt,:),2),(coordspzt(nodespzt(cpzt,:),3)),Qx,Qy,Qz,ksi,eta,dzeta,wx,wy,wz);
+        
+        kfiu=sparse(kufi');kfifi=sparse(kfifi);
+        [iout]=dofs3D(Incpzt,cpzt,dofpzt,nx*ny*nz);
+        [iout2]=dofs3Dfifi(nodespzt,cpzt,NofNodes,nx*ny*nz);
+        Kfiu=Kfiu+iout2'*kfiu*iout;
+        Kfifi=Kfifi+iout2'*kfifi*iout2;
+    end
+    KfiuA=[Kfiu(EBCI,BC03),Kfiu(EBCI,BCI3),Kfiu(EBCI,BCN3)];% actuator BC
+    KfifiA=Kfifi(EBCI,EBCI); % actuator
+    Kfifiin=Kfifi(EBCI,EBCN);
+    V1=sparse(NofNodes,1);
+    V1(EBCN,1)=V0; % top
+    V1(EBC0,1)=0; % bottom
+    Fetemp=Kfifiin*V1(EBCN);
+    fiAi=-KfifiA\Fetemp; % induced potential
+    FiA=sparse(NofNodes,1);
+    
+    FiA(EBCN)=V0;
+    FiA(EBCI)=fiAi;
+    FaL=Kfiu'*FiA; % local forces in pzt actuator j
+    [boundary_nodes_pzt] = find_boundary_nodes(nodespzt(:,1:nx*ny),nx,ny);
+    [boundary_nodes_global] = find_boundary_nodes(nodes(PZT_actuator(j).pztEl,1:nx*ny),nx,ny);
+    FaxL=FaL(1:3:end);
+    FayL=FaL(2:3:end);
+    FazL=FaL(3:3:end);
+    FaxG(boundary_nodes_global,1)=FaxL(boundary_nodes_pzt,1);
+    FayG(boundary_nodes_global,1)=FayL(boundary_nodes_pzt,1);
+    Fa(1:5:end,1) = FaxG; % pzt equivalent force along x axis
+    Fa(3:5:end,1) = FayG; % pzt equivalent force alogn y axis
+    Fa(2:5:end,1) = FaxG *(h/2+pzt_thickness/2); % pzt equivalent bending moment at neutral plane
+    Fa(4:5:end,1) = FayG *(h/2+pzt_thickness/2); % pzt equivalent bending moment at neutral plane
+end
+end
 
+scale = 1;
+% figure
+% for ne=1:length(pztEl)
+% plot3(coordspzt(nodespzt(ne,1:36),1),coordspzt(nodespzt(ne,1:36),2),coordspzt(nodespzt(ne,1:36),3),'b.')
+% hold on;
+% quiver(coordspzt(nodespzt(ne,1:36),1),coordspzt(nodespzt(ne,1:36),2),FaxL(nodespzt(ne,1:36)),FayL(nodespzt(ne,1:36)),scale,'r');
+% end
+% view(2);axis square;
+% figure
+% for ne=1:length(pztEl)
+% plot3(coordspzt(nodespzt(ne,37:72),1),coordspzt(nodespzt(ne,37:72),2),coordspzt(nodespzt(ne,37:72),3),'b.')
+% hold on;
+% quiver(coordspzt(nodespzt(ne,37:72),1),coordspzt(nodespzt(ne,37:72),2),FaxL(nodespzt(ne,37:72)),FayL(nodespzt(ne,37:72)),scale,'r');
+% end
+% view(2);axis square;
+% figure
+% for ne=1:length(pztEl)
+% plot3(coordspzt(nodespzt(ne,37:72),1),coordspzt(nodespzt(ne,37:72),2),coordspzt(nodespzt(ne,37:72),3),'b.')
+% hold on;
+% quiver3(coordspzt(nodespzt(ne,37:72),1),coordspzt(nodespzt(ne,37:72),2),coordspzt(nodespzt(ne,37:72),3),FaxL(nodespzt(ne,37:72)),FayL(nodespzt(ne,37:72)),FazL(nodespzt(ne,37:72)),scale,'r');
+% end
+% view(2);axis square;
+% figure
+% quiver(coordspzt(boundary_nodes_pzt,1),coordspzt(boundary_nodes_pzt,2),FaxL(boundary_nodes_pzt),FayL(boundary_nodes_pzt),scale,'r');
+% view(2);axis square;
+% 
+% figure
+% quiver(coords(boundary_nodes_global,1),coords(boundary_nodes_global,2),FaxG(boundary_nodes_global,1),FayG(boundary_nodes_global,1),scale,'r');
+% view(2);axis equal;
+% pause;
+% close all;
 %% Output file for solution
 outfile_voltage=fullfile(output_name,['voltage',num2str(test_case)]);
 outfile_displ=fullfile(output_name,['displ',num2str(test_case)]);
@@ -280,13 +296,13 @@ clear Nys;
 clear indxi indxj indyi indyj;
 X=zeros(fen*NofElNodes,1);
 Y=zeros(fen*NofElNodes,1);
-Z=zeros(fen*NofElNodes,1);
+% Z=zeros(fen*NofElNodes,1);
 for ne=1:fen
     n1=(ne-1)*NofElNodes+1;
     n2=n1+NofElNodes-1;
     X(n1:n2)=coords(nodes(ne,:),1);
     Y(n1:n2)=coords(nodes(ne,:),2);
-    Z(n1:n2)=coords(nodes(ne,:),3);
+%     Z(n1:n2)=coords(nodes(ne,:),3);
 end
 switch mode
     case 'gpu'
@@ -295,54 +311,18 @@ switch mode
  
     X=gpuArray(X);
     Y=gpuArray(Y);
-    Z=gpuArray(Z);
+%     Z=gpuArray(Z);
     case 'cpu'
         
 end
 disp('jacobians'); 
 J11=Npx*X;
 J21=Npx*Y;
-J31=Npx*Z;
+% J31=Npx*Z;
 J12=Npy*X;
 J22=Npy*Y;
-J32=Npy*Z;
-% normal vector
-v31=J21.*J32-J22.*J31; 
-v32=J12.*J31-J11.*J32;
-v33=J11.*J22-J12.*J21;  
-y0=v31.*v31+v32.*v32+v33.*v33;
-ys=sqrt(y0);
-v31=v31./ys;
-v32=v32./ys;
-v33=v33./ys;
-%/*v1 vector*/
-%v11=J11;
-%v12=J21;
-%v13=J31;
-v11=J11.*J22-J12.*J21;
-v12=zeros(fen*NofElNodes,1);
-v13=J22.*J31-J21.*J32;
-y0=v11.*v11+v12.*v12+v13.*v13; 
-ys=sqrt(y0);
-v11=v11./ys;
-v12=v12./ys;
-v13=v13./ys;
-%/*cross product v2=v3xv1*/
-% v21=(J12.*J31-J11.*J32).*J31-J21.*(J11.*J22-J12.*J21);
-% v22=(J11.*J22-J12.*J21).*J11-J31.*(J21.*J32-J22.*J31);
-% v23=(J21.*J32-J22.*J31).*J21-J11.*(J12.*J31-J11.*J32);
-v21=v32.*v13-v33.*v12;
-v22=-v31.*v13+v33.*v11;
-v23=v31.*v12-v32.*v11;
-y0=v21.*v21+v22.*v22+v23.*v23;
-ys=sqrt(y0);
-v21=v21./ys;
-v22=v22./ys;
-v23=v23./ys;
+% J32=Npy*Z;
 
-th11=v11;th12=v21;th13=v31;
-th21=v12;th22=v22;th23=v32;
-th31=v13;th32=v23;th33=v33;
 
 
 % clear X Y
@@ -446,22 +426,22 @@ switch mode
     case 'gpu'
     Iu=gpuArray(Iu);       
     U=zeros(dof,1,'double','gpuArray');
-    UX=zeros(fen*NofElNodes,1,'double','gpuArray');
-    UY=zeros(fen*NofElNodes,1,'double','gpuArray');
-    UZ=zeros(fen*NofElNodes,1,'double','gpuArray');
-    FIX=zeros(fen*NofElNodes,1,'double','gpuArray');
-    FIY=zeros(fen*NofElNodes,1,'double','gpuArray');
+%     UX=zeros(fen*NofElNodes,1,'double','gpuArray');
+%     UY=zeros(fen*NofElNodes,1,'double','gpuArray');
+%     UZ=zeros(fen*NofElNodes,1,'double','gpuArray');
+%     FIX=zeros(fen*NofElNodes,1,'double','gpuArray');
+%     FIY=zeros(fen*NofElNodes,1,'double','gpuArray');
     F2=zeros(5*fen*NofElNodes,1,'double','gpuArray');
     mgL=zeros(5*fen*NofElNodes,1,'double','gpuArray');
     mg=zeros(dof,1,'double','gpuArray'); % global mass matrix
    
     case 'cpu'
     U=zeros(dof,1);
-    UX=zeros(fen*NofElNodes,1);
-    UY=zeros(fen*NofElNodes,1);
-    UZ=zeros(fen*NofElNodes,1); 
-    FIX=zeros(fen*NofElNodes,1);
-    FIY=zeros(fen*NofElNodes,1);
+%     UX=zeros(fen*NofElNodes,1);
+%     UY=zeros(fen*NofElNodes,1);
+%     UZ=zeros(fen*NofElNodes,1); 
+%     FIX=zeros(fen*NofElNodes,1);
+%     FIY=zeros(fen*NofElNodes,1);
     F2=zeros(5*fen*NofElNodes,1);
     mgL=zeros(5*fen*NofElNodes,1);
     mg=zeros(dof,1); % global mass matrix
@@ -586,12 +566,12 @@ col=1;
 switch mode
     case 'gpu'
     uold=zeros(dof,1,'double','gpuArray');
-    unew=zeros(dof,1,'double','gpuArray'); % memory prealocation
-    v=zeros(dof,1,'double','gpuArray');
+%     unew=zeros(dof,1,'double','gpuArray'); % memory prealocation
+%     v=zeros(dof,1,'double','gpuArray');
     case 'cpu'
     uold=zeros(dof,1);
-    unew=zeros(dof,1); % memory prealocation
-    v=zeros(dof,1);
+%     unew=zeros(dof,1); % memory prealocation
+%     v=zeros(dof,1);
 end
 
 mg2=a2*mg;
@@ -625,18 +605,15 @@ else
     % pzt actuator excitation is not implemented !
     switch mode
         case 'gpu'
-            Fa=zeros(dof,1,'double','gpuArray');  
+            Fa=gpuArray(Fa);  
         case 'cpu'
-            Fa=zeros(dof,1);
+            
     end
 end
 
 if(isempty(pztEl))
     Fi(outputs(1))=1;Fi=Fi*V0; % force excitation according to dof defined in output  
     %Fi(3)=1;Fi=Fi*V0; % force excitation in z direction
-else
-    % pzt actuator excitation is not implemented !
-     Fa(outputs(1))=1;Fa=Fa*V0;
 end
 
 tic;minTime = Inf;

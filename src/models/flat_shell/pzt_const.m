@@ -1,7 +1,18 @@
-function [Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT)
+function [Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT,theta)
 
-ep=dp*inv(Spzt);
-gpzt=epsT-ep*dp';
+theta = theta*pi/180;
+m=cos(theta);n=sin(theta);
+% Sierakowski p. 45, eq. 2.31
+Tinv=[m^2, n^2,  0,  0, 0,  -2*m*n;
+         n^2, m^2,  0,  0, 0,   2*m*n;
+         0,     0,      1,  0, 0,     0;
+         0,     0,      0,  m, n,    0;
+         0,     0,      0, -n, m,   0;
+         m*n, -m*n, 0,  0, 0, (m^2 - n^2)];
+dp_= Tinv*dp';
+
+ep=dp_'*inv(Spzt);
+gpzt=epsT-ep*dp_;
 %gpzt=epsT;
 %elastic constants matrix of pzt element (stiffness matrix)
 % change convention from Ex,Ey,Ez,Gxz,Gyz,Gxy into: Ex,Ey,Ez,Gxy,Gxz,Gyz

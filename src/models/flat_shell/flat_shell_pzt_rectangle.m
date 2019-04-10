@@ -18,23 +18,24 @@ model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
 % load mesh parameters
-load([image_label_path,filesep,'mesh_parameters']);
+mesh_parameters(1).meshfile = 'rectangle_pzt_test';
+mesh_parameters(2).meshfile = 'rectangle_pzt_test2';
+mesh_parameters(3).meshfile = 'rectangle_pzt_test3';
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
-input_no = 2;
-%tasks=[6];
-tasks=[2];
-%tasks=[41];
+input_no = 4;
+tasks=[3];
+
 mode='gpu'; % options: mode='cpu';mode='gpu';
-%meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
-%meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
+
+
 
 %% input for post-processing
 Nx=500;
 Ny=500;
 shell_surface = 'top'; % options: shell_surface = 'top'; shell_surface = 'bottom';
 %% input for figures
-selected_frames = [64,128,256,512];
+selected_frames = [32,64,128,256,384,512];
 %ColorMapName = 'jet';
 %ColorMapName = 'map_sunset_interp'; % zero-symmetric
 ColorMapName = 'map_burd_interp'; % zero-symmetric
@@ -74,13 +75,13 @@ for test_case=tasks
             % out-of-plane
             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,shell_surface,output_name,interim_output_name); % Vz 
             plot_meshgrid_frames(Data,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
-            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
-            plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+%             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
+%             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
             % in-plane
             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,shell_surface,output_name,interim_output_name); % sqrt((Vx-h/2.*VFix).^2+(Vy-h/2.*VFiy).^2)
             plot_meshgrid_frames(Data,'top',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
-            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
-            plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
+%             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
+%             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
             %delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);

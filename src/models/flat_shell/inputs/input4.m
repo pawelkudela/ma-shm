@@ -1,7 +1,7 @@
 disp('.. Reading input data');
 %% Signal definition
 nft=1024*64;      % total number of samples
-tt=0.5e-3;          % total calculation time [s] % 
+tt=0.75e-3;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
 f_1=50e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]
@@ -75,36 +75,37 @@ delamination_layer = [1]; % delamination layer counting from the top after which
 %% additional outputs
 outputs=[25];
 %% pzt properties
-% Navy I 840
- YE11=8e10; %[N/m^2] youngs modulus at constant electric field
- YE33=6.8e10; %[N/m^2] youngs modulus at constant electric field
- nu11=0.31; % Poisson ratio - assumed
+% Noliac NCE51
+ YE11=5.9e10; %[N/m^2] youngs modulus at constant electric field
+ YE22=5.9e10; %[N/m^2] youngs modulus at constant electric field
+ YE33=4.8e10; %[N/m^2] youngs modulus at constant electric field
+ nu11=0.32; % Poisson ratio
 % elastic compliance matrix
- Spzt=[ 1/YE11      -nu11/YE11    -nu11/YE33   0           0        0;
-       -nu11/YE11   1/YE11      -nu11/YE33     0           0        0;
-       -nu11/YE33    -nu11/YE33    1/YE33      0           0        0;
-        0              0           0       (1+nu11)/YE33   0        0;
-        0              0           0           0     (1+nu11)/YE33   0;
-        0              0           0           0         0    (1+nu11)/YE11];%[m^2/N] efunda
+ Spzt=[ 1/YE11      -nu11/YE11    -nu11/YE33        0                      0                0;
+       -nu11/YE11       1/YE11       -nu11/YE33        0                      0                0;
+       -nu11/YE33    -nu11/YE33     1/YE33             0                      0                0;
+           0                   0                  0         (1+nu11)/YE33           0                0;
+           0                   0                  0                0               (1+nu11)/YE33     0;
+           0                   0                  0                0                       0         (1+nu11)/YE11];%[m^2/N] efunda
 
 % matrix of piezoelectric coupling constants - charge constants
 % http://www.americanpiezo.com/apc-materials/piezoelectric-properties.html
 % Navy I 840
       %sx    sy  sz  sxz syz sxy
-dp=  [ 0     0   0   0   480 0;
-       0     0   0   480 0   0;
-      -175 -175  290 0   0   0]*10^-12;%[C/N] or [m/V]
+dp=  [ 0     0       0     0   669 0;
+         0     0       0    669  0   0;
+      -208 -208   443   0     0   0]*10^-12;%[C/N]
 % voltage constants
       %sx    sy  sz  sxz syz sxy
-gp=  [ 0     0   0   0   38 0;
-       0     0   0   38 0   0;
-      -12.4 -12.4  26.5 0   0   0]*10^-3;%[m^2/C] or [Vm/N] 
-% gpzt must be calculated   ???
+gp=  [ 0      0      0     0    38.9 0;
+         0      0      0    38.9  0   0;
+      -12.4 -12.4  26.3  0     0   0]*10^-3;%[Vm/N] 
+
 % permittivity matrix (strain-charge form)
-epsT=   [dp(1,5)/gp(1,5)    0                  0;
-        0              dp(1,5)/gp(1,5)       0;
-        0                 0              dp(3,3)/gp(3,3)]; %[F/m]
+epsT=   [dp(1,5)/gp(1,5)       0                         0;
+               0                 dp(1,5)/gp(1,5)            0;
+               0                       0              dp(3,3)/gp(3,3)]; %[F/m]
 % density
-rho_pzt=7600;%[kg/m3]
+rho_pzt=7850;%[kg/m3]
 pzt_thickness =0.5/1000; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]

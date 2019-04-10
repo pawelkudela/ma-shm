@@ -50,7 +50,7 @@ all_nodes = unique(nodes(all_elements,:));
 
 c=0;cc=0;
 for k=1:fen
-    [k,fen]
+    %[k,fen]
     common_nodes=nodes(all_elements(k),1:NofElNodesx*NofElNodesy);
     % corner nodes
     for i=1:4
