@@ -1,9 +1,9 @@
-function [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
-    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
-% AUTOMESH_DELAM   automatic mesh generation including 1 delamination region 
+function [msh,nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam_GUI...
+    (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder)
+% AUTOMESH_DELAM_GUI   automatic mesh generation including 1 delamination region 
 %    it uses gmsh external software 
 % 
-% Syntax: [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+% Syntax: [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam_GUI...
 %   (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
 % 
 % Inputs: 
@@ -24,7 +24,6 @@ function [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
 %    Smoothing - see gmsh manual
 %    mesh_filename - file name for mesh, string
 %    modelfolder - corresponding model folder name
-%    figfilename - file name for png figure of mesh
 % 
 % Outputs: 
 %    nodes - nodes of spectral elements (topology), integer, dimensions [NofElements, NofNodes] 
@@ -32,9 +31,10 @@ function [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
 %    den_under - delaminated element numbers under split interface
 %    den_above - delaminated element numbers above split interface
 %    I_G,I_L - global and corresponding local node number for parallel computation
+%    msh - quad mesh structure
 % 
 % Example: 
-%    [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam...
+%    [nodes,coords,den_under,den_above,I_G,I_L] = automesh_delam_GUI...
 %   (L,W,a,b,xCenter,yCenter,rotAngle,r,xpzt,ypzt,shape_order,CharacteristicLengthFactor,CharacteristicLengthMin,CharacteristicLengthMax,Smoothing,mesh_filename,modelfolder,figfilename)
 % 
 % Other m-files required: quad2spectral_Fiborek.m, split_delam_nodes_flat_shell.m, nodesMaps_Fiborek.m 
@@ -228,9 +228,9 @@ end
 
 % load mesh into matlab
 run([mesh_output_path, mesh_filename,'.m']);
-plot_mesh(msh,figfilename);
-
-close all;
+% plot_mesh(msh);
+% print(figfilename,'-dpng', '-r300'); 
+% close all;
 disp('Quad to spectral mesh conversion...');
 %[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
 %[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order);
@@ -276,4 +276,4 @@ save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','dela
 
 %---------------------- END OF CODE---------------------- 
 
-% ================ [automesh_delam.m] ================  
+% ================ [automesh_delam_GUI.m] ================  
