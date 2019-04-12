@@ -1,4 +1,4 @@
-function [Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT,theta)
+function [Qpzt,epzt,gpzt,e31,e32,g33]=pzt_const(Spzt,dp,epsT,theta)
 
 theta = theta*pi/180;
 m=cos(theta);n=sin(theta);
@@ -12,8 +12,8 @@ Tinv=[m^2, n^2,  0,  0, 0,  -2*m*n;
 dp_= Tinv*dp';
 
 ep=dp_'*inv(Spzt);
-gpzt=epsT-ep*dp_;
-%gpzt=epsT;
+%gpzt=epsT-ep*dp_;
+gpzt=epsT;
 %elastic constants matrix of pzt element (stiffness matrix)
 % change convention from Ex,Ey,Ez,Gxz,Gyz,Gxy into: Ex,Ey,Ez,Gxy,Gxz,Gyz
 % E-epsilon, G-gamma 
@@ -32,3 +32,7 @@ epzt=[ ep(1,1) ep(1,2) ep(1,3) ep(1,6) ep(1,5) ep(1,4);
          ep(3,1) ep(3,2) ep(3,3) ep(3,6) ep(3,5) ep(3,4)];%[C/N]
 
 
+ %epzt2D=epzt(:,[1,2,4,5,6]);
+ g33 = epsT(3,3);
+ e31 = ep(3,1);
+ e32 = ep(3,2);

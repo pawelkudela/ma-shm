@@ -24,7 +24,7 @@ mesh_parameters(3).meshfile = 'rectangle_pzt_test3';
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 4;
-tasks=[3];
+tasks=[2,3];
 
 mode='gpu'; % options: mode='cpu';mode='gpu';
 
@@ -82,7 +82,7 @@ for test_case=tasks
             plot_meshgrid_frames(Data,'top',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
 %             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
 %             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
-            %delete([output_name,'*frame*']); % delete frames
+            delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);
         end

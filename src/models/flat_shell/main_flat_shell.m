@@ -42,7 +42,9 @@ ny=shape_order+1;
 [fen,NofElNodes]=size(nodes);
 NofNodes=size(coords,1);
 %unDelamEl=setdiff(1:fen,delamEl);
-
+mesh_center = (mesh_max - mesh_min)/2;
+[~,I] = min(sqrt( (coords(:,1) - mesh_center(1)).^2+( coords(:,2) - mesh_center(2)).^2) );
+outputs=5*I; % transverse displacement at the plate center
 dof=5*NofNodes; % number of degrees of freedom
 
 % host structure material
@@ -57,7 +59,7 @@ if(isempty(delamEl))
         [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
     else
         % piezoelectric constants
-        [Qpzt,epzt,gpzt]=pzt_const(Spzt,dp,epsT,theta_pzt);
+        [Qpzt,epzt,gpzt,e31,e32,g33]=pzt_const(Spzt,dp,epsT,theta_pzt);
         % Qpzt - elastic coefficients under constant electric field
         % epzt - matrix of piezoelectric coupling constants (voltage constants)
         % gpzt - permittivity matrix in stress-charge form
@@ -132,7 +134,7 @@ end
 if(isempty(pztEl))
 else
     Fa=zeros(dof,1);
-    
+    voltage=zeros(nft,1);
 for j=1:length(PZT_actuator)
     FaxG=zeros(max(max(nodes)),1);
     FayG=zeros(max(max(nodes)),1);
@@ -421,6 +423,17 @@ for ne=1:fen
     Ifiy(n1:n2,1)=5*nodes(ne,:)-1;
     Iw(n1:n2,1)=5*nodes(ne,:);
 end    
+if(~isempty(pztEl))
+    Ipzt=zeros(length(pztEl)*NofElNodes,1);
+    for k=1:length(pztEl)
+        ne=pztEl(k);
+        n1=(ne-1)*NofElNodes+1;
+        n2=n1+NofElNodes-1;
+        c1=(k-1)*NofElNodes+1;
+        c2=c1+NofElNodes-1;
+        Ipzt(c1:c2,1)=n1:n2;
+    end
+end
 Uc=zeros(dof,1); % displacement on cpu
 switch mode
     case 'gpu'
@@ -662,7 +675,11 @@ for nn=2:nft
    my=Npxt*(Syyz.*invJ12.*WWDetJ)+Npyt*(Syyz.*invJ22.*WWDetJ)+Npxt*(Sxyz.*invJ11.*WWDetJ)+Npyt*(Sxyz.*invJ21.*WWDetJ)+Syz.*WWDetJ;
    
    fw=Npxt*(Syz.*invJ12.*WWDetJ)+Npyt*(Syz.*invJ22.*WWDetJ)+Npxt*(Sxz.*invJ11.*WWDetJ)+Npyt*(Sxz.*invJ21.*WWDetJ);
- 
+   if(~isempty(pztEl))
+       Volt = pzt_thickness/g33 *( e31*(NpxUX(Ipzt).*invJ11(Ipzt) +  NpyUX(Ipzt).*invJ12(Ipzt) + h/2* NpxFIX(Ipzt).*invJ11(Ipzt) + h/2*NpyFIX(Ipzt).*invJ12(Ipzt))  +...
+                                             e32*(NpxUY(Ipzt).*invJ21(Ipzt) +  NpyUY(Ipzt).*invJ22(Ipzt) + h/2* NpxFIY(Ipzt).*invJ21(Ipzt) + h/2*NpyFIY(Ipzt).*invJ22(Ipzt)));
+       voltage(nn,1) = gather(mean(Volt));
+   end
     switch mode
         case 'gpu'
         F=zeros(dof,1,'double','gpuArray');
@@ -758,7 +775,7 @@ for nn=2:nft
             if(isempty(pztEl))
                 save(outfile_displ,'displ');
             else
-                %save(outfile_voltage,'voltage');   
+                save(outfile_voltage,'voltage');   
                 save(outfile_displ,'displ'); 
             end
           return; 
@@ -767,7 +784,7 @@ for nn=2:nft
            if(isempty(pztEl))
                 save(outfile_displ,'displ');
             else
-               %save(outfile_voltage,'voltage');   
+               save(outfile_voltage,'voltage');   
                save(outfile_displ,'displ'); 
             end
            return; 
@@ -871,8 +888,12 @@ for nn=2:nft
         end
         no_of_remaining_tasks = length(tasks)-jj;
         if(no_of_remaining_tasks>0)
-            remaining_tasks =tasks(jj+1:length(tasks));
-            message2 = sprintf('%d remaining tasks in the queue: ',no_of_remaining_tasks);
+            %remaining_tasks =tasks(jj+1:length(tasks));
+             if(no_of_remaining_tasks==1)
+                message2 = sprintf('%d remaining task in the queue ',no_of_remaining_tasks);
+             else
+                 message2 = sprintf('%d remaining tasks in the queue ',no_of_remaining_tasks);
+             end
             disp(message2);
             %disp(remaining_tasks);
         else
@@ -888,7 +909,7 @@ end
 %%  END OF MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 averageTime = toc/(nft-1);
-%save(outfile_voltage,'voltage');   
+save(outfile_voltage,'voltage');   
 save(outfile_displ,'displ');
 % t_frames_filename=fullfile(output_name,'t_frames');
 % save(t_frames_filename,'t_frames');
