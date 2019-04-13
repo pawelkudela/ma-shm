@@ -1,6 +1,7 @@
 disp('.. Reading input data');
 %% Signal definition
-nft=1024*64;      % total number of samples
+%nft=1024*64;      % total number of samples
+nft=75000;      % total number of samples
 tt=0.75e-3;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
 f_1=50e3/5;        % frequency of the modulation signal [Hz]
@@ -99,8 +100,6 @@ delamination_layer = [2]; % delamination layer counting from the top after which
            0                   0                  0                0                       0         (1+nu11)/YE11];%[m^2/N] efunda
 
 % matrix of piezoelectric coupling constants - charge constants
-% http://www.americanpiezo.com/apc-materials/piezoelectric-properties.html
-% Navy I 840
       %sx    sy  sz  sxz syz sxy
 dp=  [ 0     0       0     0   669 0;
          0     0       0    669  0   0;

@@ -103,6 +103,7 @@ target/
 *.mexa64
 *.mexw64
 *.mexmaci64
+*.mlappinstall
 
 # documents
 *.docx

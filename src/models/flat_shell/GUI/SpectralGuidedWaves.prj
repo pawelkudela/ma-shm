@@ -1,0 +1,75 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="1947083639" file="E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\GUI\SpectralGuidedWaves.prj" location="E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\GUI" name="SpectralGuidedWaves" target="target.mlapps" target-name="Package App">
+    <param.appname>SpectralGuidedWaves</param.appname>
+    <param.authnamewatermark>Pawel Kudela</param.authnamewatermark>
+    <param.email>pk@imp.gda.pl</param.email>
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms />
+    <param.output>E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\GUI</param.output>
+    <param.guid>c010de11-09cd-4c88-94b9-f8a77c55c3f3</param.guid>
+    <unset>
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\SpectralGuidedWaves.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\common\nodesMaps_Fiborek.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\common\prepare_figure_paths.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\common\quad2spectral_Fiborek.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\automesh_delam_GUI.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\gll.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\split_delam_nodes_flat_shell.m</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\project_paths.mat</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\visualization\plot_mesh_GUI.m</file>
+    </fileset.depfun>
+    <fileset.resources>
+      <file>E:\work\projects\nawa-bekker\ma-shm\bin\external\gmsh</file>
+      <file>E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\geo_templates</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell" name="GUI" optional="false">E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\GUI</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2018a</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.1</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>

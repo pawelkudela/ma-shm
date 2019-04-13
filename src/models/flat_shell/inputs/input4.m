@@ -89,8 +89,6 @@ outputs=[25];
            0                   0                  0                0                       0         (1+nu11)/YE11];%[m^2/N] efunda
 
 % matrix of piezoelectric coupling constants - charge constants
-% http://www.americanpiezo.com/apc-materials/piezoelectric-properties.html
-% Navy I 840
       %sx    sy  sz  sxz syz sxy
 dp=  [ 0     0       0     0   669 0;
          0     0       0    669  0   0;

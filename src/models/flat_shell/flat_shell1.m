@@ -22,7 +22,7 @@ load([image_label_path,filesep,'mesh_parameters']);
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 5;
-tasks=[1:10];
+tasks=[13];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 %meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
 %meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
@@ -79,7 +79,7 @@ for test_case=tasks
             plot_meshgrid_frames(Data,'top',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
             [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',8,'bottom',output_name,interim_output_name); % sqrt((Vx+h/2.*VFix).^2+(Vy+h/2.*VFiy).^2)
             plot_meshgrid_frames(Data,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',8,fig_width,fig_height);
-            %delete([output_name,'*frame*']); % delete frames
+            delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);
         end
