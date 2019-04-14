@@ -53,15 +53,14 @@ fig_width = 12; fig_height = 12;
 axis equal;
 axis([msh.MIN(1) msh.MAX(1) msh.MIN(2)  msh.MAX(2)]);
 set(gca,'FontName','Times');
-set(gcf,'Color','w');
+set(h,'Color','w');
 set(gca,'Fontsize',10);
-fig = gcf;
-set(fig, 'Units','centimeters', 'Position',[10 10 fig_width fig_height]); 
+set(h, 'Units','centimeters', 'Position',[10 10 fig_width fig_height]); 
 % remove unnecessary white space
 set(gca,'LooseInset', max(get(gca,'TightInset'), 0.02));
-fig.PaperPositionMode   = 'auto';
-%print(figfilename,'-dpng', '-r300'); 
-saveas(h,figfilename,'png');
+h.PaperPositionMode   = 'auto';
+print(h,figfilename,'-dpng', '-r300'); 
+%saveas(h,figfilename,'png');
 delete(h);
 %---------------------- END OF CODE---------------------- 
 
