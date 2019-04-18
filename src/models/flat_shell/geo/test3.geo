@@ -3,12 +3,12 @@ L=0.500000;
 W=0.500000; 
 a=0.020000; 
 b=0.010000; 
-x=0.250000; 
-y=0.375000; 
-alpha=0.166667 *Pi; 
+x=0.500000; 
+y=0.500000; 
+alpha=0.250000 *Pi; 
 r=0.005000; 
-xpzt=0.350000; 
-ypzt=0.350000; 
+xpzt=0.250000; 
+ypzt=0.250000; 
 //+
 Point(1) = {0, 0, 0, 1.0};
 //+
@@ -34,21 +34,45 @@ Rotate {{0, 0, 1}, {x, y, 0}, alpha} {
   Curve{6}; 
 }
 //+
-Curve Loop(1) = {4, 1, 2, 3};
+BooleanDifference{ Curve{6}; Delete; }{ Curve{2};Curve{3};}
 //+
-Curve Loop(2) = {6};
+Delete {
+  Curve{6}; 
+}
 //+
-Curve Loop(3) = {5};
+Delete {
+  Curve{8}; 
+}
 //+
-Curve Loop(4) = {6};
+Delete {
+  Curve{2}; 
+}
 //+
-Curve Loop(5) = {5};
+Delete {
+  Curve{3}; 
+}
 //+
-Plane Surface(1) = {5};
+Line(9) = {2, 8};
 //+
-Plane Surface(2) = {4};
+Line(10) = {8, 3};
 //+
-Plane Surface(3) = {1, 2, 3};
+Line(11) = {3, 7};
+//+
+Line(12) = {7, 4};
+//+
+Curve Loop(1) = {5};
+//+
+Plane Surface(1) = {1};
+//+
+Curve Loop(2) = {10,11, 7};
+//+
+Plane Surface(2) = {2};
+//+
+Curve Loop(3) = {9, 7, 12,4,1};
+//+
+Curve Loop(4) = {5};
+//+
+Plane Surface(3) = {3, 4};
 //+
 Point(9) = {xpzt, ypzt, 0, 1.0};
 //+
