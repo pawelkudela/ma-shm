@@ -13,16 +13,16 @@ rhof=zeros(1,lay);
 nif=zeros(1,lay);
 alpha=zeros(1,lay);
 %%
-h=sum(lh);
+h=sum(lh(1:lay));
 h2(1)=h/2; h1(1)=h/2-lh(1);
-for i=2:lay;
+for i=2:lay
   h2(i)=h2(i-1)-lh(i-1);
   h1(i)=h1(i-1)-lh(i);
-end;
-for i=1:lay;
+end
+for i=1:lay
 % matrix properties %%%%%%fibres properties %%%%%%%%%%%%%%%%%
   em(i)=i_em(lmat(i));                ef(i)=i_ef(lfib(i));
   rhom(i)=i_rhom(lmat(i));            rhof(i)=i_rhof(lfib(i));
   nim(i)=i_nim(lmat(i));              nif(i)=i_nif(lfib(i));
   vol(i)=lvol(i);                     alpha(i)=lalpha(i);
-end;
+end

@@ -111,43 +111,43 @@ YE11=AllData.YE11*1e9; %[N/m^2] youngs modulus at constant electric field
 YE33=AllData.YE33*1e9; %[N/m^2] youngs modulus at constant electric field
 nu11=AllData.nu11; % Poisson ratio
 
-dp11=AllData.dp11*1e-12;
-dp12=AllData.dp12*1e-12;
-dp13=AllData.dp13*1e-12;
-dp14=AllData.dp14*1e-12;
-dp15=AllData.dp15*1e-12;
-dp16=AllData.dp16*1e-12;
-dp21=AllData.dp21*1e-12;
-dp22=AllData.dp22*1e-12;
-dp23=AllData.dp23*1e-12;
-dp24=AllData.dp24*1e-12;
-dp25=AllData.dp25*1e-12;
-dp26=AllData.dp26*1e-12;
-dp31=AllData.dp31*1e-12;
-dp32=AllData.dp32*1e-12;
-dp33=AllData.dp33*1e-12;
-dp34=AllData.dp34*1e-12;
-dp35=AllData.dp35*1e-12;
-dp36=AllData.dp36*1e-12;
+dp11=AllData.dp11;
+dp12=AllData.dp12;
+dp13=AllData.dp13;
+dp14=AllData.dp14;
+dp15=AllData.dp15;
+dp16=AllData.dp16;
+dp21=AllData.dp21;
+dp22=AllData.dp22;
+dp23=AllData.dp23;
+dp24=AllData.dp24;
+dp25=AllData.dp25;
+dp26=AllData.dp26;
+dp31=AllData.dp31;
+dp32=AllData.dp32;
+dp33=AllData.dp33;
+dp34=AllData.dp34;
+dp35=AllData.dp35;
+dp36=AllData.dp36;
 
-gp11=AllData.gp11*1e-12;
-gp12=AllData.gp12*1e-12;
-gp13=AllData.gp13*1e-12;
-gp14=AllData.gp14*1e-12;
-gp15=AllData.gp15*1e-12;
-gp16=AllData.gp16*1e-12;
-gp21=AllData.gp21*1e-12;
-gp22=AllData.gp22*1e-12;
-gp23=AllData.gp23*1e-12;
-gp24=AllData.gp24*1e-12;
-gp25=AllData.gp25*1e-12;
-gp26=AllData.gp26*1e-12;
-gp31=AllData.gp31*1e-12;
-gp32=AllData.gp32*1e-12;
-gp33=AllData.gp33*1e-12;
-gp34=AllData.gp34*1e-12;
-gp35=AllData.gp35*1e-12;
-gp36=AllData.gp36*1e-12;
+gp11=AllData.gp11;
+gp12=AllData.gp12;
+gp13=AllData.gp13;
+gp14=AllData.gp14;
+gp15=AllData.gp15;
+gp16=AllData.gp16;
+gp21=AllData.gp21;
+gp22=AllData.gp22;
+gp23=AllData.gp23;
+gp24=AllData.gp24;
+gp25=AllData.gp25;
+gp26=AllData.gp26;
+gp31=AllData.gp31;
+gp32=AllData.gp32;
+gp33=AllData.gp33;
+gp34=AllData.gp34;
+gp35=AllData.gp35;
+gp36=AllData.gp36;
 % elastic compliance matrix
  Spzt=[ 1/YE11      -nu11/YE11    -nu11/YE33        0                      0                0;
        -nu11/YE11       1/YE11       -nu11/YE33        0                      0                0;
@@ -174,8 +174,8 @@ epsT=   [dp(1,5)/gp(1,5)       0                         0;
 rho_pzt=AllData.rho_pzt;%[kg/m3] % density
 pzt_thickness =AllData.pzt_thickness/1e3; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]
-
 [h,h1,h2,em,rhom,nim,vol,ef,rhof,nif,alpha]=lay_const(lay,lh,i_em,i_ef,i_rhom,i_rhof,i_nim,i_nif,lvol,lalpha,lmat,lfib);
+pause(0.01);
 clear i_em i_ef i_rhom i_rhof i_nim i_nif lvol lalpha
 delamination_layer = AllData.delamination_layer;
 if(isempty(delamEl))
@@ -234,13 +234,13 @@ end
 tt = AllData.Totalpropagationtime/1e3;
 dt=tt/nft;   % calculation time step [s]
 f_1 = AllData.ModulationFrequency*1e3;% frequency of the modulation signal [Hz]
-f_2 = AllData.CarrierFrequency;% frequency of the carrier signal [Hz]
+f_2 = AllData.CarrierFrequency*1e3;% frequency of the carrier signal [Hz]
 t_1 = 0;
 V0 =AllData.Peakvoltage; % [V]
 [t,st]=Hanning_signal(dt,nft,f_1,f_2,t_1);
-%  figure;
-%  plot(t,st);pause(1);
- 
+%   figure;
+%   plot(t,st);pause(1);
+
 %% forces induced by the pzt actuators
 
 c=0;
@@ -407,6 +407,8 @@ for ne=1:fen
     Y(n1:n2)=coords(nodes(ne,:),2);
 %     Z(n1:n2)=coords(nodes(ne,:),3);
 end
+Xne=reshape(X,nx*ny,fen);
+Yne=reshape(Y,nx*ny,fen);
 switch mode
     case 'GPU'
     Npx=gpuArray(Npx);
@@ -425,7 +427,6 @@ J21=Npx*Y;
 J12=Npy*X;
 J22=Npy*Y;
 % J32=Npy*Z;
-
 
 
 % clear X Y
@@ -674,7 +675,7 @@ t_frames = zeros(nFrames,1);
 %%  MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('time integration...');
-
+app.ActuatotrAsSensorSignal.Visible = 'on';
 for nn=2:nft
     tstart = tic;
     %[nn,nft]
@@ -909,9 +910,11 @@ for nn=2:nft
                 save(outfile_AFix,'AFix'); % frame output for global vector of AFix acceleration
                 save(outfile_AFiy,'AFiy'); % frame output for global vector of AFiy acceleration   
         end
+        clc;
+        
         averageTime = toc/(nn-1);
         progress = round(nn/nft*100);
-        clc;
+        
         message1 = sprintf('Task %d progress: %d%%',test_case,progress);
         disp(message1);
         expected_duration_seconds = (nft-nn)*averageTime; 
@@ -921,6 +924,34 @@ for nn=2:nft
         message2 = sprintf('Expected finish time: %s',t_expected);
         disp('Expected finish time: ');
         disp(t_expected);
+        
+        % plot wavefield based on corner nodes only (takes too long 25s - 30s)
+%         tic
+%         close all;
+%         UZne = gather(UZ);
+%         UZne= reshape(UZne,nx*ny,fen);
+%         figure;
+%         fill(Xne([1,6,36,31],:),Yne([1,6,36,31],:),UZne([1,6,36,31],:));
+%         axis off ;
+%         axis equal;
+%         shading interp;
+%         colormap jet;
+%         toc
+%         disp(toc);
+%         
+        
+        
+        %cla(app.ActuatotrAsSensorSignal,'reset');
+        %cla(app.ActuatotrAsSensorSignal);
+        
+%         plot( app.ActuatotrAsSensorSignal,t(1:nn)*1e3,voltage(1:nn) );  
+%         hold(app.ActuatotrAsSensorSignal, 'on')
+%         plot( app.ActuatotrAsSensorSignal,t(nn+1:end)*1e3,voltage(nn+1:end),'r' );
+        
+        plot( app.ActuatotrAsSensorSignal,t*1e3,voltage(:,1)*1e3 );
+        Vmax = max(abs(voltage))*1e3;
+        axis(app.ActuatotrAsSensorSignal,[0 t(end)*1e3 -Vmax Vmax]);
+        ylabel(app.ActuatotrAsSensorSignal,'Voltage [mV]');    
         app.NotificationTextArea.Value = message2;
         drawnow;
         if(progress >=10 && progress <20)
