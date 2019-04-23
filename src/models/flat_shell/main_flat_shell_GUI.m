@@ -1,4 +1,4 @@
-function main_flat_shell_GUI(app,filename)
+function main_flat_shell_GUI(app,AllData_filename)
 % MAIN_FLAT_SHELL_GUI   Compute wavefield by using flat shell spectral elements  
 % 
 % Syntax: main_flat_shell_GUI(test_case,meshfile,mode,output_name)
@@ -34,7 +34,7 @@ function main_flat_shell_GUI(app,filename)
 %load('project_paths.mat','projectroot');
 test_case = 1;
 tasks = [];
-load(filename,'AllData');
+load(AllData_filename,'AllData');
 
 assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
 model_output_path = prepare_model_paths('raw','num','flat_shell','GUI');
@@ -102,7 +102,7 @@ i_rhom(1) = AllData.rhom;
 i_rhof(1) = AllData.rhof;
 i_nim(1) = AllData.nim;
 i_nif(1) = AllData.nif;
-lh = lh/1e3; % [mm]
+lh = lh/1e3; % [m]
 lvol = lvol/100;
 i_em = i_em*1e9;
 i_ef = i_ef*1e9;
@@ -944,11 +944,12 @@ for nn=2:nft
         %cla(app.ActuatotrAsSensorSignal,'reset');
         %cla(app.ActuatotrAsSensorSignal);
         
-%         plot( app.ActuatotrAsSensorSignal,t(1:nn)*1e3,voltage(1:nn) );  
+%         plot( app.ActuatotrAsSensorSignal,t(1:nn)*1e3,voltage(1:nn)*1e3 );  
 %         hold(app.ActuatotrAsSensorSignal, 'on')
-%         plot( app.ActuatotrAsSensorSignal,t(nn+1:end)*1e3,voltage(nn+1:end),'r' );
+%         plot( app.ActuatotrAsSensorSignal,t(nn+1:end)*1e3,voltage(nn+1:end)*1e3,'r' );
         
-        plot( app.ActuatotrAsSensorSignal,t*1e3,voltage(:,1)*1e3 );
+        %plot( app.ActuatotrAsSensorSignal,t*1e3,voltage(:,1)*1e3 );
+        plot( app.ActuatotrAsSensorSignal,t(1:nn)*1e3,voltage(1:nn)*1e3 ); 
         Vmax = max(abs(voltage))*1e3;
         axis(app.ActuatotrAsSensorSignal,[0 t(end)*1e3 -Vmax Vmax]);
         ylabel(app.ActuatotrAsSensorSignal,'Voltage [mV]');    
