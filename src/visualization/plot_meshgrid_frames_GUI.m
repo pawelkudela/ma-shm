@@ -52,10 +52,11 @@ function plot_meshgrid_frames_GUI(Data,shell_surface,filename,selected_frames,fi
 
 %    ColorMapName - map name: 'map_sunset', 'map_sunset_interp', 'map_burd', 'map_burd_interp'
 %    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
-is_custom_map = strcmp(ColorMapName,'map_sunset') || strcmp(ColorMapName,'map_sunset_interp') || strcmp(ColorMapName,'map_burd') ...
-    || strcmp(ColorMapName,'map_burd_interp') || strcmp(ColorMapName,'map_brewer') || strcmp(ColorMapName,'map_brewer_interp')...
-    || strcmp(ColorMapName,'map_iridescent') || strcmp(ColorMapName,'map_iridescent_interp') || strcmp(ColorMapName,'map_discrete_rainbow') ; 
+is_custom_map = strcmp(ColorMapName,'sunset')  || strcmp(ColorMapName,'burd') ...
+     || strcmp(ColorMapName,'brewer') ...
+    || strcmp(ColorMapName,'iridescent') ; 
 if(is_custom_map)
+    ColorMapName = ['map_',ColorMapName,'_interp'];
     [cmap] = custom_colour_maps(ColorMapName);
 end
 [variable_name] = flat_shell_variable_names(field_variable,motion);
@@ -68,6 +69,7 @@ for n=selected_frames
         Smin=-Smax;
     end
     h=figure(n);
+    h.Visible = 'off';
     surf(squeeze(((Data(:,:,n)))));
     axis equal;view(2);
     set(h,'color','white');axis off;

@@ -347,9 +347,9 @@ end
 
 
 %% Output file for solution
-outfile_voltage=fullfile(output_name,['voltage',num2str(test_case)]);
-outfile_displ=fullfile(output_name,['displ',num2str(test_case)]);
-outfile_time=fullfile(output_name,['time',num2str(test_case)]);
+outfile_voltage=fullfile(output_name,['voltage_',AllData_filename]);
+outfile_displ=fullfile(output_name,['displ_',AllData_filename]);
+outfile_time=fullfile(output_name,['time_',AllData_filename]);
 %%
 disp('local derivatives');
 [Nprimx,Nprimy]=shape2D_prim(nx,ny,Qx,Qy,ksi',eta');
@@ -792,7 +792,7 @@ for nn=2:nft
     end
     %%
     % save frame to file
-    if (mod(nn,frm_int) == 0)
+    if (mod(nn,frm_int) == 0 && c <nFrames)
         c=c+1;
         t_frames(c)=t(nn);
         switch field_variable
@@ -1013,8 +1013,8 @@ end
 averageTime = toc/(nft-1);
 save(outfile_voltage,'voltage');   
 save(outfile_displ,'displ');
-% t_frames_filename=fullfile(output_name,'t_frames');
-% save(t_frames_filename,'t_frames');
+t_frames_filename=fullfile(output_name,'t_frames');
+save(t_frames_filename,'t_frames');
 TotalNofNodes=dof/3;
 save(outfile_time,'minTime','averageTime','TotalNofNodes','t');
 switch mode
