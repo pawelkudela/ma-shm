@@ -88,7 +88,7 @@ for n=selected_frames
     %set(gca,'LooseInset', max(get(gca,'TightInset'), 0.02));
     %fig.PaperPositionMode   = 'auto';
     set(h,'PaperPositionMode','auto');
-        
+    [figure_output_path,figfilename];    
     print(h,[figure_output_path,figfilename],'-dpng', '-r600'); 
     delete(h);
 end

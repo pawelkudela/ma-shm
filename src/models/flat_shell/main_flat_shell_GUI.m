@@ -347,9 +347,9 @@ end
 
 
 %% Output file for solution
-outfile_voltage=fullfile(output_name,['voltage_',AllData_filename]);
-outfile_displ=fullfile(output_name,['displ_',AllData_filename]);
-outfile_time=fullfile(output_name,['time_',AllData_filename]);
+outfile_voltage=fullfile(output_name,['voltage_',AllData.Filename]);
+outfile_displ=fullfile(output_name,['displ_',AllData.Filename]);
+outfile_time=fullfile(output_name,['time_',AllData.Filename]);
 %%
 disp('local derivatives');
 [Nprimx,Nprimy]=shape2D_prim(nx,ny,Qx,Qy,ksi',eta');
@@ -1010,10 +1010,20 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  END OF MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+plot( app.ActuatotrAsSensorSignal,t(1:nn)*1e3,voltage(1:nn)*1e3 ); 
+Vmax = max(abs(voltage))*1e3;
+axis(app.ActuatotrAsSensorSignal,[0 t(end)*1e3 -Vmax Vmax]);
+ylabel(app.ActuatotrAsSensorSignal,'Voltage [mV]');    
 averageTime = toc/(nft-1);
 save(outfile_voltage,'voltage');   
 save(outfile_displ,'displ');
-t_frames_filename=fullfile(output_name,'t_frames');
+model_output_path = prepare_model_paths('interim','num','flat_shell','GUI');
+output_name = [model_output_path,filesep,AllData.Filename,filesep];
+% check if folder exist, if not create it
+if ~exist(output_name, 'dir')
+    mkdir(output_name);
+end
+t_frames_filename=fullfile(output_name,['t_frames_',AllData.Filename]);
 save(t_frames_filename,'t_frames');
 TotalNofNodes=dof/3;
 save(outfile_time,'minTime','averageTime','TotalNofNodes','t');
@@ -1027,8 +1037,8 @@ end
 t_now = datetime('now','TimeZone','local','Format','d-MMM-y HH:mm');
 message3 = sprintf('Calculation finished: %s',t_now);
 app.Lamp_Progress100.Color = [0,1,0];
-drawnow;
 app.NotificationTextArea.Value = message3;
+drawnow;
 %---------------------- END OF CODE---------------------- 
 
 % ================ [main_flat_shell_GUI.m] ================  
