@@ -55,7 +55,7 @@ function [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,fie
 Eps=1e-8;
 input_file = fullfile('inputs',['input',num2str(input_no)]);
 run(input_file); 
-load([meshfile(1:end-4),'_jacobians']);
+load([meshfile,'_jacobians']);
 load(meshfile); % cords, nodes
 h=sum(lh);
 

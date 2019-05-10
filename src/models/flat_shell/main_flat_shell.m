@@ -52,8 +52,18 @@ dof=5*NofNodes; % number of degrees of freedom
 clear i_em i_ef i_rhom i_rhof i_nim i_nif lvol lalpha
 if(isempty(delamEl))
     % host structure elastic constants for the reference case
-    [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay);
-   else
+     if(isempty(pztEl))
+        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay);
+     else
+          % piezoelectric constants
+        [Qpzt,epzt,gpzt,e31,e32,g33]=pzt_const(Spzt,dp,epsT,theta_pzt);
+        % Qpzt - elastic coefficients under constant electric field
+        % epzt - matrix of piezoelectric coupling constants (voltage constants)
+        % gpzt - permittivity matrix in stress-charge form
+        % theta_pzt - rotation angle of pzt [deg]
+        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_pzt(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay,fen,NofElNodes,rho_pzt,pzt_thickness,Qpzt,pztEl);
+     end
+else
     % host structure elastic constants for delaminated case
     if(isempty(pztEl))
         [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_delam(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay, delamEl,den_above,den_under,delamination_layer,fen,NofElNodes);
@@ -342,14 +352,16 @@ switch mode
     case 'gpu'
         j11=gather(J11);j21=gather(J21);j12=gather(J12);j22=gather(J22);
         invj11=gather(invJ11);invj21=gather(invJ21);invj12=gather(invJ12);invj22=gather(invJ22);
-        det_jac=detJ;
-        save([meshfile(1:end-4),'_jacobians'],'j11','j21','j12','j22','invj11','invj12','invj21','invj22','det_jac');
+        det_jac=gather(detJ);
+        save([meshfile,'_jacobians'],'j11','j21','j12','j22','invj11','invj12','invj21','invj22','det_jac');
     case 'cpu'
         j11=J11;j21=J21;j12=J12;j22=J22;
         invj11=invJ11;invj21=invJ21;invj12=invJ12;invj22=invJ22;
         det_jac=detJ;
-        save([meshfile(1:end-4),'_jacobians'],'j11','j21','j12','j22','invj11','invj12','invj21','invj22','det_jac');
+        save([meshfile,'_jacobians'],'j11','j21','j12','j22','invj11','invj12','invj21','invj22','det_jac');
 end
+fprintf('Min determinant of Jacobi matrix: %e\n',min(det_jac));
+fprintf('Max determinant of Jacobi matrix: %e\n',max(det_jac));
 clear j11 j12 j21 j22 invj11 invj12 invj21 invj22 det_jac
 %disp('done');
 %

@@ -228,12 +228,14 @@ end
 
 % load mesh into matlab
 run([mesh_output_path, mesh_filename,'.m']);
+[nodes1,coords1]=change_turn_quad(msh.QUADS(:,1:4),msh.POS(:,1:2));
+msh.QUADS(:,1:4) = nodes1;
 plot_mesh(msh,figfilename);
-
+%size(msh.QUADS)
 close all;
 disp('Quad to spectral mesh conversion...');
 %[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
-%[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order);
+%[nodes,coords,boundary_nodes] = quad2spec_boundary(msh.QUADS(:,1:4),msh.POS,shape_order); % something is wrong here
 
 %  % Piotr Fiborek implementation
 %[nodes_pl,coords_pl]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);
@@ -262,17 +264,22 @@ NofElNodesx = shape_order +1;
 NofElNodesy = shape_order +1;
 
 %plot(coords(boundary_nodes,1),coords(boundary_nodes,2),'m.');
+den_under{1}=[];
+den_above{1}=[];
 [nodes,coords,den_under1,den_above1] = split_delam_nodes_flat_shell(nodes,coords,delamEl1,NofElNodesx,NofElNodesy,boundary_nodes);
 den_under{1} = den_under1;
 den_above{1} = den_above1;
 delamEl = [den_under1, den_above1];
+%delamEl=[];
 disp('12 baskets: calculating local and global node numbers...');
-%[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes); % Zhibo implementation
+% [IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes); % Zhibo implementation
+% I_G = [IG1',IG2',IG3',IG4',IG5',IG6',IG7',IG8',IG9',IG10',IG11',IG12'];
+% I_L = [IL1',IL2',IL3',IL4',IL5',IL6',IL7',IL8',IL9',IL10',IL11',IL12'];
 n_z=1; % number of nodes in thickness direction
 [I_G,I_L]=nodesMaps_Fiborek(nodes,size(coords,1),shape_order,n_z); % Piotr Fiborek implementation
 
 %save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','IG1','IG2','IG3','IG4','IG5','IG6','IG7','IG8','IG9','IG10','IG11','IG12','IL1','IL2','IL3','IL4','IL5','IL6','IL7','IL8','IL9','IL10','IL11','IL12','mesh_min','mesh_max','shape_order','den_under','den_above');
-save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','I_G','I_L','mesh_min','mesh_max','shape_order','den_under','den_above');
+save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes','coords','pztEl','delamEl','I_G','I_L','mesh_min','mesh_max','shape_order','den_under','den_above','msh');
 
 %---------------------- END OF CODE---------------------- 
 
