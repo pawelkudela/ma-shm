@@ -133,8 +133,8 @@ xi=min(coords(:,1))+Eps:L/(Nx-1):max(coords(:,1))-Eps;
 B=max(coords(:,2))-min(coords(:,2))-2*Eps;
 yi=min(coords(:,2))+Eps:B/(Ny-1):max(coords(:,2))-Eps;
 [XI,YI]=meshgrid(xi,yi);
-xp=reshape(XI,1,Nx*Ny);
-yp=reshape(YI,1,Nx*Ny);
+xp=reshape(XI,Nx*Ny,1);
+yp=reshape(YI,Nx*Ny,1);
 %ZA=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 
 
@@ -164,8 +164,8 @@ y=reshape(y,fen,4)';
 
 % cross product method
 % check if there is the same sign so that the point is inside convex polygon (element)
-
-elem_index=zeros(Nx*Ny,1);
+%%
+ownerElement=zeros(Nx*Ny,1);
 
 x21=x(2,:)-x(1,:);
 x32=x(3,:)-x(2,:);
@@ -196,7 +196,7 @@ for j =1:Nx*Ny
     Ibb=find(xp(j) >= Pmin_x & xp(j)<=Pmax_x & yp(j) >= Pmin_y & yp(j)<=Pmax_y);
 
     if(length(Ibb)==1)
-         elem_index(j,1) = Ibb;
+         ownerElement(j,1) = Ibb;
     else
         % cross product for the consequtive edges
         d1 = (xp(j).*y21(Ibb)-x1y21(Ibb))  - (yp(j).*x21(Ibb)-y1x21(Ibb));
@@ -207,7 +207,7 @@ for j =1:Nx*Ny
         negd1=uint32(d1<0);negd2=uint32(d2<0);negd3=uint32(d3<0);negd4=uint32(d4<0);
         neg=negd1.*negd2.*negd3.*negd4;
         neg_index=find(neg);
-        elem_index(j,1)=Ibb(neg_index(1));
+        ownerElement(j,1)=Ibb(neg_index(1));
     end
 end
         
@@ -218,20 +218,38 @@ disp('Calculate local values of ksi and eta for each point');
 [ksi,wx]=gll(NofElNodesx); % weights and nodes distribution
 [eta,wy]=gll(NofElNodesy);
 
+[Ksi, Eta] = meshgrid(ksi,eta);
+Ksi = repmat(reshape(Ksi',1,[]),length(xp),1);
+Eta = repmat(reshape(Eta',1,[]),length(xp),1);
+
 % see: M. Li, A. Wittek, K. Miller: Efficient Inverse Isoparametric Mapping Algorithm for Whole-Body
 % Computed Tomography Registration Using Deformations Predicted by Nonlinear Finite Element Modeling
 % Journal of Biomechanical Engineering, Vol. 136 / 084503-1, 2014.
-ksi0=repmat(ksi(1),[Nx*Ny,1]);
-eta0=repmat(eta(1),[Nx*Ny,1]);
-x0=x(1,elem_index(:,1))';
-y0=y(1,elem_index(:,1))';
+% midified starting point for iteration
+% x0=x(1,ownerElement(:,1))'; % first corner node
+% y0=y(1,ownerElement(:,1))';% first corner node
+elementNodes_owner = nodes(ownerElement,:);
+x_0 = coords(elementNodes_owner,1);
+x_0 = reshape(x_0,[],NofElNodes);
+y_0 = coords(elementNodes_owner,2);
+y_0 = reshape(y_0,[],NofElNodes);
+
+[~,point_no] = min(sqrt(bsxfun(@minus, x_0,xp).^2+bsxfun(@minus, y_0,yp).^2),[],2);
+x0 = x_0(sub2ind(size(x_0),(1:length(point_no))',point_no));
+y0 = y_0(sub2ind(size(y_0),(1:length(point_no))',point_no));
+
+ksi0 = Ksi(sub2ind(size(Ksi),ones(length(point_no),1),point_no));
+eta0 = Eta(sub2ind(size(Eta),ones(length(point_no),1),point_no));
+% ksi0=repmat(ksi(1),[Nx*Ny,1]);
+% eta0=repmat(eta(1),[Nx*Ny,1]);
+
 % first iteration
-n1=((elem_index(:,1))-1)*NofElNodes+1;
-ksi_p=ksi0+invj11(n1).*(xp'-x0) +invj12(n1).*(yp'-y0);
-eta_p=eta0+invj21(n1).*(xp'-x0)+invj22(n1).*(yp'-y0);
+n1=((ownerElement(:,1))-1)*NofElNodes+1;
+ksi_p=ksi0+invj11(n1).*(xp-x0) +invj12(n1).*(yp-y0);
+eta_p=eta0+invj21(n1).*(xp-x0)+invj22(n1).*(yp-y0);
 clear invj11 invj12 invj21 invj22 j11 j12 j21 j22;
 % n= 48451;
-% ne1=elem_index(n);
+% ne1=ownerElement(n);
 % plot(xp(n),yp(n),'ro');hold on; plot(x(:,ne1),y(:,ne1),'b');plot(x(1,ne1),y(1,ne1),'go');
 [Q]=Vandermonde2D(ksi,eta,NofElNodesx,NofElNodesy);
 N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
@@ -241,8 +259,8 @@ Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNod
 xe=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 ye=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 for k=1:NofElNodesx*NofElNodesy
-    xe(k,:)=coords(nodes((elem_index(:,1)),k),1);
-    ye(k,:)=coords(nodes((elem_index(:,1)),k),2);
+    xe(k,:)=coords(nodes((ownerElement(:,1)),k),1);
+    ye(k,:)=coords(nodes((ownerElement(:,1)),k),2);
 end
 xe=reshape(xe,NofElNodesx*NofElNodesy*Nx*Ny,1);
 ye=reshape(ye,NofElNodesx*NofElNodesy*Nx*Ny,1);
@@ -251,7 +269,7 @@ y1=Ns*ye;% interpolated values
 % plot(coords(nodes(ne1,1:NofElNodesx*NofElNodesy),1),coords(nodes(ne1,1:NofElNodesx*NofElNodesy),2),'c.');
 % plot(x1(n),y1(n),'mx');
 % errors
-% e=sqrt((xp'-x1).^2+(yp'-y1).^2);
+% e=sqrt((xp-x1).^2+(yp-y1).^2);
 % [A,I]=max(e)
 % J=find(e>1e-5);
 % length(J)
@@ -275,8 +293,8 @@ for k=1:nIterations
     J22=Npy*ye;
     [invJ11,invJ12,invJ21,invJ22]=inv_jacp_2D(J11,J12,J21,J22);
     % next iteration
-    ksi_p=ksi0+invJ11.*(xp'-x0) +invJ12.*(yp'-y0);
-    eta_p=eta0+invJ21.*(xp'-x0)+invJ22.*(yp'-y0);
+    ksi_p=ksi0+invJ11.*(xp-x0) +invJ12.*(yp-y0);
+    eta_p=eta0+invJ21.*(xp-x0)+invJ22.*(yp-y0);
     
     N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
     [indxi,indxj]=find(N);
@@ -287,7 +305,7 @@ for k=1:nIterations
 end
 
 % errors
-e=sqrt((xp'-x1).^2+(yp'-y1).^2);
+e=sqrt((xp-x1).^2+(yp-y1).^2);
 [A,I]=max(e);
 fprintf('max error of grid points location in respect to local coordinates: %f mm \n', A*1e3);
 
@@ -551,7 +569,7 @@ for n=1:nFrames
         case 'top'
             U(nodes_under) = U(nodes_above); % overwrite values of bottom part of delamination by upper part
     end
-    ZA=U(nodes(elem_index,1:NofElNodesx*NofElNodesy))'; 
+    ZA=U(nodes(ownerElement,1:NofElNodesx*NofElNodesy))'; 
     ZA=reshape(ZA,NofElNodesx*NofElNodesy*Nx*Ny,1);
     ZI=Ns*ZA;% interpolated values
     ZI=reshape(ZI,Nx,Ny);

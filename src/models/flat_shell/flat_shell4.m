@@ -3,15 +3,15 @@ clear all;close all;   warning off;clc;
 load project_paths projectroot src_path;
 %% Prepare output directories
 % allow overwriting existing results if true
-overwrite=false;
-%overwrite=true;
+%overwrite=false;
+overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
 idx = strfind( pathstr,filesep );
 modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
-image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam1'); % mesh parameters and labels
+image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam2');
 % prepare model output path
 model_output_path = prepare_model_paths('raw','num',modelfolder,modelname);
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
@@ -21,8 +21,8 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 load([image_label_path,filesep,'mesh_parameters']);
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
-input_no = 7;
-tasks=[399];
+input_no = 5;
+tasks=[77];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 %meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
 %meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
@@ -51,7 +51,7 @@ for test_case=tasks
     output_name = [model_output_path,filesep,num2str(test_case),'_output',filesep];
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
     figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
-    if(overwrite||(~overwrite && ~exist([output_name,'time',num2str(test_case),'.mat'],'file')))
+    if(overwrite||(~overwrite && ~exist(output_name, 'dir')))
         fprintf([modelname,' test case: %d\n'], test_case);
         try
             if ~exist(output_name, 'dir')
