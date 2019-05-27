@@ -783,7 +783,8 @@ for nn=2:nft
                 anew = a0*(uold-2*U+unew); % update acceleration
                 Ac=gather(anew);
         end
-        if( max(U)> 10*h(1)) disp('integration error'); 
+        if( max(UZ)> 10*h(1)) disp('integration error'); 
+            disp(max(UZ))
             if(isempty(pztEl))
                 save(outfile_displ,'displ');
             else

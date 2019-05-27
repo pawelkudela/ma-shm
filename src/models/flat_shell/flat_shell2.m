@@ -22,7 +22,7 @@ load([image_label_path,filesep,'mesh_parameters']);
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 7;
-tasks=[79,81,82,85:87,93:95,174,176,177,179:182,188:190,269,271,274:277,283:285,364,366,367,370:372,374:456,458,459,461:469];
+tasks=[79,81,82,85:87,93:95,174,176,177,179:182,188:190,269,271,274:277,283:285,364,366,367,370:372,378:380,382,384,386:388,392,401,403,405:408,411,420,422,424:427,430,439,441,443:445,449,458,459,461:469];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 %meshfile=fullfile('mesh','plate_Tomek_dens2_3mm1lay_pzt_mesh_2D.mat'); % 
 %meshfile=fullfile('mesh','delam1_position_no_78_a_15mm_b_10mm_angle_150.mat');
