@@ -1,7 +1,7 @@
 disp('.. Reading input data');
 %% Signal definition
 nft=4096*16;      % total number of samples
-tt= 0.001599609375000/2;          % total calculation time [s] % 
+tt= 1.3/1e3;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
 f_1=40e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]
@@ -80,8 +80,8 @@ rho = repmat(rho,[lay,1]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % damping coefficient proportional to mass matrix
-etad_xy=0; % damping ratio
-etad_z=0; % damping ratio
+etad_xy=2e4; % damping ratio
+etad_z=2e4; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -20,6 +20,7 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 % mesh parameters
 shape_order = 5; % element shape function order, Number of nodes in one direction is shape_order+1
 nPZT = 12; % number of piezoelectric trans
+isDelamOn = true; % delamination case
 %%
 
 mesh_filename = 'delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0'; 
@@ -31,7 +32,7 @@ if(overwrite||(~overwrite && ~exist([mesh,filesep,mesh_filename,'.mat'], 'file')
      try
         disp(mesh_filename);
      
-        [nodes,coords,den_under,den_above,I_G,I_L] = automesh_multi_pzt_simple(nPZT,shape_order,mesh_filename,modelfolder,figfilename);
+        [nodes,coords,den_under,den_above,I_G,I_L] = automesh_multi_pzt_simple(nPZT,shape_order,mesh_filename,modelfolder,figfilename,isDelamOn);
      catch
         fprintf(['Meshing failed:', mesh_filename,' \n']);
      end

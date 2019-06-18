@@ -22,10 +22,10 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 % NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 10;
-tasks=[1];
+tasks=[1:12];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0'); % 
-actuator_no = 1;
+
 %% input for post-processing
 Nx=500;
 Ny=500;
@@ -47,7 +47,7 @@ fig_height=5; % figure height in cm
 %    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
 %%
 for test_case=tasks
-    
+    actuator_no = test_case;
     output_name = [model_output_path,filesep,num2str(test_case),'_output',filesep];
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
     figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
@@ -65,6 +65,7 @@ for test_case=tasks
              end
              
             %% RUN MODEL
+            
             t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks);
             %
             t_frames_filename=fullfile(interim_output_name,'t_frames');

@@ -59,8 +59,8 @@ end
 run([mesh_output_path, mesh_filename,'.m']);
 [nodes1,coords1]=change_turn_quad(msh.QUADS(:,1:4),msh.POS(:,1:2));
 msh.QUADS(:,1:4) = nodes1;
-plot_mesh(msh);
-print(figfilename,'-dpng', '-r300'); 
+plot_mesh(msh,figfilename);
+
 close all;
 disp('Quad to spectral mesh conversion...');
 %[nodes,coords] = quad2spec(msh.QUADS(:,1:4),msh.POS,shape_order); % my implementation
