@@ -21,7 +21,7 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 % load([image_label_path,filesep,'mesh_parameters']);
 % NofMeshes = length(mesh_parameters);
 % input for constant parameters
-input_no = 10;
+input_no = 11;
 tasks=[1:12];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0'); % 
