@@ -180,7 +180,7 @@
 	\begin{equation}
 	w_i = \frac{2}{m(m-1)\big[ P_{m-1}\!(\xi_i) \big]^2}\; , \quad i \in 1,\ldots, m \label{eq:weights}
 	\end{equation}
-	where $P_{m-1}$ is Legendre polynomial of order $m-1$, $m=6$ for 6 by 6 nodes flat shell spectral element.
+	where $P_{m-1}$ is Legendre polynomial of order $m-1$, $m=6$ for 6~$\times$~6 nodes flat shell spectral element.
 	Matrix $\bm{R}^e$ from eq. (\ref{eq:delam_plate_mass}) is calculated as:
 	\begin{equation}
 	\begin{split}
@@ -200,7 +200,7 @@
 	0&0&0&\overline{Q}_{45}&\overline{Q}_{55}\end{array}\right] \label{eq:dealm_plate_stf}
 	\end{equation}
 	The components of matrix $\bm{\overline Q}$ can be found in the literature~[{sierakowski89-composite}].
-	It should be noted that in general both mass density $\rho_k$ as well as elastic constants $\bm{\overline Q}_k^e$ can have arbitrary values at Gauss-Lobatto-Legendre points but for simplicity it is assumed that they are constant within $k$-th layer. Integral over thickness of layers in eq.~\ref{eq:dealm_plate_stiffness} is evaluated analytically which leads to the following constants:
+	It should be noted that in general both mass density $\rho_k$ as well as elastic constants $\bm{\overline Q}_k^e$ can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within $k$-th layer. Integral over thickness of layers in eq.~\ref{eq:dealm_plate_stiffness} is evaluated analytically which leads to the following constants:
 	\begin{equation}
 	\begin{split}
 	& A_{ij} =  \sum \limits_{k=1}\limits^{N} (\overline{Q}_k)_{ij} \,(h_{k-1} - h_k),\quad i,j = 1,2,6,\\
@@ -397,7 +397,7 @@
 	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user.
 	% mention about computation speed-up
 	\section{Interpolation on uniform grid}
-	With the advent of laser vibrometry technique, many damage visualisation algorithms are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to Gauss--Lobatto--Legendre points. It makes difficult to apply damage visualisation algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed.
+	With the advent of laser vibrometry technique, many damage visualisation algorithms are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualisation algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed.
 	\section{Experimental validation}
 	\section{Exemplary applications}
 	\section{Conclusions}
@@ -408,7 +408,7 @@
 	%% \section{}
 	%% \label{}
 	\section*{Acknowledgement}
-	The research was funded by the Polish National Science Center under grant agreement no 
+	The first author would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). The research was partially funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. The authors are also grateful to Task-CI for allowing the use of Matlab and Parallel Computing Toolbox licenses. 
 	
 	
 	
