@@ -113,6 +113,8 @@
 	
 	%% main text
 	\section{Introduction}
+	Leckey et al.~\cite{Leckey2018} investigated four numerical simulation tools: custom implementation~\cite{Leckey2014} of the 3D Elastodynamic Finite Integration Technique (EFIT) \cite{Schubert1998} along with three widely used commercial FE codes: COMSOL, ABAQUS, and ANSYS.
+	
 	\section{Flat shell spectral element}
 	Spectral finite element for flat shell modelling is based on Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom in each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The displacement field can be written as:
 	\begin{equation}
@@ -397,7 +399,7 @@
 	\end{equation} 
 	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user.
 	% mention about computation speed-up
-	\section{Interpolation on uniform grid}
+	\section{Interpolation on an uniform grid}
 	With the advent of laser vibrometry technique, many algorithms for damage visualization  are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed. 
 	
 	The implemented interpolation method utilizes shape functions of spectral elements. The interpolation on uniform grid of data points is accomplished in three steps: the determination of the element containing the data point (owner element), the transformation of the data point’s coordinates into the reference coordinate system (inverse mapping), and finally the application of the spectral elements shape functions to determine the degrees of freedom at that point (eq.~\ref{eq:delam_plateaproxim}).
@@ -407,18 +409,18 @@
 	The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account spectral elements instead of the isoparametric hexahedral elements. As an initial point, spectral node closest to the data point in the owner element $(x_p, y_p)$ is selected. Hence, its global coordinates $(x_0, y_0)$ as well as local coordinates $(\xi_0,\eta_0)$  can be easily determined. In the first iteration inverse values of Jacobian matrix (eq.~\ref{eq:Jacobi2D}) already stored in memory are utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
 	\begin{equation}
 	\begin{split}
-	\bs{\xi}_{p}&=\bs{\xi}_0 + \left(\vec{J}^{-1}\right)_{11}\,.*\left(\vec{x}_p-\vec{x}_0\right) +  \left(\vec{J}^{-1}\right)_{12}\,.*\left(\vec{y}_p-\vec{y}_0\right), \\
-	\bs{\eta}_{p}&=\bs{\eta}_0 + \left(\vec{J}^{-1}\right)_{21}\,.*\left(\vec{x}_p-\vec{x}_0\right) +  \left(\vec{J}^{-1}\right)_{22}\,.*\left(\vec{y}_p-\vec{y}_0\right).
+	\bs{\xi}_{k+1}&=\bs{\xi}_k + \left(\vec{J}^{-1}_{k}\right)_{11}\,.*\left(\vec{x}_p-\vec{x}_k\right) +  \left(\vec{J}^{-1}_{k}\right)_{12}\,.*\left(\vec{y}_p-\vec{y}_k\right), \\
+	\bs{\eta}_{k+1}&=\bs{\eta}_k + \left(\vec{J}^{-1}_{k}\right)_{21}\,.*\left(\vec{x}_p-\vec{x}_k\right) +  \left(\vec{J}^{-1}_{k}\right)_{22}\,.*\left(\vec{y}_p-\vec{y}_k\right),
 	\end{split}
 	\label{eq:interp_initial}
 	\end{equation} 
-	
-	. The advantage of such approach is that
+	in which $k=0$ in the first iteration.
+	Next, shape functions and Jacobians are evaluated at $(\bs{\xi}_{1}, \bs{\eta}_{1})$ points. The global coordinates of interpolated point $(x_1,y_1)$ in the owner element in the first iteration are calculated by using eq.~\ref{eq:delam_plategeom}. Three iterations are used in the current implementation. Finally, spectral element shape functions are evaluated at interpolated local coordinates $N(\tilde{\xi}_p,\tilde{\eta}_p)$ and the wavefield is approximated by using eq.~\ref{eq:delam_plateaproxim}.
 
-	
-	The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. 
+	The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas  \verb|griddata| function must be called for each frame separately which is inefficient.
 
 	\section{Experimental validation}
+	The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}.
 	\section{Exemplary applications}
 	\section{Conclusions}
 	
