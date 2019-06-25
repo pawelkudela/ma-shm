@@ -39,7 +39,8 @@
 
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amsmath,amssymb,bm}
-\usepackage[dvips,colorlinks=true,citecolor=green]{hyperref}
+%\usepackage[dvips,colorlinks=true,citecolor=green]{hyperref}
+\usepackage[colorlinks=true,citecolor=green]{hyperref}
 %% my added packages
 \usepackage{verbatim}
 %\usepackage{breqn}
@@ -113,7 +114,7 @@
 	%% main text
 	\section{Introduction}
 	\section{Flat shell spectral element}
-	Spectral finite element for flat shell modelling is based on Mindlin-Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom in each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The displacement field can be written as:
+	Spectral finite element for flat shell modelling is based on Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom in each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The displacement field can be written as:
 	\begin{equation}
 	\begin{split}
 	& u(x,y,z)=u_0(x,y) - \varphi_x(x,y) \cdot z\\
@@ -230,7 +231,7 @@
 	\label{eq:explicit_integration}
 	\end{split}
 	\end{equation}
-	The advantage of the spectral element method over finite element method is that the mass matrix is diagonal. It has been shown [] that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix. In such case calculation of displacements at the time step $t + \Delta t$ is straightforward and does not require costly matrix inversion. However, the term $\vec{F}^i=\bm{K}\vec{u}_t$ related to internal forces at the time step $t$ is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problem which can be simulated. In order to alleviate these deficiencies, parallel code is proposed in which assembly is performed at the internal force vector level without necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in []. However, due to analytic integration over thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of $\vec{F}^i=\bm{K}\vec{u}_t$ term is a little bit different and it is divided into two steps. In the first step stress-like components are calculated at the time moment $t$ (index $t$ in displacement vectors is omitted for clarity):
+	The advantage of the spectral element method over finite element method is that the mass matrix is diagonal. It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step $t + \Delta t$ is straightforward and does not require costly matrix inversion. However, the term $\vec{F}^i=\bm{K}\vec{u}_t$ related to internal forces at the time step $t$ is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problem which can be simulated. In order to alleviate these deficiencies, parallel code is proposed in which assembly is performed at the internal force vector level without necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. However, due to analytic integration over thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of $\vec{F}^i=\bm{K}\vec{u}_t$ term is a little bit different and it is divided into two steps. In the first step stress-like components are calculated at the time moment $t$ (index $t$ in displacement vectors is omitted for clarity):
 	\begin{equation}
 	\begin{split}
 	\bs{\sigma}_{xx}&=\left((\bm{N},_{\xi}\vec{U}_x).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\vec{U}_x).*(\vec{J}^{-1})_{21}\right).*\vec{A}_{11}\\
@@ -387,17 +388,36 @@
 	\begin{equation}
 	\vec{W} = \vec{w}_{\xi}\,.*\vec{w}_{\eta}\,.*\left(\det\vec{J}\right)
 	\end{equation}
-	Since internal forces are calculated for disjoined spectral elements, assembly of global vector $\vec{F}^i$ is necessary. It can be performed according to mesh colouring algorithm proposed in []. The algorithm uniformly divides nodes of spectral elements within the whole mesh into 12 sets. Because each flat shell spectral element consists of 36 nodes, the 12 sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one GPU card.
+	Since internal forces are calculated for disjoined spectral elements, assembly of global vector $\vec{F}^i$ is necessary. It can be performed according to mesh colouring algorithm proposed in~\cite{Kudela2016}. The algorithm uniformly divides nodes of spectral elements within the whole mesh into 12 sets. Because each flat shell spectral element consists of 36 nodes, the 12 sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one GPU card.
 	
 	Once internal forces $\vec{F}^i$ are calculated and substituted into eq.~\ref{eq:explicit_integration}, the displacements at time step $t+\Delta t$ can be explicitly obtained from perfectly vectorized code:
 	\begin{equation}
-	\vec{u}_{t+\Delta t}=1/\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
+	\vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 	\label{eq:vectorized_motion}
 	\end{equation} 
-	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user.
+	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user.
 	% mention about computation speed-up
 	\section{Interpolation on uniform grid}
-	With the advent of laser vibrometry technique, many damage visualisation algorithms are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualisation algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed.
+	With the advent of laser vibrometry technique, many algorithms for damage visualization  are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed. 
+	
+	The implemented interpolation method utilizes shape functions of spectral elements. The interpolation on uniform grid of data points is accomplished in three steps: the determination of the element containing the data point (owner element), the transformation of the data point’s coordinates into the reference coordinate system (inverse mapping), and finally the application of the spectral elements shape functions to determine the degrees of freedom at that point (eq.~\ref{eq:delam_plateaproxim}).
+	
+	In the first step, the algorithm sequentially scans the full list of spectral elements using the bounding box test. If the element fails the bounding box test, the algorithm moves to the next element in the list. If the data point is within the bounding box, the cross-product test is performed. The idea is to eliminate impossible owner elements with the computationally inexpensive bounding-box test before using the more expensive cross-product test~\cite{Silva2009}. It has been found that such implementation in case of 36--node spectral element meshes is generally faster than Matlab's \verb|inpolygon| function. 
+	
+	The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account spectral elements instead of the isoparametric hexahedral elements. As an initial point, spectral node closest to the data point in the owner element $(x_p, y_p)$ is selected. Hence, its global coordinates $(x_0, y_0)$ as well as local coordinates $(\xi_0,\eta_0)$  can be easily determined. In the first iteration inverse values of Jacobian matrix (eq.~\ref{eq:Jacobi2D}) already stored in memory are utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
+	\begin{equation}
+	\begin{split}
+	\bs{\xi}_{p}&=\bs{\xi}_0 + \left(\vec{J}^{-1}\right)_{11}\,.*\left(\vec{x}_p-\vec{x}_0\right) +  \left(\vec{J}^{-1}\right)_{12}\,.*\left(\vec{y}_p-\vec{y}_0\right), \\
+	\bs{\eta}_{p}&=\bs{\eta}_0 + \left(\vec{J}^{-1}\right)_{21}\,.*\left(\vec{x}_p-\vec{x}_0\right) +  \left(\vec{J}^{-1}\right)_{22}\,.*\left(\vec{y}_p-\vec{y}_0\right).
+	\end{split}
+	\label{eq:interp_initial}
+	\end{equation} 
+	
+	. The advantage of such approach is that
+
+	
+	The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. 
+
 	\section{Experimental validation}
 	\section{Exemplary applications}
 	\section{Conclusions}
@@ -408,7 +428,7 @@
 	%% \section{}
 	%% \label{}
 	\section*{Acknowledgement}
-	The first author would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). The research was partially funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. The authors are also grateful to Task-CI for allowing the use of Matlab and Parallel Computing Toolbox licenses. 
+	The first author would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). The research was partially funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. Authors are also grateful to Task-CI for allowing the use of Matlab and Parallel Computing Toolbox licences. 
 	
 	
 	
@@ -420,9 +440,10 @@
 	
 	%% else use the following coding to input the bibitems directly in the
 	%% TeX file.
-	\section*{Reference}
-	\bibliography{BibTeX_interface}{}
-	\bibliographystyle{num_order}
+	%\section*{Reference}
+    \bibliographystyle{num_order}
+	\bibliography{Parallel_ma_shm}{}
+
 \end{document}
 
 
