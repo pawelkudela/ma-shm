@@ -1,6 +1,6 @@
 disp('.. Reading input data');
 %% Signal definition
-nft=4096*24;      % total number of samples
+nft=4096*30;      % total number of samples
 tt= 1.3/1e3;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
 f_1=40e3/5;        % frequency of the modulation signal [Hz]
@@ -128,3 +128,16 @@ epsT=   [dp(1,5)/gp(1,5)       0                         0;
 rho_pzt=7850;%[kg/m3]
 pzt_thickness =0.5/1000; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]
+
+%% added mass properties
+rho_added_mass = 2700; %[kg/m3]
+added_mass_thickness = 3/1000; % [m]
+E_added_mass = 72e9; % 'Young modulus [Pa]';  
+ni_added_mass = 0.33; % 'Poisson ratio';
+Qm = E_added_mass/((1+ni_added_mass)*(1-2*ni_added_mass))*...
+    [1-ni_added_mass  ni_added_mass         ni_added_mass           0                        0                          0
+       ni_added_mass  1-ni_added_mass       ni_added_mass           0                        0                          0 
+       ni_added_mass    ni_added_mass        1-ni_added_mass        0                        0                          0
+          0                      0                           0            1-2*ni_added_mass             0                          0
+          0                      0                           0                         0            1-2*ni_added_mass              0
+          0                      0                           0                         0                        0                1-2*ni_added_mass];
