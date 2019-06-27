@@ -1,6 +1,18 @@
 % prepare meshes
 automesh_delam1;
+automesh_multi_pzt_simple_added_mass;
+automesh_delam_Jochen_signals;
+automesh_undelam_Jochen_signals;
 % calculate wave propagation
 flat_shell1;
 flat_shell2;
 flat_shell3;
+flat_shell_Jochen_signals_90_damping_added_mass;
+flat_shell_Jochen_signals_90_damping_baseline;
+flat_shell_Jochen_signals_90_damping;
+% visualize numerical wavefield
+plot_Jochen_wavefield_90;
+% visualize experimental wavefield data
+Read_AcousticWavefiled_my;
+% comparison of numerical and experimental signals
+Analysis_Differential_Signal_my_damp_added_mass;

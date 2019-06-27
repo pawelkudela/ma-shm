@@ -43,6 +43,8 @@
 \usepackage[colorlinks=true,citecolor=green]{hyperref}
 %% my added packages
 \usepackage{verbatim}
+\usepackage{caption}
+\usepackage{subcaption}
 %\usepackage{breqn}
 \newcommand{\ud}{\mathrm{d}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
@@ -421,7 +423,81 @@
 	The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas  \verb|griddata| function must be called for each frame separately which is inefficient.
 
 	\section{Experimental validation}
+	
+	Mesh
+	\begin{figure} [h!]
+		\centering
+		%\includegraphics[width=\textwidth]{path_4_8.png}
+		\includegraphics{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass.png}	
+		\caption{Quad mesh}
+		\label{fig:quad_mesh}
+	\end{figure}
+   \begin{figure} [h!]
+   	\centering
+   	%\includegraphics[width=\textwidth]{path_4_8.png}
+   	\includegraphics{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass_spec_zoom.png}	
+   	\caption{Close up of mesh of spectral elements in the damage area (green) and piezoelectric transducers no. 3 and 4}
+   	\label{fig:spec_mesh_zoom}
+   \end{figure}
 	The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}.
+	
+	Full wavefield
+	
+	\begin{figure} [h!]
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			% size fitted
+			%\includegraphics[width=\textwidth]{SASE/\modelname_out/\modelname_angle_30_param_dispersion_curves.png}
+			% size 100%
+			\includegraphics[]{exp_frame64.png}
+			\caption{Experiment: $t=112.5  \mu$s}
+			\label{fig:exp_frame64}
+		\end{subfigure}
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{exp_frame100.png}
+			\caption{Experiment: $t=168.7 \mu$s}
+			\label{fig:exp_frame100.png}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			% shift of 8 frames due to excitation misalignment in experiment of pzt with (0,0) coordinates
+			\includegraphics[]{Vz_1_frame72_bottom.png} 
+			\caption{Numerical simulation: $t=112.5  \mu$s}
+			\label{fig:num_frame72}
+		\end{subfigure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{Vz_1_frame108_bottom.png}
+		\caption{Numerical simulation: $t=168.7 \mu$s}
+		\label{fig:num_frame108}
+	\end{subfigure}
+	\hfill
+		\caption{Comparison of experimental and numerical full wavefield data.} 
+		\label{fig:wavefields_comparison}
+	\end{figure}
+	\begin{comment}
+	\begin{figure} [h!]
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{cut_Vz_1_frame72_top.png} 
+			\caption{Numerical simulation: $t=112.5  \mu$s}
+			\label{fig:num_frame72top}
+		\end{subfigure}
+		\centering
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{cut_Vz_1_frame108_top.png}
+			\caption{Numerical simulation: $t=168.7 \mu$s}
+			\label{fig:num_frame108top}
+		\end{subfigure}
+		\hfill
+		\caption{Numerical full wavefield data at top surface of the plate.} 
+		\label{fig:num_wavefield_top}
+	\end{figure}
+\end{comment}
 	\begin{figure} [h!]
 			\centering
 			%\includegraphics[width=\textwidth]{path_1_7.png}

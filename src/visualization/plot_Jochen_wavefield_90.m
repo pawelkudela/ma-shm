@@ -15,6 +15,7 @@ modelname =  'flat_shell_Jochen_wavefield_90';
 
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
+paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\Elsevier\figs\';
 %% Input for flat_shell
 
 tasks=[1];
@@ -49,11 +50,22 @@ figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
 load([interim_output_name,'flat_shell_Vz_1_500x500top']);
 Data_quarter=Data(1:250,1:250,:);
 plot_meshgrid_frames(Data_quarter,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+% caxis cut
+caxis_cut = 0.05;
+Data_zoom=Data(1:250,1:250,:);
+plot_meshgrid_frames(Data_zoom,'top',test_case,selected_frames,[figure_output_name,'cut_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+caxis_cut = 0.8;
 load([interim_output_name,'flat_shell_Vz_1_500x500bottom']);
 Data_quarter=Data(1:250,1:250,:);
 plot_meshgrid_frames(Data_quarter,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 
-
-
-
+% copy selected files to paper figs folder
+command = ['copy ', figure_output_name,'Vz_1_frame72_bottom.png ',paper_fig_folder];
+system(command);
+command = ['copy ', figure_output_name,'Vz_1_frame108_bottom.png ',paper_fig_folder];
+system(command);
+command = ['copy ', figure_output_name,'cut_Vz_1_frame72_top.png ',paper_fig_folder];
+system(command);
+command = ['copy ', figure_output_name,'cut_Vz_1_frame108_top.png ',paper_fig_folder];
+system(command);
 
