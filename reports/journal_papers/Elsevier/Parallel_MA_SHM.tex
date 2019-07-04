@@ -45,6 +45,7 @@
 \usepackage{verbatim}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{booktabs} % for nice tables
 %\usepackage{breqn}
 \newcommand{\ud}{\mathrm{d}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
@@ -116,7 +117,7 @@
 	
 	%% main text
 	\section{Introduction}
-	Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms that based on signals registered by ultrasonic or piezoelectric sensors are able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example in anisotropic composite laminates wave velocity of particular mode depends on angle of propagation. Improper velocity values would lead to wrong damage localization.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually model--assisted approach is required with a lot of numerical simulations. Unfortunately, due to complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
+	Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms that based on signals registered by ultrasonic or piezoelectric sensors are able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example in anisotropic composite laminates wave velocity of particular mode depends on angle of propagation. Improper velocity values would lead to wrong identification of damage location.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually model--assisted approach is required supported by a lot of numerical simulations. Unfortunately, due to complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
 	
 	Guided wave modelling techniques can be roughly divided into analytic, semi--analytic and approximate in which domains are discretized in various ways e.g. finite element method. Analytic methods are suitable for parametric studies and can be used for damage influence analysis in simple isotropic structures~\cite{Giurgiutiu2014}. Semi--analytic methods such as semi-analytic finite element (SAFE) method is utilized for dispersion curves analysis and wave attenuation in wave guides of arbitrary cross-sections including multi-layer composite laminates~\cite{Bartoli2006}. Another method which utilizes analytic solution of wave equation as a shape function is frequency domain spectral element method. The method was popularized by Doyle~\cite{Doyle1989} and exploited by many researchers~\cite{RoyMahapatra2003,Palacz2005} mostly in relation to wave propagation analysis in 1D waveguides. The advantage of the method is that it is very fast if only few response points are considered and guided wave of high frequency can be modelled easily. On the other hand, the periodic nature of Fourier transform and inverse Fourier transform used in this method in conjunction with finite dimensions of waveguide causes that artificial wave packets appears in response signals. Special \emph{throw-off elements} can be applied at ends of 1D waveguides to alleviate this problem. In 2D waveguides such as membranes and plates the method has been extended to wavelet spectral finite element method~\cite{Mitra2008,Yang2016}. It should be noted that by using this approach simulation of wave propagation in anisotropic materials with defects can be conducted.
 	
@@ -128,8 +129,20 @@
 	
 	Leckey et al.~\cite{Leckey2018} investigated four numerical simulation tools: custom implementation~\cite{Leckey2014} of the 3D Elastodynamic Finite Integration Technique (EFIT) \cite{Schubert1998} along with three widely used commercial finite element codes: COMSOL, ABAQUS, and ANSYS. The studied example was related to interaction of propagating Lamb waves with delamination in cross-ply laminate consisted of 8 layers (delamination was below second ply counting from the top). The laminate was modelled by dense mesh of 3D solid elements. The numerical results were compared with experiment in terms of wavefield showing quite good agreement in case of some methods. Unfortunately, despite the simulations were performed on a workstation equipped with 16 cores, the efficiency of each investigated methods is so low that it is prohibitive to perform any parametric study or generate data set e.g. for machine learning (the shortest simulation run time was for the case of COMSOL i.e. 19.5~hours followed by ABAQUS implicit i.e. 40~hours).
 	
-	\section{Flat shell spectral element}
-	Developed spectral finite element for flat shell modelling is based on Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom in each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The displacement field can be written as:
+	High computation demanding of guided wave propagation problem causes that more and more researchers have been looking for possible ways of computation speedup over last decade. One of possible popular solution is by using parallelisation via the Compute Unified Device Architecture (CUDA), which enables parallel computing on powerful graphic cards. A parallel algorithm of the Local Interaction Simulation Approach (LISA) for Lamb wave propagation modelling in aluminum plates exposed to temperature changes was developed by~Kijanka et~al.~\cite{Kijanka2013}. Similar approach to model the nonlinear dynamic interactions between ultrasonic guided waves and fatigue cracks was utilised by Shen and Cesnik~\cite{Shen2017}.  
+	
+	The presented in this paper method for solving guided wave propagation problems combines high order time domain spectral element method (SEM) with CUDA through Matlab Parallel Computing Toolbox. It is characterized by fast convergence rate, diagonality of mass matrix and high parallelism of the code. The SEM was originally developed by Patera in 1984 for modelling of laminar flows~\cite{Patera1984}. Than, over the years the method has gained attention in geophysics community for the numerical simulation of seismic wave propagation~\cite{Seriani1998,Komatitsch2009}. The method was later adopted for modelling structural health monitoring systems based on anomalies of guided waves~\cite{Ostachowicz2012,Lonkar2013}. The presented concept of parallel implementation of SEM is similar to the parallel implementation developed previously~\cite{Kudela2016} but it is applied to flat shell spectral elements instead of 3D solid elements. Moreover, it is more suitable for wave propagation modelling in multilayer composite laminates because it leads to much lower number of degrees of freedom. Therefore, the computation can be performed faster which is important for application in the model--assisted structural health monitoring.
+	
+	\section{Numerical modelling}
+	\subsection{Flat shell spectral element}
+	The developed spectral finite element for flat shell modelling is based on Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom in each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The spectral shell element is schematically shown in Fig.~\ref{fig:spectral_shell_element}.
+	\begin{figure} [h!]
+		\centering
+		\includegraphics{shell.png}	
+		\caption{36--node spectral shell element.}
+		\label{fig:spectral_shell_element}
+	\end{figure}
+	The displacement field can be written as:
 	\begin{equation}
 	\begin{split}
 	& u(x,y,z)=u_0(x,y) - \varphi_x(x,y) \cdot z\\
@@ -208,24 +221,25 @@
 	\end{equation}
 	where $N$ -- the number of composite layers, $\rho_k$ -- mass density of $k$-th layer, $h_k$ -- the distance from the neutral surface to the top surface of the $k$-th layer, $h_{k-1}$ -- the distance from the neutral surface to the bottom surface of the $k$-th layer.
 	In the current implementation it is assumed that damping matrix is proportional to the mass matrix.
-	The matrix $\bm{\overline Q}_k^e$ from eq. (\ref{eq:dealm_plate_stiffness}) for $k$-th composite layer is calculated as:
+	The matrix $\bm{\overline Q}_k^e$ from eq. (\ref{eq:dealm_plate_stiffness}) for $k$-th composite layer has a form:
 	\begin{equation}
 	\bm{\overline Q}_k^e = \left[\begin{array}{ccccc} \overline{Q}_{11} & \overline{Q}_{12}& \overline{Q}_{16} & 0&0\\[2pt]
 	\overline{Q}_{12}& \overline{Q}_{22} & \overline{Q}_{26}& 0&0\\\overline{Q}_{16}&\overline{Q}_{26}&\overline{Q}_{66}&0&0\\[2pt]
 	0& 0 &0&\overline{Q}_{44}& \overline{Q}_{45}\\[2pt]
 	0&0&0&\overline{Q}_{45}&\overline{Q}_{55}\end{array}\right] \label{eq:dealm_plate_stf}
 	\end{equation}
-	The components of matrix $\bm{\overline Q}$ can be found in the literature~[{sierakowski89-composite}].
-	It should be noted that in general both mass density $\rho_k$ as well as elastic constants $\bm{\overline Q}_k^e$ can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within $k$-th layer. Integral over thickness of layers in eq.~\ref{eq:dealm_plate_stiffness} is evaluated analytically which leads to the following constants:
+	The components of matrix $\bm{\overline Q}_k^e$ are calculated for lamina rotated according to stacking sequence. The transformation matrix of stiffness tensor $\bm{Q}_k^e$ along with explicit formulas can be found in the literature~\cite{Vinson1987}.
+	It should be noted that in general both mass density $\rho_k$ as well as stiffness tensor components $\bm{Q}_k^e$ can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within $k$-th layer. Integral over thickness of layers in eq.~\ref{eq:dealm_plate_stiffness} is evaluated analytically which leads to the following constants:
 	\begin{equation}
 	\begin{split}
 	& A_{ij} =  \sum \limits_{k=1}\limits^{N} (\overline{Q}_k)_{ij} \,(h_{k-1} - h_k),\quad i,j = 1,2,6,\\
 	& A_{ij} =  \sum \limits_{k=1}\limits^{N} (\overline{Q}_k)_{ij} \,5/4 (h_{k-1} - h_k - 4/3 (h_{k-1}^3 - h_k^3)/h^2 ),\quad i,j = 4,5,\\
 	& B_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^2 - h_k^2)/2, \quad i,j = 1,2,6,\\
-	& D_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^3 - h_k^3)/3, \quad i,j = 1,2,6.
+	& D_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^3 - h_k^3)/3, \quad i,j = 1,2,6,
 	\end{split}
 	\end{equation}
-	\section{Implementation by using Matlab Parallel Computing Toolbox}
+	where $h$ is the total shell thickness.
+	\subsection{Implementation by using vectorization of the code and Matlab Parallel Computing Toolbox}
 	In classic finite element approach elemental matrices are assembled to form equation of motion:
 	\begin{equation}
 	\bm{M} \vec{\ddot{U}} + \bm{C} \vec{\dot{U}} + \bm{K} \vec{U} = \vec{F} \label{eq:motion}
@@ -410,9 +424,29 @@
 	\vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 	\label{eq:vectorized_motion}
 	\end{equation} 
-	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user.
-	% mention about computation speed-up
-	\section{Interpolation on an uniform grid}
+	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. Parallel version of the code run on Tesla K20X GPU card enable about 10$\times$ computation speedup in relation to single CPU. 
+	\subsection{Signal sensing}
+	Piezoelectric sensors are considered in the model in terms of stiffness and mass reduced to neutral plane of the shell. The signal sensing is realised by the following equation:
+	\begin{equation}
+	\begin{split}
+	\vec{s}^{pzt} &= \left[ e_{31}\left((\bm{N},_{\xi}^{pzt}\vec{U}_x^{pzt}).*(\vec{J}^{-1})_{11}^{pzt} + (\bm{N},_{\eta}^{pzt}\vec{U}_x^{pzt}).*(\vec{J}^{-1})_{12}^{pzt} \right.\right.\\
+	&+ \frac{h}{2} (\bm{N},_{\xi}^{pzt}\bs{\Phi}_x^{pzt}).*(\vec{J}^{-1})_{11}^{pzt} + \frac{h}{2} \left.(\bm{N},_{\eta}^{pzt}\bs{\Phi}_x^{pzt}).*(\vec{J}^{-1})_{12}^{pzt}\right)\\
+	&+ e_{32}\left((\bm{N},_{\xi}^{pzt}\vec{U}_y^{pzt}).*(\vec{J}^{-1})_{21}^{pzt} + (\bm{N},_{\eta}^{pzt}\vec{U}_y^{pzt}).*(\vec{J}^{-1})_{22}^{pzt} \right.\\
+	&+ \frac{h}{2} (\bm{N},_{\xi}^{pzt}\bs{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{21}^{pzt} + \frac{h}{2} \left.\left.(\bm{N},_{\eta}^{pzt}\bs{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{22}^{pzt}\right)\right] \frac{h_{pzt}}{g_{33}}, 
+	\end{split}
+	\label{eq:pzt_sensing}
+	\end{equation}
+	where $e_{31}$ and $e_{32}$ are piezoelectric coupling constants, $g_{33}$ is the extensional voltage constant, $h_{pzt}$ is the thickness of piezoelectric sensor. The submatrices and subvectors in Eq.~\ref{eq:pzt_sensing} denoted by $pzt$ superscript corresponds to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of $\vec{s}$ at particular integration time step gives voltage value. 
+	\subsection{Delamination modelling}
+	The concept of delamination modelling is the same as in~\cite{Kudela2009}. The flat shell is divided into three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface. These regions are denoted in the cross--section through delamination shown in Fig.~\ref{fig:delam_modelling_shell}. 
+	\begin{figure} [h!]
+		\centering
+		\includegraphics{delam_modelling_shell.png}	
+		\caption{The concept of delamination modelling: cross-section through the composite laminate and delamination showing three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface and corresponding elements.}
+		\label{fig:delam_modelling_shell}
+	\end{figure}
+	In the flat shell all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. The contact effect is neglected. It should be noted that the delamination can be placed at arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through thickness integrals over appropriate composite layers.
+	\subsection{Interpolation on an uniform grid}
 	With the advent of laser vibrometry technique, many algorithms for damage visualization  are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed. 
 	
 	The implemented interpolation method utilizes shape functions of spectral elements. The interpolation on uniform grid of data points is accomplished in three steps: the determination of the element containing the data point (owner element), the transformation of the data point’s coordinates into the reference coordinate system (inverse mapping), and finally the application of the spectral elements shape functions to determine the degrees of freedom at that point (eq.~\ref{eq:delam_plateaproxim}).
@@ -433,8 +467,32 @@
 	The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas  \verb|griddata| function must be called for each frame separately which is inefficient.
 
 	\section{Experimental validation}
+	\subsection{Open Guided Waves}
+	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}.
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \footnotesize
+		\caption{Material properties of unidirectional Hexply M21/34\%/UD134/T700/300 (values of stiffness tensor according to~\cite{Moll2018}; density is assumed).}
+		%\begin{tabular}{@{}ccccccc@{}} % remove spaces from vertical lines
+		\begin{tabular}{ccccccc} 
+			%\hline
+			\toprule
+			$\rho$ & $Q_{11}$ & $Q_{12}$  & $Q_{22}$ & $Q_{44}$ & $Q_{55}$ & $Q_{66}$\\
+			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
+			%\hline
+			kg/m\textsuperscript{3} &GPa& GPa  & GPa  & GPa& GPa & GPa\\ 
+			%\hline
+			\midrule
+			1571 &130& 6.1& 11.2 & 3 & 4.2 & 4.2\\
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:mat_prop}
+	\end{table}
+		
 	
-	Mesh
+	\subsection{Meshing}
+	External meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisted of quadrilateral elements (see Fig.\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code so that generate spectral elements with node distribution according to GLL points. The close up of spectral element mesh is shown in Fig.~\ref{fig:spec_mesh_zoom}. 
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
@@ -449,6 +507,7 @@
    	\caption{Close up of mesh of spectral elements in the damage area (green) and piezoelectric transducers no. 3 and 4}
    	\label{fig:spec_mesh_zoom}
    \end{figure}
+
 	The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}.
 	
 	Full wavefield
