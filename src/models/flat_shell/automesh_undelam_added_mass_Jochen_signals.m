@@ -1,5 +1,5 @@
 clear all; close all;
-% generate mesh for single geometry file (1 delamination, square pzt)
+% generate mesh for single geometry file (1 delamination, multi pzt)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Prepare output directories

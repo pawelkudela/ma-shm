@@ -437,7 +437,7 @@
 	\label{eq:pzt_sensing}
 	\end{equation}
 	where $e_{31}$ and $e_{32}$ are piezoelectric coupling constants, $g_{33}$ is the extensional voltage constant, $h_{pzt}$ is the thickness of piezoelectric sensor. The submatrices and subvectors in Eq.~\ref{eq:pzt_sensing} denoted by $pzt$ superscript corresponds to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of $\vec{s}$ at particular integration time step gives voltage value. 
-	\subsection{Delamination modelling}
+	\subsection{Delamination modelling \label{sec:delam_model}}
 	The concept of delamination modelling is the same as in~\cite{Kudela2009}. The flat shell is divided into three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface. These regions are denoted in the cross--section through delamination shown in Fig.~\ref{fig:delam_modelling_shell}. 
 	\begin{figure} [h!]
 		\centering
@@ -468,7 +468,9 @@
 
 	\section{Experimental validation}
 	\subsection{Open Guided Waves}
-	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}.
+	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.5 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}.
+	
+	Two data sets were utilized for qualitative and quantitative validation of the numerical model, respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer place in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling).
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
@@ -489,28 +491,50 @@
 		\end{tabular} 
 		\label{tab:mat_prop}
 	\end{table}
-		
+	\subsection{Defects}
+	In both experiments, defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
 	
+	In numerical model, two defects modelling techniques were investigated: delamination as described in section~\ref{sec:delam_model} and added mass. The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \footnotesize
+		\caption{Coordinates of analysed defects; Units: [m].}
+		%\begin{tabular}{@{}ccccccc@{}} % remove spaces from vertical lines
+		\begin{tabular}{cccc} 
+			%\hline
+			\toprule
+			\multicolumn{2}{c}{\textbf{Data set I} }	& \multicolumn{2}{c}{\textbf{Data set II} } \\
+			\multicolumn{2}{c}{\textbf{(wavefield)} }	& \multicolumn{2}{c}{\textbf{(signals)} } \\
+			%\midrule
+			\cmidrule(lr){1-2} \cmidrule(lr){3-4}
+			x & y &  x &  y  \\
+			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
+			%\hline
+			0.191 & 0.145 & 0.250  & 0.427 \\ 
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:defect_coordinates}
+	\end{table}		
 	\subsection{Meshing}
-	External meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisted of quadrilateral elements (see Fig.\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code so that generate spectral elements with node distribution according to GLL points. The close up of spectral element mesh is shown in Fig.~\ref{fig:spec_mesh_zoom}. 
+	External meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisted of quadrilateral elements (see Fig.~\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code so that generate spectral elements with node distribution according to GLL points. The close up of spectral element mesh near the defect is shown in Fig.~\ref{fig:spec_mesh_zoom}. 
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
 		\includegraphics{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass.png}	
-		\caption{Quad mesh}
+		\caption{Mesh of quadrilateral elements used in numerical modelling; red -- piezoelectric transducers; green -- defect location.}
 		\label{fig:quad_mesh}
 	\end{figure}
    \begin{figure} [h!]
    	\centering
    	%\includegraphics[width=\textwidth]{path_4_8.png}
    	\includegraphics{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass_spec_zoom.png}	
-   	\caption{Close up of mesh of spectral elements in the damage area (green) and piezoelectric transducers no. 3 and 4}
+   	\caption{Close up of spectral element mesh in the damage area (green) and piezoelectric transducers no. 3 and 4}
    	\label{fig:spec_mesh_zoom}
    \end{figure}
-
-	The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}.
+   \clearpage
 	
-	Full wavefield
+	\subsection{Comparison of full wavefield data }
 	
 	\begin{figure} [h!]
 		\begin{subfigure}[b]{0.49\textwidth}
@@ -567,6 +591,9 @@
 		\label{fig:num_wavefield_top}
 	\end{figure}
 \end{comment}
+\clearpage
+\subsection{Comparison of signals}
+The comparison of experimental and numerical signals is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
 	\begin{figure} [h!]
 			\centering
 			%\includegraphics[width=\textwidth]{path_1_7.png}
