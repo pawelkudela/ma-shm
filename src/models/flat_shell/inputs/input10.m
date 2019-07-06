@@ -3,7 +3,7 @@ disp('.. Reading input data');
 nft=4096*16;      % total number of samples
 tt= 0.001599609375000/2;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
-f_1=40e3/5;        % frequency of the modulation signal [Hz]
+f_1=50e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]
 nFrames=512;        % number of frames for animation
 field_variable = 'velocity'; % field_variable for saving output data, string: 'displacement', 'velocity', 'acceleration' or 'all'
