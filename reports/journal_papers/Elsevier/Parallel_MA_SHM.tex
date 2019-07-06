@@ -468,7 +468,7 @@
 
 	\section{Experimental validation}
 	\subsection{Open Guided Waves}
-	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.5 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}.
+	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.5 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along vertical edge of specimens.
 	
 	Two data sets were utilized for qualitative and quantitative validation of the numerical model, respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer place in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling).
 	\begin{table}
@@ -557,17 +557,31 @@
 			\centering
 			% shift of 8 frames due to excitation misalignment in experiment of pzt with (0,0) coordinates
 			\includegraphics[]{Vz_1_frame72_bottom.png} 
-			\caption{Numerical simulation: $t=112.5  \mu$s}
+			\caption{Simulation (delamination): $t=112.5  \mu$s}
 			\label{fig:num_frame72}
 		\end{subfigure}
-	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\includegraphics[]{Vz_1_frame108_bottom.png}
-		\caption{Numerical simulation: $t=168.7 \mu$s}
-		\label{fig:num_frame108}
-	\end{subfigure}
-	\hfill
+		\hfill
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{Vz_1_frame108_bottom.png}
+			\caption{Simulation (delamination): $t=168.7 \mu$s}
+			\label{fig:num_frame108}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			% shift of 8 frames due to excitation misalignment in experiment of pzt with (0,0) coordinates
+			\includegraphics[]{added_mass_Vz_1_frame72_bottom.png} 
+			\caption{Simulation (added mass): $t=112.5  \mu$s}
+			\label{fig:num_frame72_added_mass}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{added_mass_Vz_1_frame108_bottom.png}
+			\caption{Simulation (added mass): $t=168.7 \mu$s}
+			\label{fig:num_frame108_added_mass}
+		\end{subfigure}
 		\caption{Comparison of experimental and numerical full wavefield data.} 
 		\label{fig:wavefields_comparison}
 	\end{figure}
