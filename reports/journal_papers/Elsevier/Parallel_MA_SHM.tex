@@ -485,14 +485,14 @@
 			kg/m\textsuperscript{3} &GPa& GPa  & GPa  & GPa& GPa & GPa\\ 
 			%\hline
 			\midrule
-			1571 &130& 6.1& 11.2 & 3 & 4.2 & 4.2\\
+			1571 &130& 6.1& 11.2 & 3.0 & 4.2 & 4.2\\
 			%\hline 
 			\bottomrule 
 		\end{tabular} 
 		\label{tab:mat_prop}
 	\end{table}
 	\subsection{Defects}
-	In both experiments, defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
+	In both experiments defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
 	
 	In numerical model, two defects modelling techniques were investigated: delamination as described in section~\ref{sec:delam_model} and added mass. The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
 	\begin{table}
@@ -535,6 +535,11 @@
    \clearpage
 	
 	\subsection{Comparison of full wavefield data }
+	Comparison of experimental and numerical full wavefield data for selected time instances is presented in Fig.~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (vide eq.~\ref{eq:first_derivative_scheme}) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (Fig.~\ref{fig:num_frame72}, Fig.~\ref{fig:num_frame108}) and added mass (Fig.~\ref{fig:num_frame72_added_mass}, Fig.~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced than in case of delamination, which is especially visible at time frame $t=112.5\,  \mu$s. The wave reflection pattern is the same in each case.
+	
+	The differences between interaction of guided waves with delamination in comparison to added mass are especially visible on numerical full wavefield data collected at the top surface of the plate (see Fig.~\ref{fig:wave_entrapment}). The phenomenon of wave entrapment at defect location is present only in case of delamination (Fig.~\ref{fig:num_frame128_top}) whereas it is not present in case of added mass (Fig.~\ref{fig:num_frame128_added_mass_top} ). 
+	
+	Despite these differences it seems that reversible damage in the form of added mass coupled to the structure by tacky tape is a good way for collecting benchmark data set. Such benchmark data set is a good starting point for development of algorithms based on full wavefield data for visualization of defect location even in the form of delamination.
 	
 	\begin{figure} [h!]
 		\begin{subfigure}[b]{0.49\textwidth}
@@ -543,13 +548,13 @@
 			%\includegraphics[width=\textwidth]{SASE/\modelname_out/\modelname_angle_30_param_dispersion_curves.png}
 			% size 100%
 			\includegraphics[]{exp_frame64.png}
-			\caption{Experiment: $t=112.5  \mu$s}
+			\caption{Experiment: $t=112.5\,  \mu$s}
 			\label{fig:exp_frame64}
 		\end{subfigure}
 		\begin{subfigure}[b]{0.49\textwidth}
 			\centering
 			\includegraphics[]{exp_frame100.png}
-			\caption{Experiment: $t=168.7 \mu$s}
+			\caption{Experiment: $t=168.7\, \mu$s}
 			\label{fig:exp_frame100.png}
 		\end{subfigure}
 		\hfill
@@ -557,14 +562,14 @@
 			\centering
 			% shift of 8 frames due to excitation misalignment in experiment of pzt with (0,0) coordinates
 			\includegraphics[]{Vz_1_frame72_bottom.png} 
-			\caption{Simulation (delamination): $t=112.5  \mu$s}
+			\caption{Simulation (delamination): $t=112.5\,  \mu$s}
 			\label{fig:num_frame72}
 		\end{subfigure}
 		\hfill
 		\begin{subfigure}[b]{0.49\textwidth}
 			\centering
 			\includegraphics[]{Vz_1_frame108_bottom.png}
-			\caption{Simulation (delamination): $t=168.7 \mu$s}
+			\caption{Simulation (delamination): $t=168.7\, \mu$s}
 			\label{fig:num_frame108}
 		\end{subfigure}
 		\hfill
@@ -572,61 +577,61 @@
 			\centering
 			% shift of 8 frames due to excitation misalignment in experiment of pzt with (0,0) coordinates
 			\includegraphics[]{added_mass_Vz_1_frame72_bottom.png} 
-			\caption{Simulation (added mass): $t=112.5  \mu$s}
+			\caption{Simulation (added mass): $t=112.5\,  \mu$s}
 			\label{fig:num_frame72_added_mass}
 		\end{subfigure}
 		\hfill
 		\begin{subfigure}[b]{0.49\textwidth}
 			\centering
 			\includegraphics[]{added_mass_Vz_1_frame108_bottom.png}
-			\caption{Simulation (added mass): $t=168.7 \mu$s}
+			\caption{Simulation (added mass): $t=168.7\, \mu$s}
 			\label{fig:num_frame108_added_mass}
 		\end{subfigure}
 		\caption{Comparison of experimental and numerical full wavefield data.} 
 		\label{fig:wavefields_comparison}
 	\end{figure}
-	\begin{comment}
+
 	\begin{figure} [h!]
 		\begin{subfigure}[b]{0.49\textwidth}
 			\centering
-			\includegraphics[]{cut_Vz_1_frame72_top.png} 
-			\caption{Numerical simulation: $t=112.5  \mu$s}
-			\label{fig:num_frame72top}
-		\end{subfigure}
-		\centering
-		\begin{subfigure}[b]{0.49\textwidth}
-			\centering
-			\includegraphics[]{cut_Vz_1_frame108_top.png}
-			\caption{Numerical simulation: $t=168.7 \mu$s}
-			\label{fig:num_frame108top}
+			\includegraphics[]{cut_Vz_1_frame128_top.png} 
+			\caption{Simulation (delamination): $t=200\,  \mu$s}
+			\label{fig:num_frame128_top}
 		\end{subfigure}
 		\hfill
-		\caption{Numerical full wavefield data at top surface of the plate.} 
-		\label{fig:num_wavefield_top}
+		\begin{subfigure}[b]{0.49\textwidth}
+			\centering
+			\includegraphics[]{added_mass_cut_Vz_1_frame128_top.png}
+			\caption{Simulation (added mass): $t=200\, \mu$s}
+			\label{fig:num_frame128_added_mass_top}
+		\end{subfigure}
+		\caption{Comparison of numerical full wavefield data at the top surface of the plate for two defect modelling techniques: delamination and added mass.} 
+		\label{fig:wave_entrapment}
 	\end{figure}
-\end{comment}
 \clearpage
 \subsection{Comparison of signals}
-The comparison of experimental and numerical signals is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
+The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
+
+It should be added that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. In the current modelling approach, the damping coefficient was arbitrary selected. However, in future some optimization technique can be applied for finding damping coefficient so that the numerical signal best fit to experimental one. 
 	\begin{figure} [h!]
 			\centering
 			%\includegraphics[width=\textwidth]{path_1_7.png}
 			\includegraphics{path_1_7.png}	
-			\caption{Path 1-7}
+			\caption{Comparison of experimental and numerical signals for transducer pairs 1--7}
 			\label{fig:path1_7}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_2_4.png}
 		\includegraphics{path_2_4.png}	
-		\caption{Path 2-4}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 2--4}
 		\label{fig:path2_4}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
 		\includegraphics{path_4_8.png}	
-		\caption{Path 4-8}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 4--8}
 		\label{fig:path4_8}
 	\end{figure}
 \clearpage
