@@ -51,7 +51,7 @@ load([interim_output_name,'flat_shell_Vz_1_500x500top']);
 Data_quarter=Data(1:250,1:250,:);
 plot_meshgrid_frames(Data_quarter,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 % caxis cut
-caxis_cut = 0.05;
+caxis_cut = 0.1;
 Data_zoom=Data(1:250,1:250,:);
 plot_meshgrid_frames(Data_zoom,'top',test_case,selected_frames,[figure_output_name,'cut_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 caxis_cut = 0.8;
@@ -64,8 +64,6 @@ command = ['copy ', figure_output_name,'Vz_1_frame72_bottom.png ',paper_fig_fold
 system(command);
 command = ['copy ', figure_output_name,'Vz_1_frame108_bottom.png ',paper_fig_folder];
 system(command);
-command = ['copy ', figure_output_name,'cut_Vz_1_frame72_top.png ',paper_fig_folder];
-system(command);
-command = ['copy ', figure_output_name,'cut_Vz_1_frame108_top.png ',paper_fig_folder];
+command = ['copy ', figure_output_name,'cut_Vz_1_frame128_top.png ',paper_fig_folder];
 system(command);
 
