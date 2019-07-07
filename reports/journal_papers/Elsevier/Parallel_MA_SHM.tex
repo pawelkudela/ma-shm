@@ -468,9 +468,9 @@
 
 	\section{Experimental validation}
 	\subsection{Open Guided Waves}
-	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.5 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along vertical edge of specimens.
+	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm (0.5 mm in numerical simulation). The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along vertical edge of specimens.
 	
-	Two data sets were utilized for qualitative and quantitative validation of the numerical model, respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer place in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling).
+	Two data sets were utilized for qualitative and quantitative validation of the numerical model, respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer place in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$150~V. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for signals' measurement.
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
@@ -610,28 +610,28 @@
 	\end{figure}
 \clearpage
 \subsection{Comparison of signals}
-The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
+The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The transducer pair 1--7 means that the guided waves were excited in actuator 1 and registered in sensor 7 (vide Fig.~\ref{fig:quad_mesh}). The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
 
-It should be added that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. In the current modelling approach, the damping coefficient was arbitrary selected. However, in future some optimization technique can be applied for finding damping coefficient so that the numerical signal best fit to experimental one. 
+It should be added that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. It has been assumed in the model that the damping matrix is proportional to mass matrix $\bm{C} = \alpha \bm{M}$. In the current modelling approach, the coefficient $\alpha$ was arbitrary selected ($\alpha = 4000$). However, in future some optimization technique can be applied for finding the damping coefficient so that the numerical signal best fit to experimental one. The same can be applied for optimization of elastic constants of material properties. 
 	\begin{figure} [h!]
 			\centering
 			%\includegraphics[width=\textwidth]{path_1_7.png}
 			\includegraphics{path_1_7.png}	
-			\caption{Comparison of experimental and numerical signals for transducer pairs 1--7}
+			\caption{Comparison of experimental and numerical signals for transducer pairs 1--7.}
 			\label{fig:path1_7}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_2_4.png}
 		\includegraphics{path_2_4.png}	
-		\caption{Comparison of experimental and numerical signals for transducer pairs 2--4}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 2--4.}
 		\label{fig:path2_4}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
 		\includegraphics{path_4_8.png}	
-		\caption{Comparison of experimental and numerical signals for transducer pairs 4--8}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 4--8.}
 		\label{fig:path4_8}
 	\end{figure}
 \clearpage
