@@ -423,7 +423,7 @@
 	\vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 	\label{eq:vectorized_motion}
 	\end{equation} 
-	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. Parallel version of the code run on Tesla K20X GPU card enable about 10$\times$ computation speedup in relation to single CPU. 
+	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. Parallel version of the code run on Tesla K20X GPU card enable about 5--10$\times$ computation speedup in relation to single CPU (depending on the size of the problem). 
 	\subsection{Signal sensing}
 	Piezoelectric sensors are considered in the model in terms of stiffness and mass reduced to neutral plane of the shell. The signal sensing is realised by the following equation:
 	\begin{equation}
@@ -617,7 +617,7 @@ The greatest difference between experimental and numerical wave packet amplitude
 
 Another important fact is that the delamination affect signals more than added mass. This effect is especially visible in Fig.~\ref{fig:path1_7} and Fig.~\ref{fig:path2_4}. Since reversible damage in the form of added mass coupled to the structure by tacky tape affect less signals of guided waves than delamination, such signals are more challenging for signal processing methods. Therefore, it can be concluded that the experimental data set provides good benchmark for development of damage detection and localization algorithms.
 
-The conducted signal analysis leads to the conclusion that model based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. The run time of simulation for the case of excitation in one actuator was about 3 hours. The total number of degrees of freedom was ???
+The conducted signal analysis leads to the conclusion that model based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. The run time of simulation for the case of excitation in one actuator was about 3 hours. The total number of degrees of freedom was 2.23 millions. The GPU memory usage was about 925~MB.
 
 	\begin{figure} [h!]
 			\centering
@@ -641,9 +641,14 @@ The conducted signal analysis leads to the conclusion that model based approach 
 		\label{fig:path4_8}
 	\end{figure}
 \clearpage
-	\section{Exemplary applications}
+	%\section{Exemplary applications}
 	\section{Conclusions}
+	A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows about 5--10$\times$ computation speedup in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved.
 	
+	The simulated wave propagation in composite laminates matches well the experimental data acquired from Open Guided Waves platform in terms of full wavefield patterns. However, the quantitative comparison of signals reveals that there are certain differences especially in wave packets' amplitudes. Thus, there are still challenges to overcome which are related to proper wave attenuation modelling. In future it is also worthy to investigate optimization of elastic and piezoelectric constants for further reduction of differences between experiments and simulations.
+	
+	Nevertheless, the current implementation is very well suited for any parametric studies or model assisted approaches of structural health monitoring.
+	 
 	%% The Appendices part is started with the command \appendix;
 	%% appendix sections are then done as normal sections
 	%% \appendix
