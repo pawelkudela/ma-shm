@@ -59,7 +59,8 @@
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers.
 %% \usepackage{lineno}
-\journal{NDT \& E International}
+%\journal{NDT \& E International}
+\journal{Journal of Sound and Vibration}
 \begin{document}
 	\begin{frontmatter}
 		%% Title, authors and addresses
@@ -81,12 +82,13 @@
 		%% \address{Address\fnref{label3}}
 		%% \fntext[label3]{}
 		
-		\title{Parallel spectral element method for model-assisted structural health monitoring}
+		%\title{Parallel spectral element method for model-assisted structural health monitoring}
+		\title{Parallel spectral element method for guided wave based structural health monitoring}
 		
 		%% use optional labels to link authors explicitly to addresses:
 		%% \author[label1,label2]{}
 		\address[IFFM]{Institute of Fluid Flow Machinery, Polish Academy of Sciences, Poland}
-		\address[GU]{Goethe University, Germany}
+		\address[GU]{J.W. Goethe--University, Department of Physics, 60438 Frankfurt, Germany}
 		
 		\ead{pk@imp.gda.pl}
 		\cortext[cor1]{Corresponding author}
@@ -98,7 +100,7 @@
 		
 		\begin{abstract}
 			%% Text of abstract
-			Parallel implementation of spectral element method is developed in which flat shell spectral elements are utilized for domain representation. The implementation is realised by using Matlab Parallel Computing Toolbox and optimized for Graphics Processing Unit (GPU) computation. In this way, considerable computation speedup can be achieved in comparison to computation on conventional processors. The method was tested on experimental data set available on Open Guided Waves platform. Qualitative comparison was performed on full wavefield data, whereas quantitative comparison was made directly on signals of propagating Lamb waves registered by piezoelectric transducers. In both cases, good agreement between numerical and experimental results was achieved. The proposed method is particularly useful for structural health monitoring algorithms in which signal parameters are required such as wave velocity dependence on angle of propagation. Moreover, it enables model-assisted damage size estimation in which damage influence curve is estimated based on large numerical data set and sparse experimental data. Due to relatively short computation time, large data sets can be generated and used for machine learning or other soft computing methods opening up new possibilities in health monitoring of structures.
+			Parallel implementation of spectral element method is developed in which flat shell spectral elements are utilized for spatial domain representation. The implementation is realised by using Matlab Parallel Computing Toolbox and optimized for Graphics Processing Unit (GPU) computation. In this way, considerable computation speedup can be achieved in comparison to computation on conventional processors. The method was tested on experimental data set available on Open Guided Waves platform. Qualitative comparison was performed on full wavefield data, whereas quantitative comparison was made directly on signals of propagating Lamb waves registered by piezoelectric transducers. In both cases, good agreement between numerical and experimental results was achieved. The proposed method is particularly useful for structural health monitoring algorithms in which signal parameters are required such as wave velocity dependence on angle of propagation. Moreover, it enables model-assisted damage size estimation in which damage influence curve is estimated based on large numerical data set and sparse experimental data. Due to relatively short computation time, large data sets can be generated and used for machine learning or other soft computing methods opening up new possibilities in health monitoring of structures.
 		\end{abstract}
 		
 		\begin{keyword}
@@ -117,21 +119,23 @@
 	
 	%% main text
 	\section{Introduction}
-	Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms that based on signals registered by ultrasonic or piezoelectric sensors are able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example in anisotropic composite laminates wave velocity of particular mode depends on angle of propagation. Improper velocity values would lead to wrong identification of damage location.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually model--assisted approach is required supported by a lot of numerical simulations. Unfortunately, due to complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
+	Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms based on ultrasound signals registered by piezoelectric sensors able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example in anisotropic composite laminates the wave velocity of particular mode depends on angle of propagation. Improper velocity values would lead to wrong identification of damage location.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually model--assisted approach is required supported by comprehensive numerical simulations. Unfortunately, due to complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
 	
-	Guided wave modelling techniques can be roughly divided into analytic, semi--analytic and approximate in which domains are discretized in various ways e.g. finite element method. Analytic methods are suitable for parametric studies and can be used for damage influence analysis in simple isotropic structures~\cite{Giurgiutiu2014}. Semi--analytic methods such as semi-analytic finite element (SAFE) method is utilized for dispersion curves analysis and wave attenuation in wave guides of arbitrary cross-sections including multi-layer composite laminates~\cite{Bartoli2006}. Another method which utilizes analytic solution of wave equation as a shape function is the frequency domain spectral finite element method. The method was popularized by Doyle~\cite{Doyle1989} and exploited by many researchers~\cite{RoyMahapatra2003,Palacz2005} mostly in relation to wave propagation analysis in 1D waveguides. The advantage of the method is that it is very fast if only few response points are considered and guided wave of high frequency can be modelled easily. On the other hand, the periodic nature of Fourier transform and inverse Fourier transform used in this method in conjunction with finite dimensions of waveguide causes that artificial wave packets appears in signal responses. Special \emph{throw-off elements} can be applied at ends of 1D waveguides to alleviate this problem. In 2D waveguides such as membranes and plates the method has been extended to wavelet spectral finite element method~\cite{Mitra2008,Yang2016}. It should be noted that by using this approach simulation of wave propagation in anisotropic materials with defects can be conducted.
+	Guided wave modelling techniques can be roughly divided into analytic, semi--analytic and approximate in which domains are discretized in various ways e.g. finite element method. Analytic methods are suitable for parametric studies and can be used for damage influence analysis in simple isotropic structures~\cite{Giurgiutiu2014}. Semi--analytic methods such as semi-analytic finite element (SAFE) method is utilized for dispersion curves analysis and wave attenuation in wave guides of arbitrary cross-sections including multi-layer composite laminates~\cite{Bartoli2006}. Another method which utilizes analytic solution of wave equation as a shape function is the frequency domain spectral finite element method. The method was popularized by Doyle~\cite{Doyle1989} and exploited by many researchers~\cite{RoyMahapatra2003,Palacz2005} mostly in relation to wave propagation analysis in 1D waveguides. The advantage of the method is that it is very fast if only few response points are considered and guided waves of high frequency can be modelled easily. On the other hand, the periodic nature of Fourier transform and inverse Fourier transform used in this method in conjunction with finite dimensions of waveguide causes that artificial wave packets appears in signal responses. Special \emph{throw-off elements} can be applied at ends of 1D waveguides to alleviate this problem~\cite{Doyle1989}. In 2D waveguides such as membranes and plates the method has been extended to wavelet spectral finite element method~\cite{Mitra2008,Yang2016}. It should be noted that by using this approach simulation of wave propagation in anisotropic materials with defects can be conducted.
 	
 	An interesting approximate method was proposed by Joulaian et al., namely spectral cell method~\cite{Joulaian2014}. The main idea of the method is to embed physical domain into a bigger domain 
 	that can be easily meshed into a Cartesian grid consisting of rectangular cells, i.e. quadrilaterals
 	in 2D or hexahedrals in 3D, respectively. It can be efficient in combination with octree meshing and explicit time integration. The authors applied the method for simulating wave propagation in complex structures made of heterogeneous materials. Recently, the code was adapted for the use on multiple GPUs and CPUs~\cite{Mossaiby2019}. 
 	
-	Willberg et al.~\cite{Willberg2012} studied several higher order finite element methods with polynomial degrees \emph{p}{\textgreater}2. Specifically, spectral elements based on Lagrange polynomials (SEM), p-elements using the normalized integrals of the Legendre polynomials (p-FEM) and isogeometric elements utilizing non-uniform rational B-splines (NURBS, N-FEM) were discussed. The results highlight the superiority of higher order approaches in comparison to low order (linear, quadratic) finite elements. The convergence behaviour is more rapid and considerably less degrees of freedom are needed for accurate results.
+	Willberg et al.~\cite{Willberg2012} studied several higher order finite element methods with polynomial degrees \emph{p}{\textgreater}2. The results highlight the superiority of higher order approaches in comparison to low order (linear, quadratic) finite elements. The convergence behaviour is more rapid and considerably less degrees of freedom are needed for accurate results.
+	
+	Another higher order method is the time domain spectral element method (SEM). It is characterized by fast convergence rate, diagonality of mass matrix and high parallelism of the code. The SEM was originally developed by Patera in 1984 for modelling of laminar flows~\cite{Patera1984}. Than, over the years the method has gained attention in geophysics community for the numerical simulation of seismic wave propagation~\cite{Seriani1998,Komatitsch2009}. The method was later adopted for modelling structural health monitoring systems based on anomalies of guided waves~\cite{Schulte2010,Ostachowicz2012,Lonkar2013}. 
 	
 	Leckey et al.~\cite{Leckey2018} investigated four numerical simulation tools: custom implementation~\cite{Leckey2014} of the 3D Elastodynamic Finite Integration Technique (EFIT) \cite{Schubert1998} along with three widely used commercial finite element codes: COMSOL, ABAQUS, and ANSYS. The studied example was related to interaction of propagating Lamb waves with delamination in cross-ply laminate consisted of 8 layers (delamination was below second ply counting from the top). The laminate was modelled by dense mesh of 3D solid elements. The numerical results were compared with experiment in terms of wavefield showing quite good agreement in case of some methods. Unfortunately, despite the simulations were performed on a workstation equipped with 16 cores, the efficiency of each investigated methods is so low that it is prohibitive to perform any parametric study or generate data set e.g. for machine learning (the shortest simulation run time was for the case of COMSOL i.e. 19.5~hours followed by ABAQUS implicit i.e. 40~hours).
 	
 	High computation demanding of guided wave propagation problem causes that more and more researchers have been looking for possible ways of computation speedup over last decade. One of possible popular solution is by using parallelisation via the Compute Unified Device Architecture (CUDA), which enables parallel computing on powerful graphic cards. A parallel algorithm of the Local Interaction Simulation Approach (LISA) for Lamb wave propagation modelling in aluminum plates exposed to temperature changes was developed by~Kijanka et~al.~\cite{Kijanka2013}. Similar approach to model the nonlinear dynamic interactions between ultrasonic guided waves and fatigue cracks was utilised by Shen and Cesnik~\cite{Shen2017}.  
 	
-	The presented in this paper method for solving guided wave propagation problems combines high order time domain spectral element method (SEM) with CUDA through Matlab Parallel Computing Toolbox. It is characterized by fast convergence rate, diagonality of mass matrix and high parallelism of the code. The SEM was originally developed by Patera in 1984 for modelling of laminar flows~\cite{Patera1984}. Than, over the years the method has gained attention in geophysics community for the numerical simulation of seismic wave propagation~\cite{Seriani1998,Komatitsch2009}. The method was later adopted for modelling structural health monitoring systems based on anomalies of guided waves~\cite{Ostachowicz2012,Lonkar2013}. The presented concept of parallel implementation of SEM is similar to the parallel implementation developed previously~\cite{Kudela2016} but it is applied to flat shell spectral elements instead of 3D solid elements. Moreover, it is more suitable for wave propagation modelling in multilayer composite laminates because it leads to much lower number of degrees of freedom. Therefore, the computation can be performed faster which is important for application in the model--assisted structural health monitoring.
+	The presented in this paper method for solving guided wave propagation problems combines high order time domain spectral element method (SEM) with CUDA through Matlab Parallel Computing Toolbox. The presented concept of parallel implementation of SEM is similar to the parallel implementation developed previously~\cite{Kudela2016} but it is applied to flat shell spectral elements instead of 3D solid elements. Moreover, it is more suitable for wave propagation modelling in multilayer composite laminates because it leads to much lower number of degrees of freedom. Therefore, the computation can be performed faster which is important for application in the model--assisted structural health monitoring.
 	
 	\section{Numerical modelling}
 	\subsection{Flat shell spectral element}
@@ -445,7 +449,7 @@
 		\label{fig:delam_modelling_shell}
 	\end{figure}
 	In the flat shell all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. The contact effect is neglected. It should be noted that the delamination can be placed at arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through thickness integrals over appropriate composite layers.
-	\subsection{Interpolation on an uniform grid}
+	\subsection{Interpolation on a uniform grid}
 	With the advent of laser vibrometry technique, many algorithms for damage visualization  are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed. 
 	
 	The implemented interpolation method utilizes shape functions of spectral elements. The interpolation on uniform grid of data points is accomplished in three steps: the determination of the element containing the data point (owner element), the transformation of the data point’s coordinates into the reference coordinate system (inverse mapping), and finally the application of the spectral elements shape functions to determine the degrees of freedom at that point (eq.~\ref{eq:delam_plateaproxim}).
@@ -469,7 +473,7 @@
 	\subsection{Open Guided Waves}
 	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along vertical edge of specimens.
 	
-	Two data sets were utilized for qualitative and quantitative validation of the numerical model, respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$150~V. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for signals' measurement.
+	Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wave--field plate" and "SHM plate", respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$100~V. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for signals' measurement in SHM plate.
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
@@ -493,7 +497,7 @@
 	\subsection{Defects}
 	In both experiments defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
 	
-	In numerical model, two defects modelling techniques were investigated: delamination as described in section~\ref{sec:delam_model} and added mass. The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
+	In the numerical model, two defect modelling techniques were investigated: delamination as described in section~\ref{sec:delam_model} and added mass. The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
@@ -503,7 +507,7 @@
 			%\hline
 			\toprule
 			\multicolumn{2}{c}{\textbf{Data set I} }	& \multicolumn{2}{c}{\textbf{Data set II} } \\
-			\multicolumn{2}{c}{\textbf{(wavefield)} }	& \multicolumn{2}{c}{\textbf{(signals)} } \\
+			\multicolumn{2}{c}{\textbf{(wavefield plate)} }	& \multicolumn{2}{c}{\textbf{(SHM plate)} } \\
 			%\midrule
 			\cmidrule(lr){1-2} \cmidrule(lr){3-4}
 			x & y &  x &  y  \\
@@ -516,7 +520,7 @@
 		\label{tab:defect_coordinates}
 	\end{table}		
 	\subsection{Meshing}
-	External meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisted of quadrilateral elements (see Fig.~\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code so that generate spectral elements with node distribution according to GLL points. The close up of spectral element mesh near the defect is shown in Fig.~\ref{fig:spec_mesh_zoom}. 
+	External meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisted of quadrilateral elements (see Fig.~\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code to generate spectral elements with node distribution according to GLL points. The close up of spectral element mesh near the defect is shown in Fig.~\ref{fig:spec_mesh_zoom}. 
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
@@ -533,10 +537,10 @@
    \end{figure}
    \clearpage
 	
-	\subsection{Comparison of full wavefield data }
-	Comparison of experimental and numerical full wavefield data for selected time instances is presented in Fig.~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (vide eq.~\ref{eq:first_derivative_scheme}) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (Fig.~\ref{fig:num_frame72}, Fig.~\ref{fig:num_frame108}) and added mass (Fig.~\ref{fig:num_frame72_added_mass}, Fig.~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced than in case of delamination, which is especially visible at time frame $t=112.5\,  \mu$s. The wave reflection pattern is the same in each case.
+	\subsection{Wavefield plate data set }
+	Comparison of experimental and numerical full wavefield data for selected time instances is presented in Fig.~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (see eq.~\ref{eq:first_derivative_scheme}) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (Fig.~\ref{fig:num_frame72}, Fig.~\ref{fig:num_frame108}) and added mass (Fig.~\ref{fig:num_frame72_added_mass}, Fig.~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced than in case of delamination, which is especially visible at time frame $t=112.5\,  \mu$s. The wave reflection pattern is the same in each case.
 	
-	The differences between interaction of guided waves with delamination in comparison to added mass are especially visible on numerical full wavefield data collected at the top surface of the plate (see Fig.~\ref{fig:wave_entrapment}). The phenomenon of wave entrapment at defect location is present only in case of delamination (Fig.~\ref{fig:num_frame128_top}) whereas it is not present in case of added mass (Fig.~\ref{fig:num_frame128_added_mass_top} ). 
+	The differences between interaction of guided waves with delamination in comparison to added mass are especially visible on numerical full wavefield data collected at the top surface of the plate (see Fig.~\ref{fig:wave_entrapment}). The phenomenon of wave entrapment at defect location is present only in case of delamination (Fig.~\ref{fig:num_frame128_top}) whereas it is not present in case of added mass (Fig.~\ref{fig:num_frame128_added_mass_top} ). The results related to the wave entrapment at delamination are consistent with the experimental findings available in the literature~\cite{Glushkov2012}. 
 	
 	Despite these differences it seems that reversible damage in the form of added mass coupled to the structure by tacky tape is a good way for collecting benchmark data set. Such benchmark data set is a good starting point for development of algorithms based on full wavefield data for visualization of defect location even in the form of delamination.
 	
@@ -604,11 +608,11 @@
 			\caption{Simulation (added mass): $t=200\, \mu$s}
 			\label{fig:num_frame128_added_mass_top}
 		\end{subfigure}
-		\caption{Comparison of numerical full wavefield data at the top surface of the plate for two defect modelling techniques: delamination and added mass.} 
+		\caption{Comparison of numerical full wavefield data at the top surface of the plate for two defect modelling techniques: delamination and added mass. Energy trapping visible only in the case of the delamination.} 
 		\label{fig:wave_entrapment}
 	\end{figure}
 \clearpage
-\subsection{Comparison of signals}
+\subsection{SHM plate data set}
 The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The transducer pair 1--7 means that the guided waves were excited in actuator 1 and registered in sensor 7 (vide Fig.~\ref{fig:quad_mesh}). The first wave packet in experimental signals should be ignored because it represents the effect of electromechanical crosstalk.
 
 In opposite to very good qualitative wavefield results, differences between experimental and numerical signals are evident. However, these differences are related to amplitude rather than wave velocity. Wave packet positions calculated numerically matches well wave packet positions in measured signals. The slight exception is in Fig.~\ref{fig:path1_7} in which in experimental signals only one wave packet exist at about 450~$\mu$s which is actually superposition of two wave packets as numerical simulation suggest. Also at the same figure the wave packet at about 650~$\mu$s is wider in experiment than in numerical results. 
@@ -623,21 +627,21 @@ The conducted signal analysis leads to the conclusion that model based approach 
 			\centering
 			%\includegraphics[width=\textwidth]{path_1_7.png}
 			\includegraphics{path_1_7.png}	
-			\caption{Comparison of experimental and numerical signals for transducer pairs 1--7.}
+			\caption{Comparison of experimental and numerical signals for transducer pairs 1--7, frequency 40~kHz.}
 			\label{fig:path1_7}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_2_4.png}
 		\includegraphics{path_2_4.png}	
-		\caption{Comparison of experimental and numerical signals for transducer pairs 2--4.}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 2--4, frequency 40~kHz.}
 		\label{fig:path2_4}
 	\end{figure}
 	\begin{figure} [h!]
 		\centering
 		%\includegraphics[width=\textwidth]{path_4_8.png}
 		\includegraphics{path_4_8.png}	
-		\caption{Comparison of experimental and numerical signals for transducer pairs 4--8.}
+		\caption{Comparison of experimental and numerical signals for transducer pairs 4--8, frequency 40~kHz.}
 		\label{fig:path4_8}
 	\end{figure}
 \clearpage
@@ -655,7 +659,8 @@ The conducted signal analysis leads to the conclusion that model based approach 
 	%% \section{}
 	%% \label{}
 	\section*{Acknowledgement}
-	The first author would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). The research was partially funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. Authors are also grateful to Task-CI for allowing the use of Matlab and Parallel Computing Toolbox licences. 
+	P. Kudela would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). J. Moll acknowledges support from the Federal Ministry for
+	Economic Affairs and Energy (Grant 03SX422B). The research was partially funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. Authors are also grateful to Task-CI for allowing the use of Matlab and Parallel Computing Toolbox licences. 
 	
 	
 	
