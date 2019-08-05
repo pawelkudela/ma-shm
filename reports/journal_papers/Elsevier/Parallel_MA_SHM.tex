@@ -427,7 +427,26 @@
 	\vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 	\label{eq:vectorized_motion}
 	\end{equation} 
-	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. Parallel version of the code run on Tesla K20X GPU card enable about 5--10$\times$ computation speedup in relation to single CPU (depending on the size of the problem). 
+	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. 
+	\subsection{Computation speedup}
+	The performance of the code was tested on a composite plate with piezoelectric transducer located at the centre and embedded delamination. The applied excitation was a tone-burst signal of carrier frequency 50~kHz. The size of the plate
+	has been increased gradually, so that meshes contained more and more nodes (30$\times$30 cm, 40$\times$40 cm, 50$\times$50 cm,70$\times$70 cm, 90$\times$90 cm, 100$\times$100 cm). Computation speedup for various meshes was calculated as follows:
+	\begin{equation}
+	speedup = \frac{CPU_{time}}{GPU_{time}}
+	\label{eq:speedup}
+	\end{equation}
+	where $CPU_{time}$ is the average time of computation of one integration step on a single core central
+	processing unit (computations were performed on a workstation equipped with 6 quad core Intel
+	Xeon X5660 2.8~GHz) and $GPU_{time}$ is the average time of computation of one integration step on
+	GPU (computations were performed on Nvidia Tesla K20X). It can be seen if Fig.~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card enable about 5--12$\times$ computation speedup in relation to single CPU (depending on the size of the problem).
+	
+	\begin{figure} [h!]
+		\centering
+		\includegraphics{speedup.png}	
+		\caption{Computation speedup on Tesla K20X GPU over single processor; NDOF - number of degrees of freedom.}
+		\label{fig:speedup}
+	\end{figure}
+\newpage
 	\subsection{Signal sensing}
 	Piezoelectric sensors are considered in the model in terms of stiffness and mass reduced to neutral plane of the shell. The signal sensing is realised by the following equation:
 	\begin{equation}
@@ -473,7 +492,7 @@
 	\subsection{Open Guided Waves}
 	Numerical simulation were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guide Waves is extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in Table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along vertical edge of specimens.
 	
-	Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wave--field plate" and "SHM plate", respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$100~V. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for signals' measurement in SHM plate.
+	Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wavefield plate" and "SHM plate", respectively. The former data set consisted of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometer. In this case only one quarter of the plate was measured. The latter data set consisted of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to Fig.~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$100~V. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for signals' measurement in SHM plate.
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
@@ -532,7 +551,7 @@
    	\centering
    	%\includegraphics[width=\textwidth]{path_4_8.png}
    	\includegraphics{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass_spec_zoom.png}	
-   	\caption{Close up of spectral element mesh in the damage area (green) and piezoelectric transducers no. 3 and 4}
+   	\caption{Close up of spectral element mesh in the damage area (green) and piezoelectric transducers no. 3 and 4.}
    	\label{fig:spec_mesh_zoom}
    \end{figure}
    \clearpage
