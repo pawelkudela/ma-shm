@@ -430,22 +430,42 @@
 	in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in eq.~\ref{eq:internal_forces} as well as in eq.~\ref{eq:vectorized_motion} are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, implementation is simple whereas CUDA GPU computation is transparent to the user. 
 	\subsection{Computation speedup}
 	The performance of the code was tested on a composite plate with piezoelectric transducer located at the centre and embedded delamination. The applied excitation was a tone-burst signal of carrier frequency 50~kHz. The size of the plate
-	has been increased gradually, so that meshes contained more and more nodes (30$\times$30 cm, 40$\times$40 cm, 50$\times$50 cm,70$\times$70 cm, 90$\times$90 cm, 100$\times$100 cm). Computation speedup for various meshes was calculated as follows:
+	has been increased gradually, so that meshes contained more and more nodes (30$\times$30 cm, 40$\times$40 cm, 50$\times$50 cm, 70$\times$70 cm, 90$\times$90 cm, 100$\times$100 cm). The total run times for investigated meshes and corresponding number of degrees of freedom (NDOF) are given in the table~\ref{tab:run_time}. Computation speedup for various meshes was calculated as follows:
 	\begin{equation}
 	speedup = \frac{CPU_{time}}{GPU_{time}}
 	\label{eq:speedup}
 	\end{equation}
-	where $CPU_{time}$ is the average time of computation of one integration step on a single core central
+	where $CPU_{time}$ is the average time of computation of one integration time step on a single core central
 	processing unit (computations were performed on a workstation equipped with 6 quad core Intel
-	Xeon X5660 2.8~GHz) and $GPU_{time}$ is the average time of computation of one integration step on
-	GPU (computations were performed on Nvidia Tesla K20X). It can be seen if Fig.~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card enable about 5--12$\times$ computation speedup in relation to single CPU (depending on the size of the problem).
+	Xeon X5660 2.8~GHz) and $GPU_{time}$ is the average time of computation of one integration time step on
+	GPU (computations were performed on Nvidia Tesla K20X). It can be seen in Fig.~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card about 5--12$\times$ faster than on single CPU (depending on the size of the problem). 
 	
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \footnotesize
+		\caption{Computation run times depending on the number of degrees of freedom (NDOF); GPU: Nvidia Tesla K20X; CPU: Intel Xeon X5660 2.8~GHz}
+		\begin{tabular}{ccccccc} 
+			%\hline
+			\toprule	
+			plate size [cm] & 30$\times$30  & 40$\times$40 & 50$\times$50 & 70$\times$70 & 90$\times$90 & 100$\times$100 \\
+			NDOF $\cdot 10^6$ & 1.02  & 1.46 & 1.98 & 3.09 & 5.23 & 6.36 \\
+			\midrule
+			CPU time [h]& 4.03& 5.71 & 8.42 & 13.13 & 22.37 & 27.33\\
+			\midrule
+			GPU time [h]& 1.00& 1.19 & 1.26 & 1.50 & 2.00 & 2.28\\
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:run_time}
+	\end{table}
+
 	\begin{figure} [h!]
 		\centering
 		\includegraphics{speedup.png}	
 		\caption{Computation speedup on Tesla K20X GPU over single processor; NDOF - number of degrees of freedom.}
 		\label{fig:speedup}
 	\end{figure}
+
 \newpage
 	\subsection{Signal sensing}
 	Piezoelectric sensors are considered in the model in terms of stiffness and mass reduced to neutral plane of the shell. The signal sensing is realised by the following equation:
@@ -467,7 +487,7 @@
 		\caption{The concept of delamination modelling: cross-section through the composite laminate and delamination showing three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface and corresponding elements.}
 		\label{fig:delam_modelling_shell}
 	\end{figure}
-	In the flat shell all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. The contact effect is neglected. It should be noted that the delamination can be placed at arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through thickness integrals over appropriate composite layers.
+	In the flat shell all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. The contact effect is neglected (penetration of nodes is allowed). It should be noted that the delamination can be placed at arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through thickness integrals over appropriate composite layers.
 	\subsection{Interpolation on a uniform grid}
 	With the advent of laser vibrometry technique, many algorithms for damage visualization  are developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for easy of efficacy comparison. However, the mesh of spectral elements is usually unstructured due to analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. It makes difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required and in turn grid of spatial points must be uniform. For this reason, interpolation technique of spectral element wavefield on uniform grid of points on top or bottom surface of the shell has been developed. 
 	
@@ -496,6 +516,25 @@
 	\begin{table}
 		\renewcommand{\arraystretch}{1.3}
 		\centering \footnotesize
+		\caption{Material properties of unidirectional Hexply M21/34\%/UD134/T700/300 according to~\cite{Moll2018}; Units: GPa.}
+		%\begin{tabular}{@{}ccccccc@{}} % remove spaces from vertical lines
+		\begin{tabular}{cccccc} 
+			%\hline
+			\toprule
+			$Q_{11}$ & $Q_{12}$  & $Q_{22}$ & $Q_{44}$ & $Q_{55}$ & $Q_{66}$\\
+			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
+			%\hline
+			\midrule
+			130& 6.1& 11.2 & 3.0 & 4.2 & 4.2\\
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:mat_prop}
+	\end{table}
+\begin{comment}
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \footnotesize
 		\caption{Material properties of unidirectional Hexply M21/34\%/UD134/T700/300 (values of stiffness tensor according to~\cite{Moll2018}; density is assumed).}
 		%\begin{tabular}{@{}ccccccc@{}} % remove spaces from vertical lines
 		\begin{tabular}{ccccccc} 
@@ -513,6 +552,7 @@
 		\end{tabular} 
 		\label{tab:mat_prop}
 	\end{table}
+	\end{comment}
 	\subsection{Defects}
 	In both experiments defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
 	
@@ -666,7 +706,7 @@ The conducted signal analysis leads to the conclusion that model based approach 
 \clearpage
 	%\section{Exemplary applications}
 	\section{Conclusions}
-	A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows about 5--10$\times$ computation speedup in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved.
+	A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows about 5--12$\times$ computation speedup in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
 	
 	The simulated wave propagation in composite laminates matches well the experimental data acquired from Open Guided Waves platform in terms of full wavefield patterns. However, the quantitative comparison of signals reveals that there are certain differences especially in wave packets' amplitudes. Thus, there are still challenges to overcome which are related to proper wave attenuation modelling. In future it is also worthy to investigate optimization of elastic and piezoelectric constants for further reduction of differences between experiments and simulations.
 	
