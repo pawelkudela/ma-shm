@@ -68,4 +68,22 @@ system(command);
 command = ['copy ', figure_output_name,'cut_Vz_1_frame128_top.png ',paper_fig_folder];
 system(command);
 
-
+%%
+% load experimental data
+% load('..\..\..\data\interim\exp\frame64');
+% Vnum=Data_quarter(:,:,64)/max(max(abs(Data_quarter(:,:,64))));
+% VI=VI/max(max(abs(VI)));
+% % difference between experimental and numerical signals
+% Vdiff=Vnum-VI;
+% surf(XI,YI,Vdiff);
+% shading interp;
+% view([0 90]);
+% axis([-0.25 -0.0 -0.1   0.14]);
+% 
+% set(gcf,'Renderer','zbuffer');
+% set(gca, 'Position',[0 0 1. 1.]); % figure without axis and white border
+% set(gcf, 'Units','centimeters', 'Position',[10 10 fig_width fig_height]); 
+% % remove unnecessary white space
+% %set(gca,'LooseInset', max(get(gca,'TightInset'), 0.02));
+% %fig.PaperPositionMode   = 'auto';
+% set(gcf,'PaperPositionMode','auto');
