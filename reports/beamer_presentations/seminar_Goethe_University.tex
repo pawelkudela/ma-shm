@@ -1,7 +1,7 @@
 \documentclass[10pt]{beamer} % aspect ratio 4:3, 128 mm by 96 mm
 %\documentclass[10pt,aspectratio=169]{beamer} % aspect ratio 16:9
 \graphicspath{{../journal_papers/Elsevier/figs/}}
-%\includeonlyframes{frameone,frametwo}
+%\includeonlyframes{frame1,frame2,frame3}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -237,7 +237,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Funding}
+\begin{frame}[fragile,label=frame1]{Funding}
 	
 	NAWA – Polish National Agency for Academic Exchange
 	
@@ -247,7 +247,7 @@
 	
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Context}
+\begin{frame}[fragile,label=frame2]{Context}
 	
 	National Science Centre, Poland
 	
@@ -257,10 +257,18 @@
   
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Small project within big project}
-	
-	
-	
+\begin{frame}[label=frame3]{Small project within big project}
+	\begin{figure}
+		\centering
+		\only<1>{
+		\includegraphics[width=\textwidth]{beamer_figs/Plan-scheme-nn-small-eng.png}	
+		\label{fig:plan_scheme}
+		}
+		\only<2>{
+		\includegraphics[width=\textwidth]{beamer_figs/Plan-scheme-nn-small-eng2.png}	
+		\label{fig:plan_scheme2}
+		}
+	\end{figure}	
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{Motivation}
@@ -350,11 +358,160 @@
 }
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]{Vectorization of the code}
+	\vspace{-0.4cm}
+	\begin{equation*}
+		\underbrace{\left(\bm{K} \vec{u}_t\right)}_{\vec{F}^i} 
+	\end{equation*}
+	\vspace{0.4cm}
+	\begin{equation*}
+	\begin{split}
+	\vec{F}_u^i&=\bm{N},_{\xi}^T \left(\bs{\sigma}_{xx}\,.*(\vec{J}^{-1})_{11}\,.*\vec{W}\right)+\bm{N},_{\eta}^T \left(\bs{\sigma}_{xx}\,.*(\vec{J}^{-1})_{21}\,.*\vec{W}\right)\\
+	&+\bm{N},_{\xi}^T \left(\bs{\sigma}_{xy}\,.*(\vec{J}^{-1})_{12}\,.*\vec{W}\right)+\bm{N},_{\eta}^T \left(\bs{\sigma}_{xy}\,.*(\vec{J}^{-1})_{22}\,.*\vec{W}\right), 
+	\label{eq:internal_forces_u}
+	\end{split}
+	\end{equation*}
+	\vspace{0.4cm}
+	\begin{equation*}
+	\begin{split}
+	\bs{\sigma}_{xx}&=\left((\bm{N},_{\xi}\vec{U}_x).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\vec{U}_x).*(\vec{J}^{-1})_{21}\right).*\vec{A}_{11}\\
+	&+\left((\bm{N},_{\xi}\bs{\Phi}_x).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\bs{\Phi}_x).*(\vec{J}^{-1})_{21}\right).*\vec{B}_{11}\\
+	&+\left((\bm{N},_{\xi}\vec{U}_y).*(\vec{J}^{-1})_{12}+(\bm{N},_{\eta}\vec{U}_y).*(\vec{J}^{-1})_{22}\right).*\vec{A}_{12}\\
+	&+\left((\bm{N},_{\xi}\bs{\Phi}_y).*(\vec{J}^{-1})_{12}+(\bm{N},_{\eta}\bs{\Phi}_y).*(\vec{J}^{-1})_{22}\right).*\vec{B}_{12}\\
+	&+\left((\bm{N},_{\xi}\vec{U}_x).*(\vec{J}^{-1})_{12}+(\bm{N},_{\eta}\vec{U}_x).*(\vec{J}^{-1})_{22}\right).*\vec{A}_{16}\ldots,
+	\end{split}
+	\end{equation*}
+	
+	where $.*$ denotes element-wise operation known as Hadamarad product (the same symbol for element-wise operation is used in Matlab).
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Mesh colouring}
+	\begin{figure}
+		\centering
+			\includegraphics[width=0.8\textwidth]{beamer_figs/mesh_colouring_scheme4.jpg}	
+			\label{fig:mesh_colouring}
+	\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]{Delamination modelling}
+	\begin{figure} [h!]
+		\centering
+		\includegraphics[width=\textwidth]{delam_modelling_shell.png}	
+		\caption{The concept of delamination modelling: cross-section through the composite laminate and delamination showing three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface and corresponding elements.}
+		\label{fig:delam_modelling_shell}
+	\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Computation speedup analysis}
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \small
+		Computation run times depending on the number of degrees of freedom (NDOF) for the wave propagation duration 400~$\mu$s; GPU: Nvidia Tesla K20X; CPU: Intel Xeon X5660 2.8~GHz.
+		
+		\begin{tabular}{ccccccc} 
+			%\hline
+			\toprule	
+			plate size [cm] & 30$\times$30  & 40$\times$40 & 50$\times$50 & 70$\times$70 & 90$\times$90 & 100$\times$100 \\
+			NDOF $\cdot 10^6$ & 1.02  & 1.46 & 1.98 & 3.09 & 5.23 & 6.36 \\
+			\midrule
+			CPU time [h]& 4.03& 5.71 & 8.42 & 13.13 & 22.37 & 27.33\\
+			\midrule
+			GPU time [h]& 1.00& 1.19 & 1.26 & 1.50 & 2.00 & 2.28\\
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:run_time}
+	\end{table}
+\end{frame}
+\begin{frame}{Computation speedup analysis}
+	\begin{figure} [h!]
+		\centering
+		\includegraphics{speedup.png}	
+		\caption{Computation speedup; NDOF - number of degrees of freedom.}
+		\label{fig:speedup}
+	\end{figure}
+	\begin{equation*}
+	speedup = \frac{CPU_{time}}{GPU_{time}}
+	\label{eq:speedup}
+	\end{equation*}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental validation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Open Guided Waves}
+	\begin{block}{\url{http://www.open-guided-waves.de}}
+		Open Guided Waves is an extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided.
+	\end{block}
 
+	CFRP plates [45/0/-45/90/-45/0/45/90]\textsubscript{S}
+	
+	500 mm $\times$ 500 mm, thickness of 2 mm. 
+	
+	Piezoelectric transducers diameter 10 mm, thickness 0.2 mm.
+	
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \small
+		Material properties of unidirectional Hexply M21/34\%/UD134/T700/300; Units: GPa.
+		
+		\begin{tabular}{cccccc} 
+			%\hline
+			\toprule
+			$Q_{11}$ & $Q_{12}$  & $Q_{22}$ & $Q_{44}$ & $Q_{55}$ & $Q_{66}$\\
+			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
+			%\hline
+			\midrule
+			130& 6.1& 11.2 & 3.0 & 4.2 & 4.2\\
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:mat_prop}
+	\end{table}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[t]{Comparison of wavefields}
+\begin{frame}{Open Guided Waves}
+
+	\begin{table}
+		\renewcommand{\arraystretch}{1.3}
+		\centering \small
+		Coordinates of analysed defects; Units: [m].
+		
+		\begin{tabular}{cccc} 
+			%\hline
+			\toprule
+			\multicolumn{2}{c}{\textbf{Data set I} }	& \multicolumn{2}{c}{\textbf{Data set II} } \\
+			\multicolumn{2}{c}{\textbf{(wavefield plate)} }	& \multicolumn{2}{c}{\textbf{(SHM plate)} } \\
+			%\midrule
+			\cmidrule(lr){1-2} \cmidrule(lr){3-4}
+			x & y &  x &  y  \\
+			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
+			%\hline
+			0.191 & 0.145 & 0.250  & 0.427 \\ 
+			%\hline 
+			\bottomrule 
+		\end{tabular} 
+		\label{tab:defect_coordinates}
+	\end{table}		
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[b]{Meshing - GMSH quadrilateral elements}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass.png}		
+		\caption{red -- piezoelectric transducers; green -- defect location}
+		\label{fig:quad_mesh}
+	\end{figure}	
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]{Meshing - spectral element mesh close up}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass_spec_zoom.png}	
+		\label{fig:spec_mesh_zoom}
+	\end{figure}	
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]{Wavefield plate: comparison of wavefields}
 %\vspace{6pt}
 \def\myindenta{0.01\textwidth} % define myindenta variable  for correcting caption placement
 \begin{columns}[T]
@@ -400,29 +557,37 @@
 \end{columns}
 	\only<5>{
 	\begin{alertblock}{Remarks}
-		\textbf{Simulated wavefield patterns matches the experimental data very well}.
+		Simulated wavefield patterns matches the experimental data very well.
 	\end{alertblock}
 	}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Tables cd}
-\begin{table}
-	\label{tab:mat_prop}
-	\renewcommand{\arraystretch}{1.3}
-	\centering \footnotesize
-	\caption{Initial material properties of composite laminate.}
-	\begin{tabular}{ccccccc} 
-		\toprule
-		\multicolumn{3}{c}{\textbf{Matrix} }	& \multicolumn{3}{c}{\textbf{Fibres} } & \textbf{Volume fraction}	 \\ 
-		\midrule
-		$\rho_m$ & $E_m$ & $\nu_m$  & $\rho_f$ & $E_f$ & $\nu_f$ & $V$\\
-		kg/m\textsuperscript{3} &GPa& --  & kg/m\textsuperscript{3}  & GPa& -- & \%\\ 
-		\cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
-		1250 &3.43& 0.35& 1900 & 240 & 0.2 & 50\\
-		\bottomrule 
-	\end{tabular} 
-\end{table}
+\begin{frame}[t]{SHM plate: comparison of signals}
+	\begin{figure}
+		\centering
+		\only<1>{
+		\includegraphics[width=0.9\textwidth]{path_1_7.png}	
+		\label{fig:path1_7}
+		}
+		\only<2>{
+			\includegraphics[width=0.9\textwidth]{path_2_4.png}	
+			\label{fig:path2_4}
+		}
+		\only<3>{
+			\includegraphics[width=0.9\textwidth]{path_4_8.png}	
+			\label{fig:path4_8}
+		}
+		\only<4>{
+			\includegraphics[width=0.9\textwidth]{path_2_4_diff.png}	
+			\label{fig:path2_4_diff}
+		}
+	\end{figure}
+	\only<5>{
+		\begin{alertblock}{Remarks}
+			Differences between experimental and numerical signals are evident and are related to amplitude rather than wave velocity.
+		\end{alertblock}
+	}	
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Blocks}
@@ -462,7 +627,23 @@
   \end{columns}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\begin{frame}{Future works}
+	\begin{figure}
+		\centering
+		\only<1>{
+			\includegraphics[width=0.75\textwidth]{beamer_figs/RMS5.png}	
+			\label{fig:random_exc_wavefield_RMS5}
+		}
+		\only<2>{
+			\includegraphics[width=0.75\textwidth]{beamer_figs/RMS14.png}	
+			\label{fig:random_exc_wavefield_RMS14}
+		}
+		\only<3>{
+			\includegraphics[width=0.75\textwidth]{beamer_figs/RMS22.png}	
+			\label{fig:random_exc_wavefield_RMS22}
+		}
+	\end{figure}	
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
