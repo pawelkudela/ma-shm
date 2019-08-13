@@ -23,8 +23,9 @@
 \beamer@slide {fig:quad_mesh}{24}
 \beamer@slide {fig:spec_mesh_zoom}{25}
 \beamer@slide {fig:wavefield}{26}
-\beamer@slide {fig:path1_7}{31}
-\beamer@slide {fig:random_exc_sig}{39}
-\beamer@slide {fig:random_exc_wavefield_16}{40}
-\beamer@slide {fig:random_exc_wavefield_RMS5}{45}
-\beamer@slide {eq:internal_forces}{52}
+\beamer@slide {fig:path1_7}{32}
+\beamer@slide {fig:random_exc_sig}{40}
+\beamer@slide {fig:random_exc_wavefield_16}{41}
+\beamer@slide {fig:random_exc_wavefield_RMS5}{46}
+\beamer@slide {eq:obj_fun}{50}
+\beamer@slide {eq:internal_forces}{54}

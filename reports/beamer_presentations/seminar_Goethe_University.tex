@@ -396,7 +396,7 @@
 \begin{frame}[t]{Delamination modelling}
 	\begin{figure} [h!]
 		\centering
-		\includegraphics[width=\textwidth]{delam_modelling_shell.png}	
+		\includegraphics[width=0.9\textwidth]{delam_modelling_shell.png}	
 		\caption{The concept of delamination modelling: cross-section through the composite laminate and delamination showing three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface and corresponding elements.}
 		\label{fig:delam_modelling_shell}
 	\end{figure}
@@ -513,51 +513,64 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{Wavefield plate: comparison of wavefields}
 %\vspace{6pt}
-\def\myindenta{0.01\textwidth} % define myindenta variable  for correcting caption placement
+\def\myindenta{0.001\textwidth} % define myindenta variable  for correcting caption placement
 \begin{columns}[T]
 	\column{0.5\textwidth}
 		\begin{figure}
 			\only<1>{
 			\includegraphics[width=\textwidth]{exp_frame64.png}
-			\caption{\hspace{\myindenta}Experimental wavefield at 112.5 $\mu$s}
+			\caption{\hspace{\myindenta}Experimental wavefield: $t=112.5\, \mu$s}
 			}
 			\only<2>{
 			\includegraphics[width=\textwidth]{exp_frame100.png}
-			\caption{\hspace{\myindenta}Experimental wavefield at 168.7 $\mu$s}
+			\caption{\hspace{\myindenta}Experimental wavefield: $t=168.7\, \mu$s}
 			}
 			\only<3>{
 				\includegraphics[width=\textwidth]{exp_frame64.png}
-				\caption{\hspace{\myindenta}Experimental wavefield at 112.5 $\mu$s}
+				\caption{\hspace{\myindenta}Experimental wavefield: $t=112.5\, \mu$s}
 			}
 			\only<4>{
 				\includegraphics[width=\textwidth]{exp_frame100.png}
-				\caption{\hspace{\myindenta}Experimental wavefield at 168.7 $\mu$s}
+				\caption{\hspace{\myindenta}Experimental wavefield: $t=169\, \mu$s}
+			}
+			\only<5>{
+				\includegraphics[width=\textwidth]{cut_Vz_1_frame128_top.png}
+				\caption{\hspace{\myindenta}Simulation (delamination): $t=200\, \mu$s}
 			}
 		\end{figure}
 	\column{0.5\textwidth}
 		\begin{figure}
 			\only<1>{
 			\includegraphics[width=\textwidth]{Vz_1_frame72_bottom.png}
-			\caption{\hspace{\myindenta}Simulation (delamination) at 112.5 $\mu$s}
+			\caption{\hspace{\myindenta}Simulation (\textbf{delamination}): $t=112.5\, \mu$s}
 			}
 			\only<2>{
 			\includegraphics[width=\textwidth]{Vz_1_frame108_bottom.png}
-			\caption{\hspace{\myindenta}Simulation (delamination) at 168.7 $\mu$s}
+			\caption{\hspace{\myindenta}Simulation (\textbf{delamination}): $t=169\, \mu$s}
 			}
 			\only<3>{
 				\includegraphics[width=\textwidth]{added_mass_Vz_1_frame72_bottom.png}
-				\caption{\hspace{\myindenta}Simulation (added mass) at 112.5 $\mu$s}
+				\caption{\hspace{\myindenta}Simulation (\textbf{added mass}): $t=112.5\, \mu$s}
 			}
 			\only<4>{
 				\includegraphics[width=\textwidth]{added_mass_Vz_1_frame108_bottom.png}
-				\caption{\hspace{\myindenta}Simulation (added mass) at 168.7 $\mu$s}
+				\caption{\hspace{\myindenta}Simulation (\textbf{added mass}): $t=169\, \mu$s}
+			}
+			\only<5>{
+				\includegraphics[width=\textwidth]{added_mass_cut_Vz_1_frame128_top.png}
+				\caption{\hspace{\myindenta}Simulation (added mass): $t=200\, \mu$s}
 			}
 			\label{fig:wavefield}
 		\end{figure}
 \end{columns}
-	\only<5>{
+	\only<6>{
 	\begin{alertblock}{Remarks}
-		Simulated wavefield patterns matches the experimental data very well.
+		\begin{itemize}
+			\item Simulated wavefield patterns matches the experimental data very well.
+			\item The interaction of wave front with added mass is slightly different than with delamination.
+			\item The phenomenon of wave entrapment is visible for the case of delamination whereas it is not present in case of added mass.
+			\item A reversible damage in the form of added mass coupled to the structure by tacky tape is a good way for collecting benchmark data set. Such benchmark data set is a good starting point for development of algorithms based on full wavefield data for visualization of defect location even in the form of delamination.
+		\end{itemize}
 	\end{alertblock}
 	}
 \end{frame}
@@ -585,7 +598,11 @@
 	\end{figure}
 	\only<5>{
 		\begin{alertblock}{Remarks}
-			Differences between experimental and numerical signals are evident and are related to amplitude rather than wave velocity.
+			\begin{itemize}
+				\item Differences between experimental and numerical signals are evident and are related to amplitude rather than wave velocity.
+				\item The amplitude difference can be attributed to the damping coefficient selected in numerical simulation.
+				\item The delamination affect signals more than added mass.
+			\end{itemize}
 		\end{alertblock}
 	}	
 \end{frame}
@@ -594,7 +611,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Summary}
 	\begin{itemize}
-		\item The method is super
+		\item The developed code is highly parallel and enables GPU computation. It allows up to \textbf{12$\times$} computation speedup in comparison to CPU. It also \textbf{does not require assembly of stiffness matrix}. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
+		\item The simulated wave propagation in composite laminates \textbf{matches well the experimental data} acquired from Open Guided Waves platform in terms of full wavefield patterns.
+		\item There are differences in wave packets' amplitudes -- proper \textbf{wave attenuation modelling is still a challenge}.
+		\item The current implementation is very well suited for any parametric studies or \textbf{model--assisted} approaches for structural health monitoring but is not feasible for \textbf{model--based} approach in which numerical signals are directly compared to experimental one.
+		
 	\end{itemize}	
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -603,7 +624,7 @@
 \begin{frame}{Random excitation}
 	\begin{figure}
 		\centering	
-		\includegraphics[width=0.75\textwidth]{beamer_figs/random_exc_sig.png}	
+		\includegraphics[width=0.9\textwidth]{beamer_figs/random_exc_sig.png}	
 		\label{fig:random_exc_sig}  
 	\end{figure}
       \begin{alertblock}{Advantage}
@@ -669,6 +690,17 @@
 % END OF SLIDES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Model--based vs model--assisted SHM}
+	 In the \textbf{model--based} approach, numerical signals must match very well experimental signals. It is because numerical signals are used in an inverse method in which certain objective function include terms such as:
+	\begin{equation*}
+	g(t) = \sum_{i=1}^{N} \left(s(t)_i^{exp} - s(t)_i^{num}\right)^2,
+	\label{eq:obj_fun}
+	\end{equation*}
+	where $s(t)^{exp}$ and $s(t)^{num}$ are experimental and numerical signals (or damage indexes), respectively.
+	
+	In the \textbf{model--assisted} approach, on the other hand, the modelled phenomenon must reflect the real behaviour, e.g. the amplitude of transmitted wave packet decreases when the size of the damage increases. But in this case, the perfect match between numerical and experimental signals is not necessary. The aim of the presented method is model--assisted structural health monitoring.
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Backup slides}
   \begin{equation*}
