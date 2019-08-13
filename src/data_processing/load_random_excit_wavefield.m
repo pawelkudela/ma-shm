@@ -33,8 +33,27 @@ for k=1:5
     set(gcf,'Renderer','zbuffer');
     RMS_combined = RMS_combined + RMS;
 end
-Smax=max(max(RMS_combined(2:end-1,2:end-1)));
+
+shell_surface='top';
+test_case=5;
+selected_frames=[16,32,48,64,80];
+ColorMapName = 'default';
+%ColorMapName = 'map_sunset_interp'; % zero-symmetric
+%ColorMapName = 'map_burd_interp'; % zero-symmetric
+caxis_cut = 0.07;
+normalization = false; % normalization to the highest value of the wavefield
+fig_width =5; % figure widht in cm
+fig_height=5; % figure height in cm
+paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\Elsevier\figs\';
+figure_output_name=fullfile(paper_fig_folder,'beamer_figs',filesep);
+ if ~exist(figure_output_name, 'dir')
+    mkdir(figure_output_name);
+ end
+plot_meshgrid_frames(Data,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+%%
+caxis_cut=0.2;
 figure;
+Smax=max(max(RMS_combined(2:end-1,2:end-1)));
 surf(RMS_combined(2:end-1,2:end-1));shading interp;view(2);axis equal;axis off;
 caxis([0 caxis_cut*Smax]);
 set(gcf,'Renderer','zbuffer');

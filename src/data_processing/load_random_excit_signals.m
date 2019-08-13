@@ -31,10 +31,33 @@ for k=1:5
 end
 % plot selected data
 % plot random excitation signals
+fig_width = 12; fig_height = 5; 
+linewidth = 0.5;
 figure;
+set(gcf, 'Units','centimeters', 'Position',[10 10 fig_width fig_height],'Color','w'); 
 hold on;
-plot(t,exc_sig5);
+plot(t*1e6,exc_sig5,'LineWidth',2*linewidth);
+set(gca,'FontName','Times');
 legend('exc1','exc2','exc3','exc4','exc5');
+xlabel('Time [µs]');
+ylabel('Amplitude [V]');
+xlim([0 1200]);
+box on;
+paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\Elsevier\figs\';
+figure;
+set(gcf, 'Units','centimeters', 'Position',[10 10 fig_width fig_height],'Color','w'); 
+hold on;
+plot(t*1e6,exc_sig5(:,5),'k-','LineWidth',2*linewidth);
+set(gca,'FontName','Times');
+title('Random excitation signal');
+xlabel('Time [µs]');
+ylabel('Amplitude [V]');
+xlim([0 1200]);
+box on;
+figname='random_exc_sig';
+figfilename=fullfile(paper_fig_folder,'beamer_figs',figname);
+print(figfilename,'-dpng', '-r600'); 
+
 % plot signal registerd in sensor 7 for random excitation 2
 figure;
 hold on;
