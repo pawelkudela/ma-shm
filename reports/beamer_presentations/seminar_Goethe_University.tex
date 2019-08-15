@@ -423,7 +423,7 @@
 		\label{tab:run_time}
 	\end{table}
 	\begin{alertblock}{Run time}
-		The longest run time was \textbf{2.28 h}\\
+		The longest run time on GPU was \textbf{2.28 h}\\
 		The typical run time for simulations performed next was about 3 hours ($t = 1300\, \mu$s, NDOF $= 2.23\cdot 10^6$) \\
 		The GPU memory usage was about 925 MB\\
 		3 h $\times$ 1000 simulations $\approx$ \textbf{125 days}
@@ -498,6 +498,12 @@
 		\end{tabular} 
 		\label{tab:defect_coordinates}
 	\end{table}		
+	\begin{block}{Wavefield plate}
+		Wavefield measured by scanning laser Doppler vibrometer
+	\end{block}
+	\begin{block}{SHM plate}
+		Signals excited and registered by an array of piezoelectric transducers
+	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[b]{Meshing - GMSH quadrilateral elements}
@@ -529,7 +535,7 @@
 			}
 			\only<2>{
 			\includegraphics[width=\textwidth]{exp_frame100.png}
-			\caption{\hspace{\myindenta}Experimental wavefield: $t=168.7\, \mu$s}
+			\caption{\hspace{\myindenta}Experimental wavefield: $t=169\, \mu$s}
 			}
 			\only<3>{
 				\includegraphics[width=\textwidth]{exp_frame64.png}
@@ -618,7 +624,7 @@
 \begin{frame}{Summary}
 	\begin{itemize}
 		\item The developed code is highly parallel and enables GPU computation. It allows up to \textbf{12$\times$} computation speedup in comparison to CPU. It also \textbf{does not require assembly of stiffness matrix}. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
-		\item The simulated wave propagation in composite laminates \textbf{matches well the experimental data} acquired from Open Guided Waves platform in terms of full wavefield patterns.
+		\item The simulated wave propagation in composite laminates \textbf{matches well the experimental data} from Open Guided Waves platform in terms of full wavefield patterns.
 		\item There are differences in wave packets' amplitudes -- proper \textbf{wave attenuation modelling is still a challenge}.
 		\item The current implementation is very well suited for any parametric studies or \textbf{model--assisted} approaches for structural health monitoring but is not feasible for \textbf{model--based} approach in which numerical signals are directly compared to experimental one.
 		
