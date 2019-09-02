@@ -19,6 +19,9 @@
 % plot_spec_mesh_zoom
 % random excitation
 % damage location #5
+flat_shell_Jochen_random_exc_signals1;
+flat_shell_Jochen_random_exc_signals2;
+flat_shell_Jochen_random_exc_signals3;
 flat_shell_Jochen_random_exc_signals4;
 flat_shell_Jochen_random_exc_signals5;
 % damage location #14
@@ -33,3 +36,9 @@ flat_shell_Jochen_random_exc_signals12;
 flat_shell_Jochen_random_exc_signals13;
 flat_shell_Jochen_random_exc_signals14;
 flat_shell_Jochen_random_exc_signals15;
+% baseline
+flat_shell_Jochen_random_exc_signals16;
+flat_shell_Jochen_random_exc_signals17;
+flat_shell_Jochen_random_exc_signals18;
+flat_shell_Jochen_random_exc_signals19;
+flat_shell_Jochen_random_exc_signals20;

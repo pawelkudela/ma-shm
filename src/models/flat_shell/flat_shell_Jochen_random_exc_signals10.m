@@ -3,8 +3,8 @@ clear all;close all;   warning off;clc;
 load project_paths projectroot src_path;
 %% Prepare output directories
 % allow overwriting existing results if true
-%overwrite=false;
-overwrite=true;
+overwrite=false;
+%overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
