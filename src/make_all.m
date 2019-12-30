@@ -10,6 +10,9 @@
 % flat_shell_Jochen_signals_90_damping_added_mass;
 % flat_shell_Jochen_signals_90_damping_baseline;
 % flat_shell_Jochen_signals_90_damping;
+% RMS_wavefield_dataset1;
+% dataset1_labels;
+% wavefield_dataset1;
 % % visualize numerical wavefield
 % plot_Jochen_wavefield_90;
 % % visualize experimental wavefield data

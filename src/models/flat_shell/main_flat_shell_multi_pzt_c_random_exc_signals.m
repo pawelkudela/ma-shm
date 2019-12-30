@@ -1,7 +1,7 @@
-function t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks)
+function t_frames=main_flat_shell_multi_pzt_c_random_exc_signals(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks)
 % MAIN_FLAT_SHELL_MULTI_PZT_C   Compute wavefield by using flat shell spectral elements and c tensor for material prop 
 % 
-% Syntax: main_flat_shell_multi_pzt_c(test_case,meshfile,mode,output_name)
+% Syntax: main_flat_shell_multi_pzt_c_random_exc_signals(test_case,meshfile,mode,output_name)
 % 
 % Inputs: 
 %    test_case - test case number (input/output number, variable parameters), integer
@@ -15,8 +15,8 @@ function t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,mes
 % Outputs:
 %    t_frames - time vector corresponding to frames, double, dimensions [nft,1], Units: s
 % Example: 
-%    main_flat_shell_multi_pzt_c(test_case,meshfile,mode,output_name)
-%    main_flat_shell_multi_pzt_c(1,'mesh1','gpu',output_name) 
+%    main_flat_shell_multi_pzt_c_random_exc_signals(test_case,meshfile,mode,output_name)
+%    main_flat_shell_multi_pzt_c_random_exc_signals(1,'mesh1','gpu',output_name) 
 % 
 % Other m-files required: none 
 % Subfunctions: none 
