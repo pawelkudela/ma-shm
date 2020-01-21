@@ -7,6 +7,7 @@
 % flat_shell1;
 % flat_shell2;
 % flat_shell3;
+% flat_shell4;
 % flat_shell_Jochen_signals_90_damping_added_mass;
 % flat_shell_Jochen_signals_90_damping_baseline;
 % flat_shell_Jochen_signals_90_damping;

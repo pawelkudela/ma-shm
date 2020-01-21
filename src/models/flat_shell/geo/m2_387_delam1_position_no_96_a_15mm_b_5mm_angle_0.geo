@@ -76,7 +76,7 @@ Physical Surface("delam") = {2};
 Physical Surface("host") = {3};
 
 Mesh.Algorithm = 6; // Frontal
-Mesh.CharacteristicLengthFactor = 0.070000;
+Mesh.CharacteristicLengthFactor = 0.068000;
 Mesh.CharacteristicLengthMin = 0.001000;
 Mesh.CharacteristicLengthMax = 0.200000;
 Mesh.RecombineAll = 1; // Apply recombination algorithm

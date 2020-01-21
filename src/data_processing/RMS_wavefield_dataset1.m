@@ -26,7 +26,7 @@ field_variable='velocity';
 motion=[3,8];
 tasks=[1:475];
 %tasks=[1];
-for m=1:3 % flat_shell1, flat_shell2 and flat_shell3
+for m=1:4 % flat_shell1, flat_shell2 and flat_shell3
 % prepare input output paths
 model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell',num2str(m)]);      
         %%

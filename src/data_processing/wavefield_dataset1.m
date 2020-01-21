@@ -21,12 +21,23 @@ dataset_output_path = prepare_data_processing_paths('processed','num',modelname)
 %% input for post-processing
 Nx=500;
 Ny=500;
-shell_surface = {'top','bottom'}; % options: shell_surface = 'top'; shell_surface = 'bottom';
+%shell_surface = {'top','bottom'}; % options: shell_surface = 'top'; shell_surface = 'bottom';
+shell_surface = {'top'}; % options: shell_surface = 'top'; shell_surface = 'bottom';
 field_variable='velocity';
-motion=[3,8];
+motion=[3];%
+%    motion - integer defining motion type: 
+%    1) Ux
+%    2) Uy
+%    3) Uz
+%    4) Fix
+%    5) Fiy
+%    6) Ux+h/2*UFix
+%    7) Uy+h/2*UFiy
+%    8) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2)
+%    9) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2)
 tasks=[1:475];
 %tasks=[1];
-for m=1:3 % flat_shell1, flat_shell2 and flat_shell3
+for m=1:4 % flat_shell1, flat_shell2 and flat_shell3
 % prepare input output paths
 model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell',num2str(m)]);      
         %%
@@ -38,7 +49,7 @@ model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell
                 input_name = [model_input_path,filesep,num2str(test_case),'_output',filesep,'flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface{s},'.mat'];
                 processed_output_name = [dataset_output_path,filesep,num2str(test_case),'_output',filesep];
                 %figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
-                filename=[processed_output_name,'flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface{s}];
+                filename=[processed_output_name,'1_flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface{s}];
                 if(overwrite||(~overwrite && ~exist([filename,'.png'],'file')))   
                     try
                         if ~exist(processed_output_name, 'dir')
