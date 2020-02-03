@@ -11,7 +11,7 @@ currentFile = mfilename('fullpath');
 idx = strfind( pathstr,filesep );
 modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
-image_label_path = prepare_model_paths('raw','num','flat_shell','automesh_delam1'); % mesh parameters and labels
+image_label_path = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand'); % mesh parameters and labels
 % prepare output paths
 dataset_output_path = prepare_data_processing_paths('processed','num',modelname);
 %figure_output_path = prepare_figure_paths(modelfolder,modelname);
@@ -24,11 +24,11 @@ Ny=500;
 shell_surface = {'top','bottom'}; % options: shell_surface = 'top'; shell_surface = 'bottom';
 field_variable='velocity';
 motion=[3,8];
-tasks=[1:475];
+tasks=[1:10];
 %tasks=[1];
-for m=1:4 % flat_shell1, flat_shell2 and flat_shell3
+for m=1 %
 % prepare input output paths
-model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell',num2str(m)]);      
+model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell_rand_',num2str(m)]);      
         %%
     for test_case=tasks
         fprintf([modelname,' test case: %d\n'], test_case);
