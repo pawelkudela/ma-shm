@@ -183,8 +183,12 @@ for j =1:Nx*Ny
 
         negd1=uint32(d1<0);negd2=uint32(d2<0);negd3=uint32(d3<0);negd4=uint32(d4<0);
         neg=negd1.*negd2.*negd3.*negd4;
-        neg_index=find(neg);
-        ownerElement(j,1)=Ibb(neg_index(1));
+        neg_index=find(neg); % can be empty
+        if(isempty(neg_index))    % point is on the edge of element  
+            ownerElement(j,1)=Ibb(1);
+        else
+            ownerElement(j,1)=Ibb(neg_index(1));
+        end
     end
 end   
  % alternative implementation (slower)
@@ -550,6 +554,7 @@ for n=1:nFrames
     ZA=reshape(ZA,NofElNodesx*NofElNodesy*Nx*Ny,1);
     ZI=Ns*ZA;% interpolated values
     ZI=reshape(ZI,Nx,Ny);
+    %ZI = interp2(coords(:,1),coords(:,2),U,xp,yp);
     Data(:,:,n)=ZI;
 
 end
