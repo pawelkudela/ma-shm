@@ -69,7 +69,9 @@ if(isempty(delamEl))
         % epzt - matrix of piezoelectric coupling constants (voltage constants)
         % gpzt - permittivity matrix in stress-charge form
         % theta_pzt - rotation angle of pzt [deg]
-        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_pzt(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay,fen,NofElNodes,rho_pzt,pzt_thickness,Qpzt,pztEl);
+        %[~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_pzt(h, h1, h2, rhom, rhof, em, ef, nim, nif, vol, alpha, lay,fen,NofElNodes,rho_pzt,pzt_thickness,Qpzt,pztEl);
+        [~, m11, I11, a11, a22, a12, a16, a26, a66, a44, a45, a55, b11,b12,b16,b22,b26,b66,d11, d12, d16, d22, d26, d66]=composite_plate_c_delam_pzt(h, h1, h2, rho, q11,q12,q22,q44,q55,q66,alpha,lay,delamEl,den_above,den_under,delamination_layer,fen,NofElNodes,rho_pzt,pzt_thickness,Qpzt,pztEl);
+      
      end
 else
     % host structure elastic constants for delaminated case

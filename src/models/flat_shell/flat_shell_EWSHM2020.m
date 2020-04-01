@@ -5,41 +5,32 @@ load project_paths projectroot src_path;
 % allow overwriting existing results if true
 %overwrite=false;
 overwrite=true;
-% figure parameters
-% size 12cm by 8cm (1-column text)
-fig_width = 12; fig_height = 8; 
-% size 7cm by 5cm (2-column text)
-%fig_width = 7; fig_height = 5; 
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
 idx = strfind( pathstr,filesep );
 modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
-image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam_Jochen_signals'); % mesh parameters and labels
+
 % prepare model output path
 model_output_path = prepare_model_paths('raw','num',modelfolder,modelname);
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
-% load mesh parameters
-% load([image_label_path,filesep,'mesh_parameters']);
-% NofMeshes = length(mesh_parameters);
-% input for constant parameters
-input_no = 15;
-tasks=[1:12];
-%tasks=[1];
-mode='gpu'; % options: mode='cpu';mode='gpu';
-meshfile=fullfile('mesh','delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0'); % 
 
+% input for constant parameters
+input_file_no = [21,22,23]; % frequency = [16.5e3/5,50e3/5,100e3/5];
+tasks=[1:3];
+mode='gpu'; % options: mode='cpu';mode='gpu';
+meshfile=fullfile('mesh','single_pzt_single_delam_large_plate_EWSHM2020');
 %% input for post-processing
-Nx=500;
-Ny=500;
+Nx=982;
+Ny=982;
 shell_surface = 'top'; % options: shell_surface = 'top'; shell_surface = 'bottom';
 %% input for figures
-selected_frames = [64,72,100,120,128,256,512];
-%ColorMapName = 'jet';
-ColorMapName = 'default';
+selected_frames = [16,32,64:64:512];
+ColorMapName = 'jet';
+%ColorMapName = 'default';
 %ColorMapName = 'map_sunset_interp'; % zero-symmetric
 %ColorMapName = 'map_burd_interp'; % zero-symmetric
 %ColorMapName = 'map_brewer_interp'; % orange-ish
@@ -53,7 +44,7 @@ fig_height=5; % figure height in cm
 %    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
 %%
 for test_case=tasks
-    actuator_no = test_case;
+    input_no = input_file_no(test_case);
     output_name = [model_output_path,filesep,num2str(test_case),'_output',filesep];
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
     figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
@@ -71,16 +62,19 @@ for test_case=tasks
              end
              
             %% RUN MODEL
-            
-            t_frames=main_flat_shell_multi_pzt_c_random_exc_signals(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks);
+            actuator_no = 1;
+            t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks);
             %
             t_frames_filename=fullfile(interim_output_name,'t_frames');
             save(t_frames_filename,'t_frames');
             %% RUN POSTPROCESSING
             % out-of-plane
-            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,shell_surface,output_name,interim_output_name); % Vz 
-            plot_meshgrid_frames(Data,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
             
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,shell_surface,output_name,interim_output_name); % Vz 
+            
+            plot_meshgrid_frames(Data(1:491,1:491,:),shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
+            plot_meshgrid_frames(Data(1:491,1:491,:),'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
             delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);
