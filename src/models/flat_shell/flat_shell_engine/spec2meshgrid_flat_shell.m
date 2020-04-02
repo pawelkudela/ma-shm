@@ -558,8 +558,12 @@ for n=1:nFrames
     Data(:,:,n)=ZI;
 
 end
-
-save(data_filename,'Data');
+[i1,j1,k1] = size(Data);
+if(i1*j1*k1 > 512*512*512)
+    save(data_filename,'Data','-v7.3');
+else
+    save(data_filename,'Data');
+end
 
 %---------------------- END OF CODE---------------------- 
 
