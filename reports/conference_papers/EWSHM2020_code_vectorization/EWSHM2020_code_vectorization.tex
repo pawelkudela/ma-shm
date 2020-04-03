@@ -24,10 +24,11 @@
 % my packages and commands
 \graphicspath{{figs/}}
 %% The amsthm package provides extended theorem environments
-% \usepackage{amsthm,bm}
+%\usepackage{amsthm}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{booktabs} % for nice tables
 \usepackage{xcolor}
+\usepackage{subcaption} % for subfigures
 \usepackage[colorlinks=true,citecolor=blue]{hyperref}
 \newcommand{\ud}{\mathrm{d}}
 \renewcommand{\vec}[1]{\mathbf{#1}}
@@ -95,21 +96,86 @@ The advantage of such approach is staggering computation speedup in comparison t
 
 The method presented in this paper for solving guided wave propagation problems combines the high order time domain spectral element method (SEM) with the Compute Unified Device Architecture (CUDA),  through Matlab Parallel Computing Toolbox. 
 The presented concept of parallel implementation of SEM is similar to the parallel implementation developed previously~\cite{Kudela2016} but it is applied to flat shell spectral elements instead of 3D solid elements. 
-The proposed approach differs in the calculation of elemental forces which depend on the contribution of the extensional stiffness, the flexural stiffness, bending-stretching coupling,  twisting-stretching along with bending-shearing coupling, stretching-shearing coupling and bending-twisting coupling instead of the matrix of elastic constants assigned to each layer of a composite laminate. 
-Hence, the proposed method is more suitable for wave propagation modelling in multilayer composite laminates because it leads to a much lower number of degrees of freedom. 
 Therefore, the computation can be performed faster than in case of utilisation of 3D solid spectral elements. 
 
 \section{Code vectorization concept}
+In classic finite element approach elemental matrices are assembled to form equation of motion:
+\begin{equation}
+\bm{M} \vec{\ddot{U}} + \bm{C} \vec{\dot{U}} + \bm{K} \vec{U} = \vec{F}, \label{eq:motion}
+\end{equation}  
+where \( \bm{M} \) is the global mass (inertia) matrix, \( \bm{K} \) is the global stiffness matrix,  \(\bm{C} \) is the global damping matrix, \(\vec{U}\) is the vector of global degrees of freedom and~\(\vec{F}\) is the vector of the time-dependent excitation (in this particular case the vector of equivalent piezoelectric forces). 
+The most efficient way to solve the (\ref{eq:motion}) is by using explicit integration scheme. 
+Assuming the central difference method:
+\begin{equation}
+\ddot{\vec{U}}\simeq \frac{1}{\Delta t^2} \left(\vec{u}_{t+\Delta t} - 2\,\vec{u}_t + \vec{u}_{t-\Delta t}\right), \label{eq:central_scheme}
+\end{equation}
+\begin{equation}
+\dot{\vec{U}}\simeq \frac{\vec{u}_{t+\Delta t} -\vec{u}_{t-\Delta t}}{2 \Delta t}
+\label{eq:first_derivative_scheme}
+\end{equation}
+and substituting (\ref{eq:central_scheme})-(\ref{eq:first_derivative_scheme}) into (\ref{eq:motion}) leads to:
+\begin{equation}
+	\underbrace{\left(\frac{1}{\Delta t^2} \,\bm{M} + \frac{1}{2 \Delta t} \bm{C}\right)}_{\vec{M}_0} \vec{u}_{t+\Delta t} = \vec{F}_t - \underbrace{\left(\bm{K} \vec{u}_t\right)}_{\vec{F}^i} + \underbrace{\left(\frac{2}{\Delta t^2} \,\bm{M} \right)}_{\vec{M}_1}\vec{u}_t 
+	+ \underbrace{\left(- \frac{1}{\Delta t^2} \,\bm{M} + \frac{1}{2 \Delta t} \bm{C}\right)}_{\vec{M}_2} \vec{u}_{t-\Delta t}.
+\label{eq:explicit_integration}
+\end{equation}
 
+It should be underlined that due to the orthogonality of shape functions and application of the Gauss-Lobatto-Legendre (GLL) integration rule the mass matrix is diagonal. 
+It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step \(t + \Delta t\) is straightforward and does not require costly matrix inversion. 
+However, the term \(\vec{F}^i=\bm{K}\vec{u}_t\) related to internal forces at the time step \(t\) is still computationally intensive. 
+Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problems which can be simulated. 
+In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without the necessity of stiffness matrix assembly. 
+The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. 
+
+The proposed approach differs in the calculation of elemental forces which depend on the contribution of the extensional stiffness, the flexural stiffness, bending-stretching coupling,  twisting-stretching along with bending-shearing coupling, stre\-tching-shearing coupling and bending-twisting coupling instead of the matrix of elastic constants assigned to each layer of a composite laminate. 
+Hence, the proposed method is more suitable for wave propagation modelling in multilayer composite laminates because it leads to a much lower number of degrees of freedom. 
+
+Essentially, the term \(\bm{K}\vec{u}_t\) is expanded for each element by using sparse matrices of shape function derivatives \(\bm{N}_{\xi}^e,\,\bm{N}_{\eta}^e\), components of the inverse of Jacobian matrix \((\vec{J}^{-1})_{ij}^e\), elastic constants \(\vec{Q}_{ij}^e\) integrated over the thickness, integration weights \(\vec{W}^e\) and nodal displacement vector at the element level \(\hat{\vec{u}}_0^{e} \). 
+These matrices and vectors are combined together in the form corresponding to disjoint spectral elements as:
+\begin{equation}
+\bm{N},_{\xi} = \left[
+\begin{array}{cccc}  
+\bm{N},_{\xi}^{e=1} & 0 & \ldots & 0\\[2pt]
+0& \bm{N},_{\xi}^{e=2}  & \ldots& 0\\[2pt]
+\vdots&\vdots&\ddots&0\\[2pt]
+0& 0 &0&\bm{N},_{\xi}^{e=n}\\[2pt]
+\end{array}\right],
+\end{equation}
+\begin{equation}
+\vec{U}_x = \left[
+\begin{array}{c}  
+\hat{\vec{u}}_0^{e=1}  \\[2pt]
+\hat{\vec{u}}_0^{e=2} \\[2pt]
+\vdots\\[2pt]
+\hat{\vec{u}}_0^{e=n}\\[2pt]
+\end{array}\right].
+\end{equation}
+Therefore, at the final step, it is necessary to assemble the global force vector. 
+It can be performed according to mesh colouring algorithm proposed in~\cite{Kudela2016}. 
+The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. 
+The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
+Due to the fact, that the colouring algorithm requires that the number of nodes must be divided into 12 sets of equal size it is best to have 36-node spectral elements in the mesh.
+
+Once internal forces \(\vec{F}^i\) are calculated and substituted into (\ref{eq:explicit_integration}), the displacements at time step \(t+\Delta t\) can be explicitly obtained from a perfectly vectorized code:
+\begin{equation}
+\vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
+\label{eq:vectorized_motion}
+\end{equation} 
+in which terms \(\vec{M}_0\), \(\vec{M}_1\) and \(\vec{M}_2\) are stored as vectors and \(./\) is element-wise division  and \(.*\) denotes element-wise operation known as Hadamard product (the same symbol for element-wise operation is used in Matlab). 
+In particular all components in (\ref{eq:vectorized_motion}) are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. 
+In this way, the implementation is simple whereas CUDA GPU computation is transparent to the user. 
+
+Depending on the size of the problem,  calculations are  about 5--12\(\times\) faster on GPU than on single CPU.
+\clearpage
 \section{Results}
-\begin{table}
+\begin{table}[h!]
 		\renewcommand{\arraystretch}{1.3}
 	\caption{Material properties of the investigated unidirectional CFRP laminate; Units: GPa.}
 	\begin{center}
 			\begin{tabular}{cccccc} 
 			%\hline
 			\toprule
-			$C_{11}$ & $C_{12}$  & $C_{22}$ & $C_{44}$ & $C_{55}$ & $C_{66}$\\
+			$Q_{11}$ & $Q_{12}$  & $Q_{22}$ & $Q_{44}$ & $Q_{55}$ & $Q_{66}$\\
 			% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
 			%\hline
 			\midrule
@@ -122,7 +188,136 @@ Therefore, the computation can be performed faster than in case of utilisation o
 
 \end{table}
 
+
+\begin{figure} [h!]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure1a.png}
+		\caption{Numerical}
+		\label{fig:wavefield16_5a}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure1b.png}
+		\caption{Experimental}
+		\label{fig:wavefield16_5b}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure1c.png}
+		\caption{Numerical}
+		\label{fig:wavefield16_5c}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure1d.png}
+		\caption{Experimental}
+		\label{fig:wavefield16_5d}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure1e.png}
+		\caption{Numerical}
+		\label{fig:wavefield16_5e}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure1f.png}
+		\caption{Experimental}
+		\label{fig:wavefield16_5f}
+	\end{subfigure}
+	\caption{Wavefield of propagating guided waves for the excitation frequency \textbf{16.5 kHz} at the time instances:  0.25 (a)-(b), 0.5 (c)-(d) and 0.75 (e)-(f) ms. }
+	\label{fig:wavefield16_5}
+\end{figure}
+
+\begin{figure} [h!]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure2a.png}
+		\caption{Numerical}
+		\label{fig:wavefield50a}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure2b.png}
+		\caption{Experimental}
+		\label{fig:wavefield50b}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure2c.png}
+		\caption{Numerical}
+		\label{fig:wavefield50c}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure2d.png}
+		\caption{Experimental}
+		\label{fig:wavefield50d}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure2e.png}
+		\caption{Numerical}
+		\label{fig:wavefield50e}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure2f.png}
+		\caption{Experimental}
+		\label{fig:wavefield50f}
+	\end{subfigure}
+	\caption{Wavefield of propagating guided waves for the excitation frequency \textbf{50 kHz} at the time instances:  0.25 (a)-(b), 0.5 (c)-(d) and 0.75 (e)-(f) ms. }
+	\label{fig:wavefield50}
+\end{figure}
+
+
+\begin{figure} [h!]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure3a.png}
+		\caption{Numerical}
+		\label{fig:wavefield100a}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure3b.png}
+		\caption{Experimental}
+		\label{fig:wavefield100b}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[]{figure3c.png}
+		\caption{Numerical}
+		\label{fig:wavefield100c}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure3d.png}
+		\caption{Experimental}
+		\label{fig:wavefield100d}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure3e.png}
+		\caption{Numerical}
+		\label{fig:wavefield100e}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics{figure3f.png}
+		\caption{Experimental}
+		\label{fig:wavefield100f}
+	\end{subfigure}
+	\caption{Wavefield of propagating guided waves for the excitation frequency \textbf{100 kHz} at the time instances:  0.2 (a)-(b), 0.3 (c)-(d) and 0.4 (e)-(f) ms. }
+	\label{fig:wavefield100}
+\end{figure}
+
 \section{Conclusions}
+
 \section*{Acknowledgements}
 The research was funded by the Polish National Science Center under grant agreement no 2018/31/B/ST8/00454. 
 P. Kudela would like to acknowledge the Polish National Agency for Academic Exchange for the support in the frame of the Bekker Programme (PPN/BEK/2018/1/00014/DEC/1). 
