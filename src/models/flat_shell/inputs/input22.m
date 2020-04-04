@@ -1,7 +1,9 @@
 disp('.. Reading input data');
 %% Signal definition
-nft=4096*32;      % total number of samples
-tt= 0.002;          % total calculation time [s] % 
+dt_exp = 1.953125000000000e-06; % time step in experiment
+tt= 0.001998046875;          % total calculation time [s] % time(1024)
+dt_num = dt_exp/2^7; % time step in numerical simulatio
+nft = tt/dt_num +1;% total number of samples
 t_1=0e-4;           % excitation initiation time [s]
 f_1=50e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]

@@ -3,7 +3,7 @@ clear all;close all;   warning off;clc;
 load project_paths projectroot src_path;
 %% Prepare output directories
 % allow overwriting existing results if true
-%overwrite=false;
+overwrite=false;
 overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
@@ -28,7 +28,7 @@ Nx=982;
 Ny=982;
 shell_surface = 'top'; % options: shell_surface = 'top'; shell_surface = 'bottom';
 %% input for figures
-selected_frames = [16,32,64:64:512];
+selected_frames = [16,32,65:64:512];
 ColorMapName = 'jet';
 %ColorMapName = 'default';
 %ColorMapName = 'map_sunset_interp'; % zero-symmetric

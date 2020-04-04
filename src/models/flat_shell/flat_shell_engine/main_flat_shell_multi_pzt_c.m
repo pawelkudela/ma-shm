@@ -34,7 +34,15 @@ function t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,mes
 
 assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
 run(fullfile('inputs',['input',num2str(input_no)]));
-frm_int=floor(nft/(nFrames)); % save displacement with interval time step frm_int (frames)
+% save displacement with interval time step frm_int (frames)
+if(mod(nft,2)) 
+    frm_int = floor((nft-1)/(nFrames-1)); 
+    frame_no = 1:frm_int:nFrames*frm_int; % frame numbers to be saved for odd number of points
+else
+    frm_int = floor(nft/nFrames);
+    frame_no = frm_int:frm_int:nFrames*frm_int;% frame numbers to be saved for even number of points
+end
+
 %pztEl=[];
 addedMassEl = [];
 
@@ -134,7 +142,7 @@ end
 %disp('preliminary calculations');
 
 %% signal
-dt=tt/nft;   % calculation time step [s]
+dt=tt/(nft-1);   % calculation time step [s]
 [t,st]=Hanning_signal(dt,nft,f_1,f_2,t_1);
 %  figure;
 %  plot(t,st);pause(1);
@@ -564,7 +572,11 @@ if(isempty(pztEl))
 end
 
 tic;minTime = Inf;
-c=0;
+if(mod(nft,2)) 
+    c=2; % start from the second frame
+else
+    c=1;% start from the first frame
+end
 t_frames = zeros(nFrames,1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  MAIN LOOP
@@ -688,9 +700,9 @@ for nn=2:nft
     end
     %%
     % save frame to file
-    if (mod(nn,frm_int) == 0)
-        c=c+1;
+    if (nn==frame_no(c)) 
         t_frames(c)=t(nn);
+        c=c+1;
         switch field_variable
             case 'displacement'
                 Uc=gather(U);

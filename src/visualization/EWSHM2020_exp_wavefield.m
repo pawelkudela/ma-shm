@@ -34,7 +34,7 @@ fig_height=5; % figure height in cm
 list = {'491x491p_16_5kHz_5HC_x5_15Vpp', ...     
          '492x492p_50kHz_5HC_x20_15Vpp', ...
          '491x491p_100kHz_5HC_x20_15Vpp'};    
-frame_list ={[16,32,64:64:512],[16,32,64:64:512]*2,[16,32,64:64:512]*2};
+frame_list ={[65,129,193],[129,193,257,385],[257,385,513]};
 %%
 tasks =1:3; % file numbers from list
 folder  = input_data_path;
