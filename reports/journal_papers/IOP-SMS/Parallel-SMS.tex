@@ -73,10 +73,10 @@
 
 \title[Parallel spectral element method for SHM]{Parallel spectral element method for guided wave based structural health monitoring}
 
-\author{P Kudela$^1$, J Moll$^2$ and P Fiborek$^1$}
+\author{P Kudela\(^1\), J Moll\(^2\) and P Fiborek\(^1\)}
 
-\address{$^1$Institute of Fluid Flow Machinery, Polish Academy of Sciences, Poland}
-\address{$^2$J.W. Goethe--University, Department of Physics, 60438 Frankfurt, Germany}
+\address{\(^1\)Institute of Fluid Flow Machinery, Polish Academy of Sciences, Poland}
+\address{\(^2\)J.W. Goethe--University, Department of Physics, 60438 Frankfurt, Germany}
 \ead{pk@imp.gda.pl}
 
 %\cortext[cor1]{Corresponding author}
@@ -131,7 +131,7 @@ Other original elements of the research work include the integration of automati
 
 \subsection{Flat shell spectral element}
 
-The developed spectral finite element for flat shell modelling is based on the Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom at each node: displacement components $u_0$ and $v_0$ in neutral plane along $x$ and $y$ axis, respectively, transverse displacement $w_0$ and two independent rotations of cross-section $\varphi_x(x,y)$ and $\varphi_y(x,y)$. The spectral shell element is schematically shown in figure~\ref{fig:spectral_shell_element}. The 36 node element was selected to be compliant with the mesh coloring algorithm developed in~\cite{Kudela2016} in which the number of nodes in the element divided by 12 must result in a natural number. This implies that the computational load can be divided into 12 equal independent tasks. Moreover, polynomial of 5\textsuperscript{th} order used for shape function construction is high enough to prevent locking on the thinner shells.
+The developed spectral finite element for flat shell modelling is based on the Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom at each node: displacement components \(u_0\) and \(v_0\) in neutral plane along \(x\) and \(y\) axis, respectively, transverse displacement \(w_0\) and two independent rotations of cross-section \(\varphi_x(x,y)\) and \(\varphi_y(x,y)\). The spectral shell element is schematically shown in figure~\ref{fig:spectral_shell_element}. The 36 node element was selected to be compliant with the mesh coloring algorithm developed in~\cite{Kudela2016} in which the number of nodes in the element divided by 12 must result in a natural number. This implies that the computational load can be divided into 12 equal independent tasks. Moreover, polynomial of 5\textsuperscript{th} order used for shape function construction is high enough to prevent locking on the thinner shells.
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure1.png}	
@@ -148,7 +148,7 @@ w(x,y,z)=w_0(x,y).}
  \label{eq:delam_platedispl}
 \end{equation}
 
-It should be noted that the displacement field resembles combination of elementary two-mode membrane theory with three-mode Mindlin-Reisner theory resulting in five-mode theory of shells. Such theory is suitable for approximation of fundamental symmetric Lamb and shear wave modes in the frequency-thickness product range up to about 1~MHz$\cdot$mm and  fundamental antisymmetric Lamb and shear wave modes in the frequency-thickness product range up to about 0.5~MHz$\cdot$mm (see~\cite{Ostachowicz2012} for more details).
+It should be noted that the displacement field resembles combination of elementary two-mode membrane theory with three-mode Mindlin-Reisner theory resulting in five-mode theory of shells. Such theory is suitable for approximation of fundamental symmetric Lamb and shear wave modes in the frequency-thickness product range up to about 1~MHz\(\cdot\)mm and  fundamental antisymmetric Lamb and shear wave modes in the frequency-thickness product range up to about 0.5~MHz\(\cdot\)mm (see~\cite{Ostachowicz2012} for more details).
 The strain field assuming small deformations is:
 \begin{equation}
 \eqalign{
@@ -164,7 +164,7 @@ Assuming approximation of displacement field within the element:
 \eqalign{
 \left[\begin{array}{l} u_0^e(\xi, \eta) \\ \varphi_x^e(\xi, \eta)\\ v_0^e(\xi, \eta) \\ \varphi_y^e(\xi, \eta)\\ w_0^e(\xi, \eta)\\ \end{array}\right] = \bm{N}^e \vec{\hat{u}}^e = \sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} N^e_i(\xi) N^e_i(\eta)\, \bm{I} \left[ \begin{array}{l} {\hat{u}_0}^e(\xi_i,\eta_j)\\\hat{\varphi}_x^e(\xi_i,\eta_j)\\{\hat{v}_0}^e(\xi_i,\eta_j) \\\hat{\varphi}_y^e(\xi_i,\eta_j) \\ \hat{w}_0^e(\xi_i,\eta_j)\end{array} \right],} \label{eq:delam_plateaproxim}
 \end{equation}  
-where $\bm{N}^e$ are shape functions, $\vec{\hat{u}}^e$ are nodal degrees of freedom in the element, $\bm{I}$ is the unit matrix of the size 5x5. It should be added that standard Lagrange shape functions based on Gauss-Lobatto-Legendre (GLL) nodal distribution are used~\cite{Kudela2007}. Assuming an isoparametric element concept, the geometry description is:
+where \(\bm{N}^e\) are shape functions, \(\vec{\hat{u}}^e\) are nodal degrees of freedom in the element, \(\bm{I}\) is the unit matrix of the size 5\(\times\)5. It should be added that standard Lagrange shape functions based on Gauss-Lobatto-Legendre (GLL) nodal distribution are used~\cite{Kudela2007}. Assuming an isoparametric element concept, the geometry description is:
 \begin{equation}
 \left[\begin{array}{l} x_0^e(\xi, \eta) \\ y_0^e(\xi, \eta)  \end{array}\right] = \sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} N^e_i(\xi) N^e_j(\eta)\, \left[ \begin{array}{l} x^e(\xi_i,\eta_j)\\y^e(\xi_i,\eta_j)\end{array} \right]. \label{eq:delam_plategeom}
 \end{equation}  
@@ -172,7 +172,7 @@ Substituting into (\ref{eq:delam_platestrains}) one obtains approximated strains
 \begin{equation}
 \boldsymbol{\varepsilon}^e(\xi,\eta) = 	\vec{B}^e \vec{\hat{u}}^e, \label{eq:delam_plate_relat}
 \end{equation} 
-where $	\vec{B}^e$ is the matrix relating strains with nodal displacements calculated as:
+where \(\vec{B}^e\) is the matrix relating strains with nodal displacements calculated as:
 \begin{equation}
 \eqalign{
  \vec{B}^e =  \bm{L} \, \bm{N}^e\!(\xi,\eta) \\ 
@@ -183,7 +183,7 @@ where $	\vec{B}^e$ is the matrix relating strains with nodal displacements calcu
 0&-1&0&0&\frac{\partial}{\partial x} \end{array} \right], \quad \left[\begin{array}{c}\frac{\partial }{\partial x}\\[4pt] \frac{\partial }{\partial y}\end{array}\right] = \vec{J}^{-1} \left[\begin{array}{c}\frac{\partial }{\partial \xi}\\[4pt] \frac{\partial }{\partial \eta}\end{array}\right],}
 \label{eq:delam_plate_disp_strains}
 \end{equation} 
-where $\vec{J}$ is Jacobi matrix which has a form:
+where \(\vec{J}\) is Jacobi matrix which has a form:
 \begin{equation}
 \vec{J} = \Bigg[ \begin{array}{cc}\frac{\partial x}{\partial \xi}&\frac{\partial y}{\partial \xi}\\[4pt]
 \frac{\partial x}{\partial \eta}&\frac{\partial y}{\partial \eta}\end{array} \Bigg].
@@ -202,12 +202,12 @@ Elemental mass matrix and stiffness matrix are calculated numerically by using G
  &\approx \sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} w_i\, w_j\! \int \limits_{-h/2}\limits^{h/2} \big[\vec{B}^e\!(\xi_i,\eta_j)\big]^{\!T}\, \bm{\overline Q}^e\!(\xi_i,\eta_j) \, \vec{B}^e\!(\xi_i,\eta_j) \, \det(\vec{J}^e)\, \ud z\\
 &=\sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} w_i\, w_j \sum \limits_{k=1}^{N} \int_{h_{k-1}}^{h_k} \big[\vec{B}^e\!(\xi_i,\eta_j)\big]^{\!T} \bm{\overline Q}_k^e\!(\xi_i,\eta_j) \, \vec{B}^e\!(\xi_i,\eta_j) \, \det(\vec{J}^e)\, \ud z.} \label{eq:dealm_plate_stiffness}
 \end{equation}
-The quadrature weight $w_i > 0$, which are independent form the element, are defined by:
+The quadrature weight \(w_i > 0\), which are independent form the element, are defined by:
 \begin{equation}
 w_i = \frac{2}{m(m-1)\big[ P_{m-1}\!(\xi_i) \big]^2}\; , \quad i \in 1,\ldots, m \label{eq:weights}
 \end{equation}
-where $P_{m-1}$ is Legendre polynomial of order $m-1$, $m=6$ for 6~$\times$~6 nodes flat shell spectral element.
-Matrix $\bm{R}^e$ from (\ref{eq:delam_plate_mass}) is calculated as:
+where \(P_{m-1}\) is Legendre polynomial of order \(m-1\), \(m=6\) for 6\(\times\)6 nodes flat shell spectral element.
+Matrix \(\bm{R}^e\) from (\ref{eq:delam_plate_mass}) is calculated as:
 \begin{equation}
 \eqalign{
 \bm{R}^e = \left[\begin{array}{ccccc} I_0 & 0&0&0&0 \\ 0& I_2&0&0&0 \\0&0&I_0&0&0\\0&0&0&I_2&0\\ 0&0&0&0&I_0 \end{array}\right],\\
@@ -215,17 +215,17 @@ I_0 =  \sum \limits_{k=1}\limits^{N} \rho_k \,(h_{k-1} - h_k),\\
  I_2 =  \sum \limits_{k=1}\limits^{N} \rho_k \,(h_{k-1}^3 - h_k^3)/3,}
 \label{eq:delam_plate_mass_dens}
 \end{equation}
-where $N$ -- the number of composite layers, $\rho_k$ -- mass density of $k$-th layer, $h_k$ -- the distance from the neutral surface to the top surface of the $k$-th layer, $h_{k-1}$ -- the distance from the neutral surface to the bottom surface of the $k$-th layer. It should be added that piezoelectric sensors are also treated as a composite layer contributing to the overall inertia of the element.
+where \(N\) -- the number of composite layers, \(\rho_k\) -- mass density of \(k\)-th layer, \(h_k\) -- the distance from the neutral surface to the top surface of the \(k\)-th layer, \(h_{k-1}\) -- the distance from the neutral surface to the bottom surface of the \(k\)-th layer. It should be added that piezoelectric sensors are also treated as a composite layer contributing to the overall inertia of the element.
 
-The matrix $\bm{\overline Q}_k^e$ from (\ref{eq:dealm_plate_stiffness}) for $k$-th composite layer has a form:
+The matrix \(\bm{\overline Q}_k^e\) from (\ref{eq:dealm_plate_stiffness}) for \(k\)-th composite layer has a form:
 \begin{equation}
 \bm{\overline Q}_k^e = \left[\begin{array}{ccccc} \overline{Q}_{11} & \overline{Q}_{12}& \overline{Q}_{16} & 0&0\\[2pt]
 \overline{Q}_{12}& \overline{Q}_{22} & \overline{Q}_{26}& 0&0\\\overline{Q}_{16}&\overline{Q}_{26}&\overline{Q}_{66}&0&0\\[2pt]
 0& 0 &0&\overline{Q}_{44}& \overline{Q}_{45}\\[2pt]
 0&0&0&\overline{Q}_{45}&\overline{Q}_{55}\end{array}\right].  \label{eq:dealm_plate_stf}
 \end{equation}
-The components of matrix $\bm{\overline Q}_k^e$ are calculated for lamina rotated according to stacking sequence. The transformation matrix of stiffness tensor $\bm{Q}_k^e$ along with explicit formulas can be found in the literature~\cite{Vinson1987}.
-It should be noted that in general both mass density $\rho_k$ as well as stiffness tensor components $\bm{Q}_k^e$ can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within $k$-th layer. Integral over thickness of layers in (\ref{eq:dealm_plate_stiffness}) is evaluated analytically which leads to the following constants:
+The components of matrix \(\bm{\overline Q}_k^e\) are calculated for lamina rotated according to stacking sequence. The transformation matrix of stiffness tensor \(\bm{Q}_k^e\) along with explicit formulas can be found in the literature~\cite{Vinson1987}.
+It should be noted that in general both mass density \(\rho_k\) as well as stiffness tensor components \(\bm{Q}_k^e\) can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within \(k\)-th layer. Integral over thickness of layers in (\ref{eq:dealm_plate_stiffness}) is evaluated analytically which leads to the following constants:
 \begin{equation}
 \eqalign{
 A_{ij} =  \sum \limits_{k=1}\limits^{N} (\overline{Q}_k)_{ij} \,(h_{k-1} - h_k),\quad i,j = 1,2,6,\\
@@ -234,14 +234,14 @@ B_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^2 - h_k^2
 D_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^3 - h_k^3)/3, \quad i,j = 1,2,6,}
 \label{eq:stiffness_contribution}
 \end{equation}
-where $h$ is the total shell thickness. Hence, the whole laminate is modelled by one element in which the contribution of the extensional stiffness ($A_{ij}, i,j = 1,2$), the flexural stiffness ($D_{ij}, i,j = 1,2$), bending-stretching coupling  ($B_{ij}, i,j = 1,2$), twisting-stretching along with bending-shearing coupling ($B_{16}, B_{26}$) , stretching-shearing coupling ($A_{16}, A_{26}$) and bending-twisting coupling ($D_{16}, D_{26}$) are taken into account. It should be added that piezoelectric layer also contribute to the overall stiffness of appropriate elements. 
+where \(h\) is the total shell thickness. Hence, the whole laminate is modelled by one element in which the contribution of the extensional stiffness (\(A_{ij}, i,j = 1,2\)), the flexural stiffness (\(D_{ij}, i,j = 1,2\)), bending-stretching coupling  (\(B_{ij}, i,j = 1,2\)), twisting-stretching along with bending-shearing coupling (\(B_{16}, B_{26}\)) , stretching-shearing coupling (\(A_{16}, A_{26}\)) and bending-twisting coupling (\(D_{16}, D_{26}\)) are taken into account. It should be added that piezoelectric layer also contribute to the overall stiffness of appropriate elements. 
 
 \subsection{Implementation by using vectorization of the code and Matlab Parallel Computing Toolbox}
 In classic finite element approach elemental matrices are assembled to form equation of motion:
 \begin{equation}
 \bm{M} \vec{\ddot{U}} + \bm{C} \vec{\dot{U}} + \bm{K} \vec{U} = \vec{F}, \label{eq:motion}
 \end{equation}  
-where $ \bm{M} $ is the global mass (inertia) matrix, $ \bm{K} $ is the global stiffness matrix,  $\bm{C} $ is the global damping matrix, $\vec{U}$ is the vector of global degrees of freedom and~$\vec{F}$ is the vector of the time dependent excitation (in this particular case the vector of equivalent piezoelectric forces). The most efficient way to solve the (\ref{eq:motion}) is by using explicit integration scheme. Assuming the central difference method:
+where \(\bm{M}\) is the global mass (inertia) matrix, \(\bm{K}\) is the global stiffness matrix,  \(\bm{C}\) is the global damping matrix, \(\vec{U}\) is the vector of global degrees of freedom and~\(\vec{F}\) is the vector of the time dependent excitation (in this particular case the vector of equivalent piezoelectric forces). The most efficient way to solve the (\ref{eq:motion}) is by using explicit integration scheme. Assuming the central difference method:
 \begin{equation}
 \ddot{\vec{U}}\simeq \frac{1}{\Delta t^2} \left(\vec{u}_{t+\Delta t} - 2\,\vec{u}_t + \vec{u}_{t-\Delta t}\right), \label{eq:central_scheme}
 \end{equation}
@@ -257,7 +257,7 @@ and substituting (\ref{eq:central_scheme})-(\ref{eq:first_derivative_scheme}) in
 \label{eq:explicit_integration}
 \end{equation}
 
-It should be underlined that due to the orthogonality of shape functions and application of the GLL integration rule the mass matrix is diagonal. It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step $t + \Delta t$ is straightforward and does not require costly matrix inversion. However, the term $\vec{F}^i=\bm{K}\vec{u}_t$ related to internal forces at the time step $t$ is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problems which can be simulated. In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. However, due to analytic integration over thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of the term $\vec{F}^i=\bm{K}\vec{u}_t$ is different and it is divided into two steps. In the first step stress-like components are calculated at the time moment $t$ (index $t$ in displacement vectors is omitted for clarity):
+It should be underlined that due to the orthogonality of shape functions and application of the GLL integration rule the mass matrix is diagonal. It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step \(t + \Delta t\) is straightforward and does not require costly matrix inversion. However, the term \(\vec{F}^i=\bm{K}\vec{u}_t\) related to internal forces at the time step \(t\) is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problems which can be simulated. In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. However, due to analytic integration over thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of the term \(\vec{F}^i=\bm{K}\vec{u}_t\) is different and it is divided into two steps. In the first step stress-like components are calculated at the time moment \(t\) (index \(t\) in displacement vectors is omitted for clarity):
 \begin{equation}
 \eqalign{
 \boldsymbol{\sigma}_{xx}&=\left((\bm{N},_{\xi}\vec{U}_x).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\vec{U}_x).*(\vec{J}^{-1})_{21}\right).*\vec{A}_{11}\\
@@ -335,7 +335,7 @@ _{66}\\
 \boldsymbol{\sigma}_{xz}&=\left(\boldsymbol{\Phi}_y+(\bm{N},_{\xi}\vec{U}_z).*(\vec{J}^{-1})_{12}+(\bm{N},_{\eta}\vec{U}_z).*(\vec{J}^{-1})_{22}\right).*\vec{A}_{45}\\
 &+\left(\boldsymbol{\Phi}_x+(\bm{N},_{\xi}\vec{U}_z).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\vec{U}_z).*(\vec{J}^{-1})_{21}\right).*\vec{A}_{55},}
 \end{equation}
-where $.*$ denotes element-wise operation known as Hadamarad product (the same symbol for element-wise operation is used in Matlab). It should be noted that $\vec{A}$, $\vec{B}$, $\vec{D}$ and $(\vec{J}^{-1})$ with appropriate indexes are arranged in the form of vectors respective to GLL nodes of consecutive disjoint spectral elements. The elements of vectors  $\vec{A}$, $\vec{B}$, $\vec{D}$ are calculated by using (\ref{eq:stiffness_contribution}). The same rules of disjoint arrangement are applied for nodal displacements:
+where \(.*\) denotes element-wise operation known as Hadamard product (the same symbol for element-wise operation is used in Matlab). It should be noted that \(\vec{A}\), \(\vec{B}\), \(\vec{D}\) and \((\vec{J}^{-1})\) with appropriate indexes are arranged in the form of vectors respective to GLL nodes of consecutive disjoint spectral elements. The elements of vectors  \(\vec{A}\), \(\vec{B}\), \(\vec{D}\) are calculated by using (\ref{eq:stiffness_contribution}). The same rules of disjoint arrangement are applied for nodal displacements:
 \begin{equation}
 \eqalign{
 &\vec{U}_x = \left[
@@ -377,7 +377,7 @@ where $.*$ denotes element-wise operation known as Hadamarad product (the same s
 \hat{\boldsymbol{\varphi}}_y^{e=n}\\[2pt]
 \end{array}\right],}
 \end{equation}
-where $n$ is the total number of elements in the spectral element mesh. Sparse matrices of shape function derivatives are formed in similar way, i.e.:
+where \(n\) is the total number of elements in the spectral element mesh. Sparse matrices of shape function derivatives are formed in similar way, i.e.:
 \begin{equation}
 \bm{N},_{\xi} = \left[
 \begin{array}{cccc}  
@@ -404,18 +404,18 @@ In the second step internal forces are calculated on the degree of freedom level
 &+\boldsymbol{\sigma}_{yz}\,.*\vec{W},}
 \label{eq:internal_forces}
 \end{equation}
-where $^T$ is the matrix transpose and $\vec{W}$ is the vector resulting from multiplication of integration weights and Jacobian determinant at appropriate GLL points:
+where \(^T\) is the matrix transpose and \(\vec{W}\) is the vector resulting from multiplication of integration weights and Jacobian determinant at appropriate GLL points:
 \begin{equation}
 \vec{W} = \vec{w}_{\xi}\,.*\vec{w}_{\eta}\,.*\left(\det\vec{J}\right).
 \end{equation}
-Since the internal forces are calculated for disjoined spectral elements, the assembly of a global vector $\vec{F}^i$ is necessary. It can be performed according to mesh coloring algorithm proposed in~\cite{Kudela2016}. The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
+Since the internal forces are calculated for disjoined spectral elements, the assembly of a global vector \(\vec{F}^i\) is necessary. It can be performed according to mesh coloring algorithm proposed in~\cite{Kudela2016}. The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
 
-Once internal forces $\vec{F}^i$ are calculated and substituted into (\ref{eq:explicit_integration}), the displacements at time step $t+\Delta t$ can be explicitly obtained from a perfectly vectorized code:
+Once internal forces \(\vec{F}^i\) are calculated and substituted into (\ref{eq:explicit_integration}), the displacements at time step \(t+\Delta t\) can be explicitly obtained from a perfectly vectorized code:
 \begin{equation}
 \vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 \label{eq:vectorized_motion}
 \end{equation} 
-in which terms $\vec{M}_0$, $\vec{M}_1$ and $\vec{M}_2$ are stored as vectors and $./$ is element--wise division. In particular all components in (\ref{eq:internal_forces}) as well as in (\ref{eq:vectorized_motion}) are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, the implementation is simple whereas CUDA GPU computation is transparent to the user. 
+in which terms \(\vec{M}_0\), \(\vec{M}_1\) and \(\vec{M}_2\) are stored as vectors and \(./\) is element--wise division. In particular all components in (\ref{eq:internal_forces}) as well as in (\ref{eq:vectorized_motion}) are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, the implementation is simple whereas CUDA GPU computation is transparent to the user. 
 
 \subsection{Signal sensing}
 
@@ -428,7 +428,7 @@ Piezoelectric sensors are considered in the model in terms of stiffness and mass
 &+ \frac{h}{2} (\bm{N},_{\xi}^{pzt}\boldsymbol{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{21}^{pzt} + \frac{h}{2} \left.\left.(\bm{N},_{\eta}^{pzt}\boldsymbol{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{22}^{pzt}\right)\right] \frac{h_{pzt}}{g_{33}},} 
 \label{eq:pzt_sensing}
 \end{equation}
-where $e_{31}$ and $e_{32}$ are piezoelectric coupling constants, $g_{33}$ is the extensional voltage constant, $h_{pzt}$ is the thickness of piezoelectric sensor. The submatrices and subvectors in (\ref{eq:pzt_sensing}) denoted by $pzt$ subscript or superscript corresponds to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of $\vec{s}^{pzt}$ at particular integration time step gives voltage value. It should be noted that the nodes of an element do not have electric potential degrees of freedom. The voltage is calculated directly from displacements.
+where \(e_{31}\) and \(e_{32}\) are piezoelectric coupling constants, \(g_{33}\) is the extensional voltage constant, \(h_{pzt}\) is the thickness of piezoelectric sensor. The submatrices and subvectors in (\ref{eq:pzt_sensing}) denoted by \(pzt\) subscript or superscript corresponds to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of \(\vec{s}^{pzt}\) at particular integration time step gives voltage value. It should be noted that the nodes of an element do not have electric potential degrees of freedom. The voltage is calculated directly from displacements.
 
 \subsection{Delamination modelling \label{sec:delam_model}}
 
@@ -451,38 +451,38 @@ The implemented interpolation method utilizes the shape functions of spectral el
 
 In the first step, the algorithm sequentially scans the full list of spectral elements using the bounding box test. If the element fails the bounding box test, the algorithm moves to the next element in the list. If the data point is within the bounding box, the cross-product test is performed. The idea is to eliminate impossible owner elements with the computationally inexpensive bounding-box test before using the more expensive cross-product test~\cite{Silva2009}. It has been found that such implementation in case of 36--node spectral element meshes is generally faster than Matlab's \verb|inpolygon| function. It should be noted that the algorithm can be further refined by using the multiple bounding box test.
 
-The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account the spectral elements instead of the isoparametric hexahedral elements. As an initial point, the spectral node closest to the data point in the owner element $(x_p, y_p)$ is selected. Hence, its global coordinates $(x_0, y_0)$ as well as local coordinates $(\xi_0,\eta_0)$  are known by construction of the element. In the first iteration, the inverse of the Jacobi matrix ((\ref{eq:Jacobi2D})) which is already stored in the memory is utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
+The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account the spectral elements instead of the isoparametric hexahedral elements. As an initial point, the spectral node closest to the data point in the owner element \((x_p, y_p)\) is selected. Hence, its global coordinates \((x_0, y_0)\) as well as local coordinates \((\xi_0,\eta_0)\)  are known by construction of the element. In the first iteration, the inverse of the Jacobi matrix ((\ref{eq:Jacobi2D})) which is already stored in the memory is utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
 \begin{equation}
 \eqalign{
 \boldsymbol{\xi}_{k+1}=\boldsymbol{\xi}_k + \left(\vec{J}^{-1}_{k}\right)_{11}\,.*\left(\vec{x}_p-\vec{x}_k\right) +  \left(\vec{J}^{-1}_{k}\right)_{12}\,.*\left(\vec{y}_p-\vec{y}_k\right), \\
 \boldsymbol{\eta}_{k+1}=\boldsymbol{\eta}_k + \left(\vec{J}^{-1}_{k}\right)_{21}\,.*\left(\vec{x}_p-\vec{x}_k\right) +  \left(\vec{J}^{-1}_{k}\right)_{22}\,.*\left(\vec{y}_p-\vec{y}_k\right),}
 \label{eq:interp_initial}
 \end{equation} 
-in which $k=0$ in the first iteration.
+in which \(k=0\) in the first iteration.
 
-Next, shape functions and Jacobians are evaluated at $(\boldsymbol{\xi}_{1}, \boldsymbol{\eta}_{1})$ points. The global coordinates of interpolated point $(x_1,y_1)$ in the owner element in the first iteration are calculated by using (\ref{eq:delam_plategeom}). Three iterations are used in the current implementation. Finally, spectral element shape functions are evaluated at interpolated local coordinates $N(\tilde{\xi}_p,\tilde{\eta}_p)$ and the wavefield is approximated by using (\ref{eq:delam_plateaproxim}).
+Next, shape functions and Jacobians are evaluated at \((\boldsymbol{\xi}_{1}, \boldsymbol{\eta}_{1})\) points. The global coordinates of interpolated point \((x_1,y_1)\) in the owner element in the first iteration are calculated by using (\ref{eq:delam_plategeom}). Three iterations are used in the current implementation. Finally, spectral element shape functions are evaluated at interpolated local coordinates \(N(\tilde{\xi}_p,\tilde{\eta}_p)\) and the wavefield is approximated by using (\ref{eq:delam_plateaproxim}).
 
 The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas  \verb|griddata| function must be called for each frame separately which is inefficient.
 
 \subsection{Computation speedup analysis}
 
-The computational performance of the code was tested on a composite plate of material parameters introduced in Section~\ref{sec:ogw}. The plate had one embedded delamination. The applied excitation was a sinusoidal tone-burst signal of carrier frequency 50~kHz modulated by Hann window (five periods were used). It was applied to the piezoelectric transducer located at the centre of the plate on the top surface. The size of the plate has been increased gradually, so that meshes contained more and more nodes (30$\times$30 cm, 40$\times$40 cm, 50$\times$50 cm, 70$\times$70 cm, 90$\times$90 cm, 100$\times$100 cm). The total run times for the investigated meshes and the corresponding numbers of degrees of freedom (NDOF) are given in table~\ref{tab:run_time}. The computation speedup for various meshes was calculated as follows:
+The computational performance of the code was tested on a composite plate of material parameters introduced in Section~\ref{sec:ogw}. The plate had one embedded delamination. The applied excitation was a sinusoidal tone-burst signal of carrier frequency 50~kHz modulated by Hann window (five periods were used). It was applied to the piezoelectric transducer located at the centre of the plate on the top surface. The size of the plate has been increased gradually, so that meshes contained more and more nodes (30\(\times\)30 cm, 40\(\times\)40 cm, 50\(\times\)50 cm, 70\(\times\)70 cm, 90\(\times\)90 cm, 100\(\times\)100 cm). The total run times for the investigated meshes and the corresponding numbers of degrees of freedom (NDOF) are given in table~\ref{tab:run_time}. The computation speedup for various meshes was calculated as follows:
 \begin{equation}
 speedup = \frac{CPU_{time}}{GPU_{time}}
 \label{eq:speedup}
 \end{equation}
-where $CPU_{time}$ is the average time of computation of one integration time step on a single core CPU (computations were performed on a workstation equipped with 6 quad core Intel
-Xeon X5660 2.8~GHz) and $GPU_{time}$ is the average time of computation of one integration time step on
-GPU (computations were performed on Nvidia Tesla K20X). It can be seen in figure~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card about 5--12$\times$ faster than on single CPU (depending on the size of the problem). The trend of computation speedup is non-linear, of type $\sqrt{NDOF}$. 
+where \(CPU_{time}\) is the average time of computation of one integration time step on a single core CPU (computations were performed on a workstation equipped with 6 quad core Intel
+Xeon X5660 2.8~GHz) and \(GPU_{time}\) is the average time of computation of one integration time step on
+GPU (computations were performed on Nvidia Tesla K20X). It can be seen in figure~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card about 5--12\(\times\) faster than on single CPU (depending on the size of the problem). The trend of computation speedup is non-linear, of type \(\sqrt{NDOF}\). 
 
 \begin{table}
-		\caption{Computation run times depending on the number of degrees of freedom (NDOF) for the wave propagation duration 400~$\mu$s; GPU: Nvidia Tesla K20X; CPU: Intel Xeon X5660 2.8~GHz.}
+		\caption{Computation run times depending on the number of degrees of freedom (NDOF) for the wave propagation duration 400~\(\mu\)s; GPU: Nvidia Tesla K20X; CPU: Intel Xeon X5660 2.8~GHz.}
 	\begin{indented}
 	\item[]	\begin{tabular}{ccccccc} 
 		%\hline
 		\toprule	
-		plate size [cm] & 30$\times$30  & 40$\times$40 & 50$\times$50 & 70$\times$70 & 90$\times$90 & 100$\times$100 \\
-		NDOF $\cdot 10^6$ & 1.02  & 1.46 & 1.98 & 3.09 & 5.23 & 6.36 \\
+		plate size [cm] & 30\(\times\)30  & 40\(\times\)40 & 50\(\times\)50 & 70\(\times\)70 & 90\(\times\)90 & 100\(\times\)100 \\
+		NDOF \(\cdot 10^6\) & 1.02  & 1.46 & 1.98 & 3.09 & 5.23 & 6.36 \\
 		\midrule
 		CPU time [h]& 4.03& 5.71 & 8.42 & 13.13 & 22.37 & 27.33\\
 		\midrule
@@ -518,7 +518,7 @@ In the model--based approach, numerical signals must match very well experimenta
 g(t) = \sum_{i=1}^{N} \left(s(t)_i^{exp} - s(t)_i^{num}\right)^2,
 \label{eq:obj_fun}
 \end{equation}
-where $s(t)^{exp}$ and $s(t)^{num}$ are experimental and numerical signals (or damage indexes), respectively.
+where \(s(t)^{exp}\) and \(s(t)^{num}\) are experimental and numerical signals (or damage indexes), respectively.
 
 In the model--assisted approach, on the other hand, the modelled phenomenon must reflect the real behaviour, e.g. the amplitude of a transmitted wave packet decreases when the size of the damage increases. But in this case, the perfect match between numerical and experimental signals is not necessary. The aim of the presented method is model--assisted structural health monitoring.
 
@@ -528,16 +528,16 @@ Also due to reasonable computation times, it is possible to simulate thousands o
 
 \section{Experimental validation}
 \subsection{Open Guided Waves \label{sec:ogw}}
-Numerical simulations were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guided Waves is an extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm $\times$ 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in table~\ref{tab:mat_prop}. It should be added that 0$^{\circ}$ fibre orientation is along the vertical edge of the specimens.
+Numerical simulations were validated by using benchmark experimental data sets: Open Guided Waves (\url{http://www.open-guided-waves.de}). Open Guided Waves is an extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm \(\times\) 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in table~\ref{tab:mat_prop}. It should be added that 0\(^{\circ}\) fibre orientation is along the vertical edge of the specimens.
 
-Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wavefield plate" and "SHM plate", respectively. The former data set consists of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometry. In this case only one quarter of the plate was measured. The latter data set consists of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to figure~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to $\pm$150~V in case of the wavefield plate and  $\pm$100~V in case of SHM plate. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for measurements in the SHM plate.
+Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wavefield plate" and "SHM plate", respectively. The former data set consists of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometry. In this case only one quarter of the plate was measured. The latter data set consists of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to figure~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to \(\pm\)150~V in case of the wavefield plate and  \(\pm\)100~V in case of SHM plate. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for measurements in the SHM plate.
 \begin{table}
 	\caption{Material properties of unidirectional Hexply M21/34\%/UD134/T700/300 according to~\cite{Moll2018}; Units: GPa.}
 	\begin{indented}
 	\item[]	\begin{tabular}{cccccc} 
 		%\hline
 		\toprule
-		$Q_{11}$ & $Q_{12}$  & $Q_{22}$ & $Q_{44}$ & $Q_{55}$ & $Q_{66}$\\
+		\(Q_{11}\) & \(Q_{12}\)  & \(Q_{22}\) & \(Q_{44}\) & \(Q_{55}\) & \(Q_{66}\)\\
 		% \cmidrule(lr){1-3} \cmidrule(lr){4-6} \cmidrule(lr){7-7}
 		%\hline
 		\midrule
@@ -592,7 +592,7 @@ The external meshing software GMSH~\cite{Geuzaine2009} is used for generating a 
 \clearpage
 
 \subsection{Wavefield plate data set }
-A comparison of experimental and numerical full wavefield data for selected time instances is presented in figure~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (see (\ref{eq:first_derivative_scheme})) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (figure~\ref{fig:num_frame72}, figure~\ref{fig:num_frame108}) and added mass (figure~\ref{fig:num_frame72_added_mass}, figure~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of the wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced compared to the case of the delamination, which is especially visible at time frame $t=112.5\,  \mu$s. The wave reflection pattern is the same in each case. It can be attributed to the fact that the added mass locally changes overall inertia and stiffness of the shell whereas delamination influences only stiffness. 
+A comparison of experimental and numerical full wavefield data for selected time instances is presented in figure~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (see (\ref{eq:first_derivative_scheme})) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (figure~\ref{fig:num_frame72}, figure~\ref{fig:num_frame108}) and added mass (figure~\ref{fig:num_frame72_added_mass}, figure~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of the wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced compared to the case of the delamination, which is especially visible at time frame \(t=112.5\,  \mu\)s. The wave reflection pattern is the same in each case. It can be attributed to the fact that the added mass locally changes overall inertia and stiffness of the shell whereas delamination influences only stiffness. 
 
 The differences between the interaction of the guided waves with the delamination in comparison to an added mass are especially visible on numerical full wavefield data collected at the top surface of the plate (see figure~\ref{fig:wave_entrapment}). The phenomenon of wave entrapment at the defect location is present only in case of the delamination (figure~\ref{fig:num_frame128_top}) whereas it is not present in case of the added mass (figure~\ref{fig:num_frame128_added_mass_top}). The results related to the wave entrapment at delamination are consistent with the experimental findings available in the literature~\cite{Glushkov2012}. 
 
@@ -600,24 +600,24 @@ Despite these differences it seems that reversible damage in the form of added m
 
 \begin{figure} [h!]
 	\centering
-	\subfloat[Experiment: $t=112.5\,  \mu$s]{\includegraphics{figure6a.png}\label{fig:exp_frame64}}
+	\subfloat[Experiment: \(t=112.5\,  \mu\)s]{\includegraphics{figure6a.png}\label{fig:exp_frame64}}
    \hspace{0.5 cm} 	
-   \subfloat[Experiment: $t=168.7\, \mu$s]{\includegraphics{figure6b.png}\label{fig:exp_frame100}}\\
-   \subfloat[Simulation (delamination): $t=112.5\,  \mu$s]{\includegraphics{figure6c.png}\label{fig:num_frame72}}
+   \subfloat[Experiment: \(t=168.7\, \mu\)s]{\includegraphics{figure6b.png}\label{fig:exp_frame100}}\\
+   \subfloat[Simulation (delamination): \(t=112.5\,  \mu\)s]{\includegraphics{figure6c.png}\label{fig:num_frame72}}
    \hspace{0.5 cm} 	
-   \subfloat[Simulation (delamination): $t=168.7\, \mu$s]{\includegraphics{figure6d.png}\label{fig:num_frame108}}\\
-   \subfloat[Simulation (added mass): $t=112.5\,  \mu$s]{\includegraphics{figure6e.png}\label{fig:num_frame72_added_mass}}
+   \subfloat[Simulation (delamination): \(t=168.7\, \mu\)s]{\includegraphics{figure6d.png}\label{fig:num_frame108}}\\
+   \subfloat[Simulation (added mass): \(t=112.5\,  \mu\)s]{\includegraphics{figure6e.png}\label{fig:num_frame72_added_mass}}
    \hspace{0.5 cm} 	
-   \subfloat[Simulation (added mass): $t=168.7\, \mu$s]{\includegraphics{figure6f.png}\label{fig:num_frame108_added_mass}}
+   \subfloat[Simulation (added mass): \(t=168.7\, \mu\)s]{\includegraphics{figure6f.png}\label{fig:num_frame108_added_mass}}
 	\caption{Comparison of experimental and numerical full wavefield data.} 
 	\label{fig:wavefields_comparison}
 \end{figure}
 
 \begin{figure} [h!]
 		\centering
-		\subfloat[Simulation (delamination): $t=200\,  \mu$s]{\includegraphics{figure7a.png}\label{fig:num_frame128_top}}
+		\subfloat[Simulation (delamination): \(t=200\,  \mu\)s]{\includegraphics{figure7a.png}\label{fig:num_frame128_top}}
 		\hspace{0.5 cm} 	
-		\subfloat[Simulation (added mass): $t=200\,  \mu$s]{\includegraphics{figure7b.png}\label{fig:num_frame128_added_mass_top}}
+		\subfloat[Simulation (added mass): \(t=200\,  \mu\)s]{\includegraphics{figure7b.png}\label{fig:num_frame128_added_mass_top}}
 	\caption{Comparison of numerical full wavefield data at the top surface of the plate for two defect modelling techniques: delamination and added mass. Energy trapping visible only in the case of the delamination.} 
 	\label{fig:wave_entrapment}
 \end{figure}
@@ -627,9 +627,9 @@ Despite these differences it seems that reversible damage in the form of added m
 
 The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The transducer pair 1--7 means that the guided waves were excited in actuator 1 and registered in sensor 7 (see figure~\ref{fig:quad_mesh}). The first wave packet in the experimental signals should be ignored because it represents the effect of electromagnetic crosstalk.
 
-In opposite to very good qualitative wavefield results, differences between experimental and numerical signals are evident. However, these differences are related to the amplitude rather than wave velocity. It could be because of slight variations in layer thicknesses and different material damping in comparison to the numerical model. It should be also added, that both symmetric and antisymmetric wave modes are present in the signal in contrast to the wavefield measurements in which transverse wave components dominates. These wave modes overlap causing constructing or destructive interference. The wave packet positions calculated numerically match well wave packet positions in measured signals. A slight exception is observed in figure~\ref{fig:path1_7} in which in experimental signals only one wave packet exist at about 450~$\mu$s which is actually superposition of two wave packets as the numerical simulation suggest. Also at the same figure the wave packet at about 650~$\mu$s is wider in experiment than in numerical results. 
+In opposite to very good qualitative wavefield results, differences between experimental and numerical signals are evident. However, these differences are related to the amplitude rather than wave velocity. It could be because of slight variations in layer thicknesses and different material damping in comparison to the numerical model. It should be also added, that both symmetric and antisymmetric wave modes are present in the signal in contrast to the wavefield measurements in which transverse wave components dominates. These wave modes overlap causing constructing or destructive interference. The wave packet positions calculated numerically match well wave packet positions in measured signals. A slight exception is observed in figure~\ref{fig:path1_7} in which in experimental signals only one wave packet exist at about 450~\(\mu\)s which is actually superposition of two wave packets as the numerical simulation suggest. Also at the same figure the wave packet at about 650~\(\mu\)s is wider in experiment than in numerical results. 
 
-The greatest difference between experimental and numerical wave packet amplitude is in figure~\ref{fig:path4_8} at about 570~$\mu$s. It can be attributed to the damping coefficient selected in numerical simulation. It should be underlined that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. It has been assumed in the model that the damping matrix is proportional to mass matrix $\bm{C} = \alpha \bm{M}$. In the current modelling approach, the coefficient $\alpha$ was arbitrary selected ($\alpha = 4000$). However, in future some optimization technique can be applied for finding the damping coefficient so that the numerical signal best fit to experimental one. The same can be applied for optimization of elastic constants of material properties as well as piezoelectric constants. 
+The greatest difference between experimental and numerical wave packet amplitude is in figure~\ref{fig:path4_8} at about 570~\(\mu\)s. It can be attributed to the damping coefficient selected in numerical simulation. It should be underlined that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. It has been assumed in the model that the damping matrix is proportional to mass matrix \(\bm{C} = \alpha \bm{M}\). In the current modelling approach, the coefficient \(\alpha\) was arbitrary selected (\(\alpha = 4000\)). However, in future some optimization technique can be applied for finding the damping coefficient so that the numerical signal best fit to experimental one. The same can be applied for optimization of elastic constants of material properties as well as piezoelectric constants. 
 
 Another important fact is that the delamination affect signals more than added mass. This effect is especially visible in figure~\ref{fig:path1_7} and figure~\ref{fig:path2_4}. Since reversible damage in the form of added mass coupled to the structure by tacky tape affect less signals of guided waves than delamination, such signals are more challenging for signal processing methods. Therefore, it can be concluded that the experimental data set provides good benchmark for development of damage detection and localization algorithms. The next step could be comparison of variety of damage detection and localization algorithms by using the same data set.
 
@@ -655,7 +655,7 @@ Another important fact is that the delamination affect signals more than added m
 	\label{fig:path4_8}
 \end{figure}
 \clearpage
-The conducted signal analysis leads to the conclusion that model based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. It is because the overall wave behaviour such as wave amplitude change due to damage and interaction of elastic waves with damage is properly modelled. It especially visible in case of differential signals presented in~figure~\ref{fig:path2_4_diff}. The differential signals are calculated as 'baseline' minus 'added mass' signals. The operation is performed separately for experimental and numerical signals. It can be seen that both in experimental and numerical differential signals, wave packets at about 200~$\mu$s and 400~$\mu$s gives greatest difference due to added mass. Even the amplitude of differential signals are on the same level.
+The conducted signal analysis leads to the conclusion that model based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. It is because the overall wave behaviour such as wave amplitude change due to damage and interaction of elastic waves with damage is properly modelled. It especially visible in case of differential signals presented in~figure~\ref{fig:path2_4_diff}. The differential signals are calculated as 'baseline' minus 'added mass' signals. The operation is performed separately for experimental and numerical signals. It can be seen that both in experimental and numerical differential signals, wave packets at about 200~\(\mu\)s and 400~\(\mu\)s gives greatest difference due to added mass. Even the amplitude of differential signals are on the same level.
 
 \begin{figure} [h!]
 	\centering
@@ -665,11 +665,11 @@ The conducted signal analysis leads to the conclusion that model based approach 
 	\label{fig:path2_4_diff}
 \end{figure}
 
-It should be noted that with the proposed parallel implementation it is easy to perform any parametric study (e.g. the analysis of wave behaviour due to delamination of various sizes) because of relatively short computation time. The run time of simulation for the case of excitation in one actuator was about 3 hours (for the wave propagation duration 1300~$\mu$s and integration time step $\Delta t = 10.6$~ns). The total number of degrees of freedom in the investigated SHM plate was 2.23 millions. The GPU memory usage was about 925~MB.
+It should be noted that with the proposed parallel implementation it is easy to perform any parametric study (e.g. the analysis of wave behaviour due to delamination of various sizes) because of relatively short computation time. The run time of simulation for the case of excitation in one actuator was about 3 hours (for the wave propagation duration 1300~\(\mu\)s and integration time step \(\Delta t = 10.6\)~ns). The total number of degrees of freedom in the investigated SHM plate was 2.23 millions. The GPU memory usage was about 925~MB.
 
 %\section{Exemplary applications}
 \section{Conclusions}
-A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows up to 12$\times$ computation speedup in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
+A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows up to 12\(\times\) computation speedup in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
 
 The simulated wave propagation in composite laminates matches well the experimental data acquired from Open Guided Waves platform in terms of full wavefield patterns. However, the quantitative comparison of signals reveals that there are certain differences especially in the amplitudes of the wave packets. Thus, there are still challenges to overcome which are related to proper wave attenuation modelling. In future, it is also worthwhile to investigate the optimization of elastic and piezoelectric constants for further reduction of differences between experiments and simulations.
 
