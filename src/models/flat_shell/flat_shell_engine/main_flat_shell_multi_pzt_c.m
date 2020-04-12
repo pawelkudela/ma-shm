@@ -36,8 +36,7 @@ assembly='mesh'; % options: assembly='trad'; assembly='mesh' ('trad' is slow);
 run(fullfile('inputs',['input',num2str(input_no)]));
 % save displacement with interval time step frm_int (frames)
 if(mod(nft,2)) 
-    frm_int = floor((nft-1)/(nFrames-1)); 
-    frame_no = 1:frm_int:nFrames*frm_int; % frame numbers to be saved for odd number of points
+  % frame numbers to be saved for odd number of points as in input file
 else
     frm_int = floor(nft/nFrames);
     frame_no = frm_int:frm_int:nFrames*frm_int;% frame numbers to be saved for even number of points
@@ -572,17 +571,13 @@ if(isempty(pztEl))
 end
 
 tic;minTime = Inf;
-if(mod(nft,2)) 
-    c=2; % start from the second frame
-else
-    c=1;% start from the first frame
-end
+c=1;
 t_frames = zeros(nFrames,1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('time integration...');
-for nn=2:nft
+for nn=1:nft
     tstart = tic;
     %[nn,nft]
 % transform from global displacement vector to local elemental vector
@@ -701,8 +696,8 @@ for nn=2:nft
     %%
     % save frame to file
     if (nn==frame_no(c)) 
-        t_frames(c)=t(nn);
-        c=c+1;
+        
+        t_frames(c)=t(nn);    
         switch field_variable
             case 'displacement'
                 Uc=gather(U);
@@ -848,6 +843,7 @@ for nn=2:nft
         else
             disp('Remaining tasks in the queue: none');
         end
+        if(c<length(frame_no)) c=c+1; end
     end
     uold=U;  
     U = unew; 

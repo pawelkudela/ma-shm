@@ -19,8 +19,8 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
 
 % input for constant parameters
-input_file_no = [21,22,23]; % frequency = [16.5e3/5,50e3/5,100e3/5];
-tasks=[1:3];
+input_file_no = [21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]; % frequency = [16.5e3/5,50e3/5,100e3/5];
+tasks=[13:15];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','single_pzt_single_delam_large_plate_EWSHM2020');
 %% input for post-processing
@@ -70,9 +70,10 @@ for test_case=tasks
             %% RUN POSTPROCESSING
             % out-of-plane
             
-            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz 
-            %plot_meshgrid_frames(Data(1:491,1:491,:),'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',3,'bottom',output_name,interim_output_name); % Vz
             plot_meshgrid_frames_time(Data(1:491,1:491,:),t_frames,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+            [Data] = spec2meshgrid_flat_shell(test_case,input_no,meshfile,Nx,Ny,'velocity',9,'bottom',output_name,interim_output_name); % Amplitude
+            plot_meshgrid_frames_time(Data(1:491,1:491,:),t_frames,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',9,fig_width,fig_height);
             delete([output_name,'*frame*']); % delete frames
         catch
             fprintf('Failed test case no: %d\n', test_case);

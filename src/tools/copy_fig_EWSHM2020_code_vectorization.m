@@ -11,7 +11,7 @@ modelname='flat_shell_EWSHM2020'; expname='EWSHM2020_exp_wavefield';
 %% 16.5 kHz
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % figure 1a num 16.5 kHz
-figname=['Vz_1_frame64_bottom_249.74.png'];
+figname=['Vz_1_frame65_bottom_250.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'1_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure1a.png'],'f');
@@ -23,7 +23,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure1b.png'],'f');
 
 % figure 1c num 16.5 kHz
-figname=['Vz_1_frame128_bottom_499.50.png'];
+figname=['Vz_1_frame129_bottom_500.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'1_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure1c.png'],'f');
@@ -35,7 +35,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure1d.png'],'f');
 
 % figure 1e num 16.5 kHz
-figname=['Vz_1_frame192_bottom_749.25.png'];
+figname=['Vz_1_frame193_bottom_750.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'1_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure1e.png'],'f');
@@ -50,7 +50,7 @@ movefile([fig_destination,figname],[fig_destination,'figure1f.png'],'f');
 %% 50 kHz
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % figure 2a num 50 kHz
-figname=['Vz_2_frame64_bottom_249.98.png'];
+figname=['Vz_2_frame65_bottom_250.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'2_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure2a.png'],'f');
@@ -62,7 +62,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure2b.png'],'f');
 
 % figure 2c num 50 kHz
-figname=['Vz_2_frame128_bottom_499.98.png'];
+figname=['Vz_2_frame129_bottom_500.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'2_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure2c.png'],'f');
@@ -74,7 +74,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure2d.png'],'f');
 
 % figure 2e num 50 kHz
-figname=['Vz_2_frame192_bottom_749.98.png'];
+figname=['Vz_2_frame193_bottom_750.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'2_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure2e.png'],'f');
@@ -89,7 +89,7 @@ movefile([fig_destination,figname],[fig_destination,'figure2f.png'],'f');
 %% 100 kHz
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % figure 3a num 100 kHz
-figname=['Vz_3_frame128_bottom_199.80.png'];
+figname=['Vz_3_frame129_bottom_200.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'3_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure3a.png'],'f');
@@ -101,7 +101,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure3b.png'],'f');
 
 % figure 3c num 100 kHz
-figname=['Vz_3_frame192_bottom_299.70.png'];
+figname=['Vz_3_frame193_bottom_300.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'3_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure3c.png'],'f');
@@ -113,7 +113,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure3d.png'],'f');
 
 % figure 3e num 100 kHz
-figname=['Vz_3_frame256_bottom_399.60.png'];
+figname=['Vz_3_frame257_bottom_400.00.png'];
 fig_source=[figs_source_folder,'flat_shell',filesep,modelname,'_out',filesep,'3_output',filesep,figname];
 copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure3e.png'],'f');

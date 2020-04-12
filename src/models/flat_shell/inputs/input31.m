@@ -1,15 +1,15 @@
 disp('.. Reading input data');
 %% Signal definition
-tt= 7.992187500000000e-04;          % total calculation time [s] % time(1024)
+tt= 0.001998046875;          % total calculation time [s] % time(1024)
 nFrames_exp = 1024; % number of time steps taken from experiment
 dt_exp = tt/(nFrames_exp-1); % time step in experiment
 division = 2^7;% number of divisions of experimental time step
 dt_num = dt_exp/division; % time step in numerical simulation
 nft = (nFrames_exp-1)*division+1;% total number of samples
 t_1=0e-4;           % excitation initiation time [s]
-f_1=100e3/5;        % frequency of the modulation signal [Hz]
+f_1=50e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]
-nFrames=512;        % number of frames for animation
+nFrames=1024;        % number of frames for animation
 frame_no = ((([1:nFrames]-1)*division)*nFrames_exp/nFrames+1);
 field_variable = 'velocity'; % field_variable for saving output data, string: 'displacement', 'velocity', 'acceleration' or 'all'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,8 +85,8 @@ rho = repmat(rho,[lay,1]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % damping coefficient proportional to mass matrix
-etad_xy=0; % damping ratio
-etad_z=0; % damping ratio
+etad_xy=9514*0.05; % damping ratio
+etad_z=9514*0.7; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

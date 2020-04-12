@@ -9,7 +9,7 @@ nft = (nFrames_exp-1)*division+1;% total number of samples
 t_1=0e-4;           % excitation initiation time [s]
 f_1=100e3/5;        % frequency of the modulation signal [Hz]
 f_2=5*f_1;          % frequency of the carrier signal [Hz]
-nFrames=512;        % number of frames for animation
+nFrames=1024;        % number of frames for animation
 frame_no = ((([1:nFrames]-1)*division)*nFrames_exp/nFrames+1);
 field_variable = 'velocity'; % field_variable for saving output data, string: 'displacement', 'velocity', 'acceleration' or 'all'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,8 +85,8 @@ rho = repmat(rho,[lay,1]);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % damping coefficient proportional to mass matrix
-etad_xy=0; % damping ratio
-etad_z=0; % damping ratio
+etad_xy=27210*0.05; % damping ratio
+etad_z=27210*0.7; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

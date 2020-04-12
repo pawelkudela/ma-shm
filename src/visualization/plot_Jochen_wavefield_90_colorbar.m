@@ -37,34 +37,34 @@ ColorMapName = 'default';
 caxis_cut = 0.8;
 normalization = false; % normalization to the highest value of the wavefield
 fig_width =5; % figure widht in cm
-fig_height=5; % figure height in cm
+fig_height=5+2; % figure height in cm (+2 for colorbar)
 %    ColorMapName - custom map name: 'map_sunset', 'map_sunset_interp', 'map_burd', 'map_burd_interp'
 %    'map_brewer', 'map_brewer_interp', 'map_iridescent', 'map_iridescent_interp', 'map_discrete_rainbow'
 %%
 test_case =1;
+scaling=20;
 interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
 figure_output_name = [figure_output_path,num2str(test_case),'_output',filesep];
  if ~exist(figure_output_name, 'dir')
     mkdir(figure_output_name);
  end
 load([interim_output_name,'flat_shell_Vz_1_500x500top']);
-return;
-Data_quarter=Data(1:250,1:250,:);
-plot_meshgrid_frames(Data_quarter,shell_surface,test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+Data_quarter=scaling*Data(1:250,11:250,:);
+plot_meshgrid_frames_colorbar(Data_quarter,shell_surface,test_case,selected_frames,[figure_output_name,'colorbar_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 % caxis cut
 caxis_cut = 0.1;
-Data_zoom=Data(1:250,1:250,:);
-plot_meshgrid_frames(Data_zoom,'top',test_case,selected_frames,[figure_output_name,'cut_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+Data_zoom=scaling*Data(1:250,11:250,:);
+plot_meshgrid_frames_colorbar(Data_zoom,'top',test_case,selected_frames,[figure_output_name,'colorbar_cut_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 caxis_cut = 0.8;
 load([interim_output_name,'flat_shell_Vz_1_500x500bottom']);
-Data_quarter=Data(1:250,1:250,:);
-plot_meshgrid_frames(Data_quarter,'bottom',test_case,selected_frames,figure_output_name,normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
+Data_quarter=scaling*Data(1:250,11:250,:);
+plot_meshgrid_frames_colorbar(Data_quarter,'bottom',test_case,selected_frames,[figure_output_name,'colorbar_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 
 % copy selected files to paper figs folder
-command = ['copy ', figure_output_name,'Vz_1_frame72_bottom.png ',paper_fig_folder];
+command = ['copy ', figure_output_name,'colorbar_Vz_1_frame72_bottom.png ',paper_fig_folder];
 system(command);
-command = ['copy ', figure_output_name,'Vz_1_frame108_bottom.png ',paper_fig_folder];
+command = ['copy ', figure_output_name,'colorbar_Vz_1_frame108_bottom.png ',paper_fig_folder];
 system(command);
-command = ['copy ', figure_output_name,'cut_Vz_1_frame128_top.png ',paper_fig_folder];
+command = ['copy ', figure_output_name,'colorbar_cut_Vz_1_frame128_top.png ',paper_fig_folder];
 system(command);
 
