@@ -1,5 +1,5 @@
 function [b] = mymedian3x3(a)
-% MYMEDIAN3X3   Apply median filter of mask size 3i3 
+% MYMEDIAN3X3   Apply median filter of mask size 3x3 
 
 % 
 % Syntax:  [b] = mymedian3x3(a)

@@ -127,7 +127,7 @@ Moreover, assembly of the stiffness matrix is troublesome because it requires a 
 In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without the necessity of stiffness matrix assembly. 
 The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. 
 
-The proposed approach differs in the calculation of elemental forces which depend on the contribution of the extensional stiffness, the flexural stiffness, bending-stretching coupling,  twisting-stretching along with bending-shearing coupling, stre\-tching-shearing coupling and bending-twisting coupling instead of the matrix of elastic constants assigned to each layer of a composite laminate. 
+The current method differs in the calculation of elemental forces which depend on the contribution of the extensional stiffness, the flexural stiffness, bending-stretching coupling,  twisting-stretching along with bending-shearing coupling, stre\-tching-shearing coupling and bending-twisting coupling instead of the matrix of elastic constants assigned to each layer of a composite laminate. 
 Hence, the proposed method is more suitable for wave propagation modelling in multilayer composite laminates because it leads to a much lower number of degrees of freedom. 
 
 Essentially, the term \(\bm{K}\vec{u}_t\) is expanded for each element by using sparse matrices of shape function derivatives \(\bm{N}_{\xi}^e,\,\bm{N}_{\eta}^e\), components of the inverse of Jacobian matrix \((\vec{J}^{-1})_{ij}^e\), elastic constants \(\vec{Q}_{ij}^e\) integrated over the thickness, integration weights \(\vec{W}^e\) and nodal displacement vector at the element level \(\hat{\vec{u}}_0^{e} \). 
@@ -152,7 +152,7 @@ Therefore, at the final step, it is necessary to assemble the global force vecto
 It can be performed according to mesh colouring algorithm proposed in~\cite{Kudela2016}. 
 The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. 
 The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
-Due to the fact, that the colouring algorithm requires that the number of nodes must be divided into 12 sets of equal size it is best to have 36-node spectral elements in the mesh.
+The 36-node spectral elements are used in the current approach. It guarantees that the mesh can be divided into 12 equal sets because the result of operation \(36/12=3\) is integer.
 
 Once internal forces \(\vec{F}^i\) are calculated and substituted into (\ref{eq:explicit_integration}), the displacements at time step \(t+\Delta t\) can be explicitly obtained from a perfectly vectorized code:
 \begin{equation}

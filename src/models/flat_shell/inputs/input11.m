@@ -1,6 +1,6 @@
 disp('.. Reading input data');
 %% Signal definition
-nft=4096*24;      % total number of samples
+nft=4096*30;      % total number of samples
 tt= 1.3/1e3;          % total calculation time [s] % 
 t_1=0e-4;           % excitation initiation time [s]
 f_1=40e3/5;        % frequency of the modulation signal [Hz]
@@ -81,7 +81,7 @@ rho = repmat(rho,[lay,1]);
 
 % damping coefficient proportional to mass matrix
 etad_xy=4e2; % damping ratio
-etad_z=4e3; % damping ratio
+etad_z=3969; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,5 +126,5 @@ epsT=   [dp(1,5)/gp(1,5)       0                         0;
                0                       0              dp(3,3)/gp(3,3)]; %[F/m]
 % density
 rho_pzt=7850;%[kg/m3]
-pzt_thickness =0.5/1000; % pzt thickness [m]
+pzt_thickness =0.2/1000; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]

@@ -9,13 +9,14 @@ overwrite=true;
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
 idx = strfind( pathstr,filesep );
+% prepare figure output path
+modelname = name; 
+figure_output_path = prepare_figure_paths(modelname);
 modelfolder = 'flat_shell'; % name of folder
-modelname =  'flat_shell_Jochen_wavefield_90';
+modelname =  'flat_shell_Jochen_wavefield_90_added_mass';
 % prepare model output path
-
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
-figure_output_path = prepare_figure_paths(modelfolder,modelname);
-paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\Elsevier\figs\';
+
 %% Input for flat_shell
 
 tasks=[1];
@@ -60,11 +61,4 @@ load([interim_output_name,'flat_shell_Vz_1_500x500bottom']);
 Data_quarter=scaling*Data(11:250,11:250,:);
 plot_meshgrid_frames_colorbar(Data_quarter,'bottom',test_case,selected_frames,[figure_output_name,'colorbar_'],normalization,caxis_cut,ColorMapName,'velocity',3,fig_width,fig_height);
 
-% copy selected files to paper figs folder
-% command = ['copy ', figure_output_name,'colorbar_Vz_1_frame72_bottom.png ',paper_fig_folder];
-% system(command);
-% command = ['copy ', figure_output_name,'colorbar_Vz_1_frame108_bottom.png ',paper_fig_folder];
-% system(command);
-% command = ['copy ', figure_output_name,'colorbar_cut_Vz_1_frame128_top.png ',paper_fig_folder];
-% system(command);
 

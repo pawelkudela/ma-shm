@@ -86,7 +86,7 @@ rho = repmat(rho,[lay,1]);
 
 % damping coefficient proportional to mass matrix
 etad_xy=27210*0.1; % damping ratio
-etad_z=27210*0.8; % damping ratio
+etad_z=27210*1.2; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
