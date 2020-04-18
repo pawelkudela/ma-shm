@@ -68,6 +68,7 @@
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers.
 \usepackage{lineno}
+\usepackage{esint}
 %\linenumbers
 \begin{document}
 
@@ -86,7 +87,7 @@
 \end{indented}
 
 \begin{abstract}
-Parallel implementation of the spectral element method is developed in which flat shell spectral elements are utilized for spatial domain representation. The implementation is realised by using Matlab Parallel Computing Toolbox and optimized for Graphics Processing Unit (GPU) computation. In this way, considerable computation speedup can be achieved in comparison to computation on conventional processors. The implementation includes interpolation of wavefield on a uniform grid. The method was tested on experimental data set available on the Open Guided Waves platform. The qualitative comparison was performed on full wavefield data, whereas quantitative comparison was made directly on signals of propagating Lamb waves registered by piezoelectric transducers. In both cases, good agreement between numerical and experimental results was achieved. The proposed method is particularly useful for structural health monitoring algorithms in which signal parameters are required such as wave velocity dependence on the angle of propagation. Moreover, it enables model--assisted damage size estimation in which the damage influence curve is estimated based on large numerical data sets and sparse experimental data. Due to relatively short computation times, large data sets can be generated and used for machine learning or other soft computing methods opening up new possibilities in health monitoring of metallic and composite structures.
+Parallel implementation of the spectral element method is developed in which flat shell spectral elements are utilized for spatial domain representation. The implementation is realised by using Matlab Parallel Computing Toolbox and optimized for Graphics Processing Unit (GPU) computation. In this way, considerable computation speed-up can be achieved in comparison to computation on conventional processors. The implementation includes an interpolation of wavefield on a uniform grid. The method was tested on experimental data set available on the Open Guided Waves platform. The qualitative comparison was performed on full wavefield data, whereas quantitative comparison was made directly on signals of propagating Lamb waves registered by piezoelectric transducers. In both cases, good agreement between numerical and experimental results was achieved. The proposed method is particularly useful for structural health monitoring algorithms in which signal parameters are required such as wave velocity dependence on the angle of propagation. Moreover, it enables model--assisted damage size estimation in which the damage influence curve is estimated based on large numerical data sets and sparse experimental data. Due to relatively short computation times, large data sets can be generated and used for machine learning or other soft computing methods opening up new possibilities in health monitoring of metallic and composite structures.
 \end{abstract}
 
 %
@@ -109,19 +110,19 @@ Parallel implementation of the spectral element method is developed in which fla
 
 \section{Introduction}\label{sec1}
 
-Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms based on ultrasound signals registered by piezoelectric sensors able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example in anisotropic composite laminates the wave velocity of a particular mode depends on the angle of propagation. Improper velocity values would lead to a wrong identification of damage location.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually a model--assisted approach is required supported by comprehensive numerical simulations. Unfortunately, due to the complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
+Guided waves are very often utilized in nondestructive evaluation and structural health monitoring. There are many algorithms based on ultrasound signals registered by piezoelectric sensors able to predict if a structure is damaged and where the damage is located. However, they often require information about wave velocity or other parameters which must be provided from a model. For example, in anisotropic composite laminates, the wave velocity of a particular mode depends on the angle of propagation. Improper velocity values would lead to wrong identification of damage location.  Moreover, it is very difficult to implement signal processing algorithm for damage size estimation exclusively based on experimental signals. Usually, a model--assisted approach is required supported by comprehensive numerical simulations. Unfortunately, due to the complex multimodal and dispersive nature of guided waves, wave propagation modelling is very challenging. 
 
-Guided wave modelling techniques can be roughly divided into analytic, semi--analytic, approximate in which domains are discretized in various ways and hybrid. Analytic methods are suitable for parametric studies and can be used for damage influence analysis in simple isotropic structures~\cite{Giurgiutiu2014}. Semi--analytic methods such as the semi-analytic finite element (SAFE) method~\cite{Bartoli2006} or the scaled boundary finite element method (SBFEM)~\cite{Gravenkamp2014} are utilized for dispersion curves analysis and wave attenuation in wave guides of arbitrary cross-sections including multi-layer composite laminates. Vivar--Perez \etal~\cite{Vivar-Perez2014} proposed analytical and higher order finite element hybrid approach for 2D analysis of ultrasonic guided waves. Another method which utilizes an analytic solution of the wave equation as a shape function is the frequency domain spectral finite element method. The method was popularized by Doyle~\cite{Doyle1989} and exploited by many researchers~\cite{RoyMahapatra2003,Palacz2005} mostly in relation to wave propagation analysis in 1D waveguides. The advantage of the method is that it is very fast if only few response points are considered and guided waves of high frequency can be modelled easily. On the other hand, the periodic nature of the Fourier transform and inverse Fourier transform used in this method in conjunction with finite dimensions of a real waveguide cause the appearance of spurious wave packets. Special \emph{throw-off elements} can be applied at ends of 1D waveguides to alleviate this problem~\cite{Doyle1989}. In 2D waveguides such as membranes and plates the method has been extended to the wavelet spectral finite element method~\cite{Mitra2008,Yang2016}. It should be noted that by using this approach simulation of wave propagation in anisotropic materials with defects can be conducted.
+Guided wave modelling techniques can be roughly divided into analytic, semi--analytic, approximate in which domains are discretized in various ways and hybrid. Analytic methods are suitable for parametric studies and can be used for damage influence analysis in simple isotropic structures~\cite{Giurgiutiu2014}. Semi--analytic methods such as the semi-analytic finite element (SAFE) method~\cite{Bartoli2006} or the scaled boundary finite element method (SBFEM)~\cite{Gravenkamp2014} are utilized for dispersion curves analysis and wave attenuation in waveguides of arbitrary cross-sections including multi-layer composite laminates. Vivar--Perez \etal~\cite{Vivar-Perez2014} proposed analytical and higher order finite element hybrid approach for 2D analysis of ultrasonic guided waves. Another method which utilizes an analytic solution of the wave equation as a shape function is the frequency domain spectral finite element method. The method was popularized by Doyle~\cite{Doyle1989} and exploited by many researchers~\cite{RoyMahapatra2003,Palacz2005} mostly in relation to wave propagation analysis in 1D waveguides. The advantage of the method is that it is very fast if only a few response points are considered and guided waves of high frequency can be modelled easily. On the other hand, the periodic nature of the Fourier transform and inverse Fourier transform used in this method in conjunction with finite dimensions of a real waveguide cause the appearance of spurious wave packets. Special \emph{throw-off elements} can be applied at ends of 1D waveguides to alleviate this problem~\cite{Doyle1989}. In 2D waveguides such as membranes and plates, the method has been extended to the wavelet spectral finite element method~\cite{Mitra2008,Yang2016}. It should be noted that by using this approach simulation of wave propagation in anisotropic materials with defects can be conducted.
 
-An interesting approximate method was proposed by Duczek \etal~\cite{Duczek2014} and extended by Joulaian \etal~\cite{Joulaian2014}, namely spectral cell method. The main idea of the method is to embed physical domain into a bigger domain that can be easily meshed into a Cartesian grid consisting of rectangular cells, i.e. quadrilaterals in 2D or hexahedrals in 3D, respectively. It can be efficient in combination with octree meshing and explicit time integration. The authors applied the method for simulating wave propagation in complex structures made of heterogeneous materials. Recently, the code was adapted for the use on multiple GPUs and CPUs~\cite{Mossaiby2019}. 
+An interesting approximate method was proposed by Duczek \etal~\cite{Duczek2014} and extended by Joulaian \etal~\cite{Joulaian2014}, namely spectral cell method. The main idea of the method is to embed physical domain into a bigger domain that can be easily meshed into a Cartesian grid consisting of rectangular cells, i.e. quadrilaterals in 2D or hexahedrals in 3D, respectively. It can be efficient in combination with octree meshing and explicit time integration. The authors applied the method for simulating wave propagation in complex structures made of heterogeneous materials. Recently, the code was adapted for the use of multiple GPUs and CPUs~\cite{Mossaiby2019}. 
 
-Willberg \etal~\cite{Willberg2012} studied the time domain spectral element method (SEM) along side with higher order finite element method (p-FEM) with polynomial degrees \emph{p}{\textgreater}2 and isogeometric analysis (IGA). The results highlight the superiority of higher order approaches in comparison to low order (linear, quadratic) finite elements. The convergence behaviour is more rapid and considerably less degrees of freedom are needed for accurate results.
+Willberg \etal~\cite{Willberg2012} studied the time domain spectral element method (SEM) alongside with higher-order finite element method (p-FEM) with polynomial degrees \emph{p}{\textgreater}2 and isogeometric analysis (IGA). The results highlight the superiority of higher-order approaches in comparison to low order (linear, quadratic) finite elements. The convergence behaviour is more rapid and considerably less degrees of freedom are needed for accurate results.
 
-SEM method is characterized by fast convergence rate, diagonality of mass matrix and high parallelism of the code. The SEM was originally developed by Patera in 1984 for modelling of laminar flows~\cite{Patera1984}. Dauksher and Emery~\cite{Dauksher1997,Dauksher2000} proposed to use Chebyshev nodes instead of Gauss-Lobatto-Legendre nodes in the construction of shape functions. Over the years the SEM method has gained attention in geophysics community for the numerical simulation of seismic wave propagation~\cite{Seriani1998,Komatitsch2009}. The method was later adopted for modelling structural health monitoring systems based on anomalies of guided waves~\cite{Schulte2010,Ostachowicz2012,Lonkar2013}. 
+SEM method is characterized by fast convergence rate, diagonality of mass matrix and high parallelism of the code. The SEM was originally developed by Patera in 1984 for modelling of laminar flows~\cite{Patera1984}. Dauksher and Emery~\cite{Dauksher1997,Dauksher2000} proposed to use Chebyshev nodes instead of Gauss-Lobatto-Legendre nodes in the construction of shape functions. Over the years the SEM method has gained attention in the geophysics community for the numerical simulation of seismic wave propagation~\cite{Seriani1998,Komatitsch2009}. The method was later adopted for modelling structural health monitoring systems based on anomalies of guided waves~\cite{Schulte2010,Ostachowicz2012,Lonkar2013}. 
 
 Leckey \etal~\cite{Leckey2018} investigated four numerical simulation tools: custom implementation~\cite{Leckey2014} of the 3D Elastodynamic Finite Integration Technique (EFIT) \cite{Schubert1998} along with three widely used commercial finite element codes: COMSOL, ABAQUS, and ANSYS. The studied example was related to the interaction of propagating Lamb waves with delaminations in cross-ply laminates consisting of 8 layers (delamination was located below the second ply). The laminate was modelled by a fine mesh of 3D solid elements. The numerical results were compared with experiments in terms of the wavefield showing quite good agreement in case of COMSOL, ABAQUS Implicit and ANSYS implicit. Unfortunately, despite the simulations were performed on a workstation equipped with 16 cores, the efficiency of each investigated methods is so low that it is prohibitive to perform any parametric study or generate data sets e.g. for machine learning (the shortest simulation run time was for the case of COMSOL i.e. 19.5~hours followed by ABAQUS implicit i.e. 40~hours).
 
-Due to the high computational demand of guided wave propagation problems more and more researchers have been looking for possible ways of computation speedup over last decade. One of possible solution is seen in using parallelisation via the Compute Unified Device Architecture (CUDA), which enables parallel computing on powerful graphics cards. A parallel algorithm of the Local Interaction Simulation Approach (LISA) for Lamb wave propagation modelling in aluminum plates exposed to temperature changes was developed by~Kijanka et~al.~\cite{Kijanka2013}. A~similar approach to model the nonlinear dynamic interactions between ultrasonic guided waves and fatigue cracks was utilised by Shen and Cesnik~\cite{Shen2017}.  
+Due to the high computational demand of guided wave propagation problems, more and more researchers have been looking for possible ways of computation speed-up over the last decade. One possible solution is seen in using parallelisation via the Compute Unified Device Architecture (CUDA), which enables parallel computing on powerful graphics cards. A parallel algorithm of the Local Interaction Simulation Approach (LISA) for Lamb wave propagation modelling in aluminium plates exposed to temperature changes was developed by~Kijanka et~al.~\cite{Kijanka2013}. A~similar approach to model the nonlinear dynamic interactions between ultrasonic guided waves and fatigue cracks was utilised by Shen and Cesnik~\cite{Shen2017}.  
 
 The method presented in this paper for solving guided wave propagation problems combines the high order time domain spectral element method (SEM) with CUDA through Matlab Parallel Computing Toolbox. The presented concept of parallel implementation of SEM is similar to the parallel implementation developed previously~\cite{Kudela2016} but it is applied to flat shell spectral elements instead of 3D solid elements. The proposed approach differs in the calculation of elemental forces which depend on the contribution of the extensional stiffness, the flexural stiffness, bending-stretching coupling,  twisting-stretching along with bending-shearing coupling, stretching-shearing coupling and bending-twisting coupling instead of the matrix of elastic constants assigned to each layer of a composite laminate. Hence, the proposed method is more suitable for wave propagation modelling in multilayer composite laminates because it leads to a much lower number of degrees of freedom. Therefore, the computation can be performed faster which is important for application in the model--assisted structural health monitoring. 
 
@@ -131,7 +132,7 @@ Other original elements of the research work include the integration of automati
 
 \subsection{Flat shell spectral element}
 
-The developed spectral finite element for flat shell modelling is based on the Mindlin--Reissner first order shear deformation theory. It has 36 nodes and 5 degrees of freedom at each node: displacement components \(u_0\) and \(v_0\) in neutral plane along \(x\) and \(y\) axis, respectively, transverse displacement \(w_0\) and two independent rotations of cross-section \(\varphi_x(x,y)\) and \(\varphi_y(x,y)\). The spectral shell element is schematically shown in figure~\ref{fig:spectral_shell_element}. The 36 node element was selected to be compliant with the mesh coloring algorithm developed in~\cite{Kudela2016} in which the number of nodes in the element divided by 12 must result in a natural number. This implies that the computational load can be divided into 12 equal independent tasks. Moreover, polynomial of 5\textsuperscript{th} order used for shape function construction is high enough to prevent locking on the thinner shells.
+The developed spectral finite element for flat shell modelling is based on the Mindlin--Reissner first-order shear deformation theory. It has 36 nodes and 5 degrees of freedom at each node: displacement components \(u_0\) and \(v_0\) in neutral plane along \(x\) and \(y\) axis, respectively, transverse displacement \(w_0\) and two independent rotations of cross-section \(\varphi_x(x,y)\) and \(\varphi_y(x,y)\). The spectral shell element is schematically shown in figure~\ref{fig:spectral_shell_element}. The 36 node element was selected to be compliant with the mesh colouring algorithm developed in~\cite{Kudela2016} in which the number of nodes in the element divided by 12 must result in a natural number. This implies that the computational load can be divided into 12 equal independent tasks. Moreover, a polynomial of 5\textsuperscript{th} order used for shape function construction is high enough to prevent locking on the thinner shells.
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure1.png}	
@@ -148,7 +149,7 @@ w(x,y,z)=w_0(x,y).}
  \label{eq:delam_platedispl}
 \end{equation}
 
-It should be noted that the displacement field resembles combination of elementary two-mode membrane theory with three-mode Mindlin-Reisner theory resulting in five-mode theory of shells. Such theory is suitable for approximation of fundamental symmetric Lamb and shear wave modes in the frequency-thickness product range up to about 1~MHz\(\cdot\)mm and  fundamental antisymmetric Lamb and shear wave modes in the frequency-thickness product range up to about 0.5~MHz\(\cdot\)mm (see~\cite{Ostachowicz2012} for more details).
+It should be noted that the displacement field resembles a combination of elementary two-mode membrane theory with three-mode Mindlin-Reisner theory resulting in the five-mode theory of shells. Such theory is suitable for the approximation of fundamental symmetric Lamb and shear wave modes in the frequency-thickness product range up to about 1~MHz\(\cdot\)mm and fundamental antisymmetric Lamb and shear wave modes in the frequency-thickness product range up to about 0.5~MHz\(\cdot\)mm (see~\cite{Ostachowicz2012} for more details).
 The strain field assuming small deformations is:
 \begin{equation}
 \eqalign{
@@ -202,7 +203,7 @@ Elemental mass matrix and stiffness matrix are calculated numerically by using G
  &\approx \sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} w_i\, w_j\! \int \limits_{-h/2}\limits^{h/2} \big[\vec{B}^e\!(\xi_i,\eta_j)\big]^{\!T}\, \bm{\overline Q}^e\!(\xi_i,\eta_j) \, \vec{B}^e\!(\xi_i,\eta_j) \, \det(\vec{J}^e)\, \ud z\\
 &=\sum \limits_{j=1}^{6} \sum \limits_{i=1}^{6} w_i\, w_j \sum \limits_{k=1}^{N} \int_{h_{k-1}}^{h_k} \big[\vec{B}^e\!(\xi_i,\eta_j)\big]^{\!T} \bm{\overline Q}_k^e\!(\xi_i,\eta_j) \, \vec{B}^e\!(\xi_i,\eta_j) \, \det(\vec{J}^e)\, \ud z.} \label{eq:dealm_plate_stiffness}
 \end{equation}
-The quadrature weight \(w_i > 0\), which are independent form the element, are defined by:
+The quadrature weights \(w_i > 0\), which are independent of the element, are defined by:
 \begin{equation}
 w_i = \frac{2}{m(m-1)\big[ P_{m-1}\!(\xi_i) \big]^2}\; , \quad i \in 1,\ldots, m \label{eq:weights}
 \end{equation}
@@ -224,8 +225,8 @@ The matrix \(\bm{\overline Q}_k^e\) from (\ref{eq:dealm_plate_stiffness}) for \(
 0& 0 &0&\overline{Q}_{44}& \overline{Q}_{45}\\[2pt]
 0&0&0&\overline{Q}_{45}&\overline{Q}_{55}\end{array}\right].  \label{eq:dealm_plate_stf}
 \end{equation}
-The components of matrix \(\bm{\overline Q}_k^e\) are calculated for lamina rotated according to stacking sequence. The transformation matrix of stiffness tensor \(\bm{Q}_k^e\) along with explicit formulas can be found in the literature~\cite{Vinson1987}.
-It should be noted that in general both mass density \(\rho_k\) as well as stiffness tensor components \(\bm{Q}_k^e\) can have arbitrary values at GLL points but for simplicity it is assumed that they are constant within \(k\)-th layer. Integral over thickness of layers in (\ref{eq:dealm_plate_stiffness}) is evaluated analytically which leads to the following constants:
+The components of the matrix \(\bm{\overline Q}_k^e\) are calculated for lamina rotated according to the stacking sequence. The transformation matrix of stiffness tensor \(\bm{Q}_k^e\) along with explicit formulas can be found in the literature~\cite{Vinson1987}.
+It should be noted that in general both mass density \(\rho_k\), as well as stiffness tensor components \(\bm{Q}_k^e\), can have arbitrary values at GLL points but for simplicity, it is assumed that they are constant within \(k\)-th layer. Integral over the thickness of layers in (\ref{eq:dealm_plate_stiffness}) is evaluated analytically which leads to the following constants:
 \begin{equation}
 \eqalign{
 A_{ij} =  \sum \limits_{k=1}\limits^{N} (\overline{Q}_k)_{ij} \,(h_{k-1} - h_k),\quad i,j = 1,2,6,\\
@@ -234,14 +235,14 @@ B_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^2 - h_k^2
 D_{ij} = \sum \limits_{k=1}\limits^{N}(\overline{Q}_k)_{ij} \,(h_{k-1}^3 - h_k^3)/3, \quad i,j = 1,2,6,}
 \label{eq:stiffness_contribution}
 \end{equation}
-where \(h\) is the total shell thickness. Hence, the whole laminate is modelled by one element in which the contribution of the extensional stiffness (\(A_{ij}, i,j = 1,2\)), the flexural stiffness (\(D_{ij}, i,j = 1,2\)), bending-stretching coupling  (\(B_{ij}, i,j = 1,2\)), twisting-stretching along with bending-shearing coupling (\(B_{16}, B_{26}\)) , stretching-shearing coupling (\(A_{16}, A_{26}\)) and bending-twisting coupling (\(D_{16}, D_{26}\)) are taken into account. It should be added that piezoelectric layer also contribute to the overall stiffness of appropriate elements. 
+where \(h\) is the total shell thickness. Hence, the whole laminate is modelled by one element in which the contribution of the extensional stiffness (\(A_{ij}, i,j = 1,2\)), the flexural stiffness (\(D_{ij}, i,j = 1,2\)), bending-stretching coupling  (\(B_{ij}, i,j = 1,2\)), twisting-stretching along with bending-shearing coupling (\(B_{16}, B_{26}\)) , stretching-shearing coupling (\(A_{16}, A_{26}\)) and bending-twisting coupling (\(D_{16}, D_{26}\)) are taken into account. It should be added that the piezoelectric layer also contributes to the overall stiffness of appropriate elements. 
 
 \subsection{Implementation by using vectorization of the code and Matlab Parallel Computing Toolbox}
 In classic finite element approach elemental matrices are assembled to form equation of motion:
 \begin{equation}
 \bm{M} \vec{\ddot{U}} + \bm{C} \vec{\dot{U}} + \bm{K} \vec{U} = \vec{F}, \label{eq:motion}
 \end{equation}  
-where \(\bm{M}\) is the global mass (inertia) matrix, \(\bm{K}\) is the global stiffness matrix,  \(\bm{C}\) is the global damping matrix, \(\vec{U}\) is the vector of global degrees of freedom and~\(\vec{F}\) is the vector of the time dependent excitation (in this particular case the vector of equivalent piezoelectric forces). The most efficient way to solve the (\ref{eq:motion}) is by using explicit integration scheme. Assuming the central difference method:
+where \(\bm{M}\) is the global mass (inertia) matrix, \(\bm{K}\) is the global stiffness matrix,  \(\bm{C}\) is the global damping matrix, \(\vec{U}\) is the vector of global degrees of freedom and~\(\vec{F}\) is the vector of the time-dependent excitation (in this particular case the vector of equivalent piezoelectric forces). The most efficient way to solve the (\ref{eq:motion}) is by using an explicit integration scheme. Assuming the central difference method:
 \begin{equation}
 \ddot{\vec{U}}\simeq \frac{1}{\Delta t^2} \left(\vec{u}_{t+\Delta t} - 2\,\vec{u}_t + \vec{u}_{t-\Delta t}\right), \label{eq:central_scheme}
 \end{equation}
@@ -257,7 +258,7 @@ and substituting (\ref{eq:central_scheme})-(\ref{eq:first_derivative_scheme}) in
 \label{eq:explicit_integration}
 \end{equation}
 
-It should be underlined that due to the orthogonality of shape functions and application of the GLL integration rule the mass matrix is diagonal. It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step \(t + \Delta t\) is straightforward and does not require costly matrix inversion. However, the term \(\vec{F}^i=\bm{K}\vec{u}_t\) related to internal forces at the time step \(t\) is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problems which can be simulated. In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. However, due to analytic integration over thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of the term \(\vec{F}^i=\bm{K}\vec{u}_t\) is different and it is divided into two steps. In the first step stress-like components are calculated at the time moment \(t\) (index \(t\) in displacement vectors is omitted for clarity):
+It should be underlined that due to the orthogonality of shape functions and application of the GLL integration rule the mass matrix is diagonal. It has been shown that for the Lamb wave attenuation modelling it is possible to assume that the damping matrix is proportional to the mass matrix~\cite{Wandowski2017}. In such case calculation of displacements at the time step \(t + \Delta t\) is straightforward and does not require costly matrix inversion. However, the term \(\vec{F}^i=\bm{K}\vec{u}_t\) related to internal forces at the time step \(t\) is still computationally intensive. Moreover, assembly of the stiffness matrix is troublesome because it requires a lot of memory and limits the size of wave propagation problems which can be simulated. In order to alleviate these deficiencies, a parallel code is proposed in which assembly is performed at the internal force vector level without the necessity of stiffness matrix assembly. The proposed approach is very similar to the parallel implementation given in~\cite{Kudela2016}. However, due to analytic integration over the thickness and more complex displacement field in comparison to 3D solid spectral elements, the process of calculation of the term \(\vec{F}^i=\bm{K}\vec{u}_t\) is different and it is divided into two steps. In the first step stress-like components are calculated at the time moment \(t\) (index \(t\) in displacement vectors is omitted for clarity):
 \begin{equation}
 \eqalign{
 \boldsymbol{\sigma}_{xx}&=\left((\bm{N},_{\xi}\vec{U}_x).*(\vec{J}^{-1})_{11}+(\bm{N},_{\eta}\vec{U}_x).*(\vec{J}^{-1})_{21}\right).*\vec{A}_{11}\\
@@ -377,7 +378,7 @@ where \(.*\) denotes element-wise operation known as Hadamard product (the same 
 \hat{\boldsymbol{\varphi}}_y^{e=n}\\[2pt]
 \end{array}\right],}
 \end{equation}
-where \(n\) is the total number of elements in the spectral element mesh. Sparse matrices of shape function derivatives are formed in similar way, i.e.:
+where \(n\) is the total number of elements in the spectral element mesh. Sparse matrices of shape function derivatives are formed in a similar way, i.e.:
 \begin{equation}
 \bm{N},_{\xi} = \left[
 \begin{array}{cccc}  
@@ -404,18 +405,18 @@ In the second step internal forces are calculated on the degree of freedom level
 &+\boldsymbol{\sigma}_{yz}\,.*\vec{W},}
 \label{eq:internal_forces}
 \end{equation}
-where \(^T\) is the matrix transpose and \(\vec{W}\) is the vector resulting from multiplication of integration weights and Jacobian determinant at appropriate GLL points:
+where \(^T\) is the matrix transpose and \(\vec{W}\) is the vector resulting from the multiplication of integration weights and Jacobian determinant at appropriate GLL points:
 \begin{equation}
 \vec{W} = \vec{w}_{\xi}\,.*\vec{w}_{\eta}\,.*\left(\det\vec{J}\right).
 \end{equation}
-Since the internal forces are calculated for disjoined spectral elements, the assembly of a global vector \(\vec{F}^i\) is necessary. It can be performed according to mesh coloring algorithm proposed in~\cite{Kudela2016}. The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
+Since the internal forces are calculated for disjoined spectral elements, the assembly of a global vector \(\vec{F}^i\) is necessary. It can be performed according to mesh colouring algorithm proposed in~\cite{Kudela2016}. The algorithm uniformly divides the nodes of spectral elements within the whole mesh into 12 sets. The sets are of the same size so the computation can be perfectly balanced between workers or resources can be uniformly divided within one graphics card.
 
 Once internal forces \(\vec{F}^i\) are calculated and substituted into (\ref{eq:explicit_integration}), the displacements at time step \(t+\Delta t\) can be explicitly obtained from a perfectly vectorized code:
 \begin{equation}
 \vec{u}_{t+\Delta t}=1./\vec{M}_0\, .*\left(\vec{F}_t - \vec{F}^i +\vec{M}_1 \, .* \vec{u}_t +\vec{M}_2 \, .* \vec{u}_{t-\Delta t}\right),
 \label{eq:vectorized_motion}
 \end{equation} 
-in which terms \(\vec{M}_0\), \(\vec{M}_1\) and \(\vec{M}_2\) are stored as vectors and \(./\) is element--wise division. In particular all components in (\ref{eq:internal_forces}) as well as in (\ref{eq:vectorized_motion}) are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, the implementation is simple whereas CUDA GPU computation is transparent to the user. 
+in which terms \(\vec{M}_0\), \(\vec{M}_1\) and \(\vec{M}_2\) are stored as vectors and \(./\) is element--wise division. In particular, all components in (\ref{eq:internal_forces}) as well as in (\ref{eq:vectorized_motion}) are implemented in Matlab Parallel Computing Toolbox as \verb|gpuArray|. In this way, the implementation is simple whereas CUDA GPU computation is transparent to the user. 
 
 \subsection{Signal sensing}
 
@@ -428,7 +429,7 @@ Piezoelectric sensors are considered in the model in terms of stiffness and mass
 &+ \frac{h}{2} (\bm{N},_{\xi}^{pzt}\boldsymbol{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{21}^{pzt} + \frac{h}{2} \left.\left.(\bm{N},_{\eta}^{pzt}\boldsymbol{\Phi}_y^{pzt}).*(\vec{J}^{-1})_{22}^{pzt}\right)\right] \frac{h_{pzt}}{g_{33}},} 
 \label{eq:pzt_sensing}
 \end{equation}
-where \(e_{31}\) and \(e_{32}\) are piezoelectric coupling constants, \(g_{33}\) is the extensional voltage constant, \(h_{pzt}\) is the thickness of piezoelectric sensor. The submatrices and subvectors in (\ref{eq:pzt_sensing}) denoted by \(pzt\) subscript or superscript corresponds to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of \(\vec{s}^{pzt}\) at particular integration time step gives voltage value. It should be noted that the nodes of an element do not have electric potential degrees of freedom. The voltage is calculated directly from displacements.
+where \(e_{31}\) and \(e_{32}\) are piezoelectric coupling constants, \(g_{33}\) is the extensional voltage constant, \(h_{pzt}\) is the thickness of the piezoelectric sensor. The submatrices and subvectors in (\ref{eq:pzt_sensing}) denoted by \(pzt\) subscript or superscript correspond to nodes of appropriate spectral elements which form piezoelectric sensors. The mean value of \(\vec{s}^{pzt}\) at a particular integration time step gives voltage value. It should be noted that the nodes of an element do not have electric potential degrees of freedom. The voltage is calculated directly from displacements.
 
 \subsection{Delamination modelling \label{sec:delam_model}}
 
@@ -439,19 +440,19 @@ The concept of delamination modelling is the same as in~\cite{Kudela2009}. The f
 	\caption{The concept of delamination modelling: cross-section through the composite laminate and delamination showing three regions: (I) undelaminated, (II) above delamination interface, and (III) below delamination interface and corresponding elements.}
 	\label{fig:delam_modelling_shell}
 \end{figure}
-In the flat shell all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. In other words, at the delamination are two shell elements on top of each other that have the same nodal positions but the nodes are not merged. On the boundary of the delamination, the nodes of all shell elements are then again merged.
+In the flat shell, all spectral elements are located at the neutral plane. There are two layers of elements at the delamination region with zero gap between them. In other words, at the delamination are two shell elements on top of each other that have the same nodal positions but the nodes are not merged. On the boundary of the delamination, the nodes of all shell elements are then again merged.
 
-The contact effect is neglected (penetration of nodes is allowed) but such model seems to be accurate enough for the SHM applications. It should be noted that the delamination can be placed at arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through thickness integrals over appropriate composite layers (see (\ref{eq:delam_plate_mass_dens}) and (\ref{eq:stiffness_contribution})).
+The contact effect is neglected (penetration of nodes is allowed) but such a model seems to be accurate enough for the SHM applications. It should be noted that the delamination can be placed at an arbitrary interface between composite layers. The contribution to stiffness and inertia matrices is calculated separately for regions I, II and III, respectively taking into account through-thickness integrals over appropriate composite layers (see (\ref{eq:delam_plate_mass_dens}) and (\ref{eq:stiffness_contribution})).
 
 \subsection{Interpolation on a uniform grid}
 
-With the advent of laser vibrometry, many algorithms for damage visualization have been developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for straightforward comparison of their efficiency. However, the mesh of spectral elements is usually unstructured due to the analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. This makes it difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required where the grid of spatial points must be uniform. For this reason, an interpolation technique for the spectral element wavefield on a uniform grid of points on the top or bottom surfaces of the shell has been developed. 
+With the advent of laser vibrometry, many algorithms for damage visualization have been developed in which full wavefield data is used. Such algorithms can be tested also on synthetic data for a straightforward comparison of their efficiency. However, the mesh of spectral elements is usually unstructured due to the analysed features such as delamination as well as piezoelectric transducers. Moreover, the nodes of spectral elements are non-uniformly distributed and correspond to GLL points. This makes it difficult to apply damage visualization algorithms for such numerically simulated wavefields, especially when Fourier transforms are required where the grid of spatial points must be uniform. For this reason, an interpolation technique for the spectral element wavefield on a uniform grid of points on the top or bottom surfaces of the shell has been developed. 
 
 The implemented interpolation method utilizes the shape functions of spectral elements. The interpolation on a uniform grid of data points is accomplished in three steps: the determination of the element containing the data point (owner element), the transformation of the data point’s coordinates into the reference coordinate system (inverse mapping), and finally the application of the spectral element shape functions to determine the values of the primary variables at that point ((\ref{eq:delam_plateaproxim})).
 
 In the first step, the algorithm sequentially scans the full list of spectral elements using the bounding box test. If the element fails the bounding box test, the algorithm moves to the next element in the list. If the data point is within the bounding box, the cross-product test is performed. The idea is to eliminate impossible owner elements with the computationally inexpensive bounding-box test before using the more expensive cross-product test~\cite{Silva2009}. It has been found that such implementation in case of 36--node spectral element meshes is generally faster than Matlab's \verb|inpolygon| function. It should be noted that the algorithm can be further refined by using the multiple bounding box test.
 
-The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account the spectral elements instead of the isoparametric hexahedral elements. As an initial point, the spectral node closest to the data point in the owner element \((x_p, y_p)\) is selected. Hence, its global coordinates \((x_0, y_0)\) as well as local coordinates \((\xi_0,\eta_0)\)  are known by construction of the element. In the first iteration, the inverse of the Jacobi matrix ((\ref{eq:Jacobi2D})) which is already stored in the memory is utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
+The second step of the algorithm is inspired by the work by Li et al.~\cite{Li2014} in which inverse mapping is done iteratively. But it is modified to take into account the spectral elements instead of the isoparametric hexahedral elements. As an initial point, the spectral node closest to the data point in the owner element \((x_p, y_p)\) is selected. Hence, its global coordinates \((x_0, y_0)\), as well as local coordinates \((\xi_0,\eta_0)\), are known by the construction of the element. In the first iteration, the inverse of the Jacobi matrix ((\ref{eq:Jacobi2D})) which is already stored in the memory is utilized. The computation is performed for all data points in regular mesh in parallel, hence: 
 \begin{equation}
 \eqalign{
 \boldsymbol{\xi}_{k+1}=\boldsymbol{\xi}_k + \left(\vec{J}^{-1}_{k}\right)_{11}\,.*\left(\vec{x}_p-\vec{x}_k\right) +  \left(\vec{J}^{-1}_{k}\right)_{12}\,.*\left(\vec{y}_p-\vec{y}_k\right), \\
@@ -462,18 +463,16 @@ in which \(k=0\) in the first iteration.
 
 Next, shape functions and Jacobians are evaluated at \((\boldsymbol{\xi}_{1}, \boldsymbol{\eta}_{1})\) points. The global coordinates of interpolated point \((x_1,y_1)\) in the owner element in the first iteration are calculated by using (\ref{eq:delam_plategeom}). Three iterations are used in the current implementation. Finally, spectral element shape functions are evaluated at interpolated local coordinates \(N(\tilde{\xi}_p,\tilde{\eta}_p)\) and the wavefield is approximated by using (\ref{eq:delam_plateaproxim}).
 
-The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas  \verb|griddata| function must be called for each frame separately which is inefficient.
+The developed interpolation method in case of dense meshes used for wave propagation simulations is faster than Matlab embedded function \verb|griddata| which generate interpolation meshes via Delaunay triangulation. The advantage of the proposed approach is that once shape functions are evaluated at interpolated local coordinates, they are stored and used for each frame of propagating waves for wavefield interpolation whereas \verb|griddata| function must be called for each frame separately which is inefficient.
 
-\subsection{Computation speedup analysis}
+\subsection{Computation speed-up analysis}
 
-The computational performance of the code was tested on a composite plate of material parameters introduced in Section~\ref{sec:ogw}. The plate had one embedded delamination. The applied excitation was a sinusoidal tone-burst signal of carrier frequency 50~kHz modulated by Hann window (five periods were used). It was applied to the piezoelectric transducer located at the centre of the plate on the top surface. The size of the plate has been increased gradually, so that meshes contained more and more nodes (30\(\times\)30 cm, 40\(\times\)40 cm, 50\(\times\)50 cm, 70\(\times\)70 cm, 90\(\times\)90 cm, 100\(\times\)100 cm). The total run times for the investigated meshes and the corresponding numbers of degrees of freedom (NDOF) are given in table~\ref{tab:run_time}. The computation speedup for various meshes was calculated as follows:
+The computational performance of the code was tested on a composite plate of material parameters introduced in Section~\ref{sec:ogw}. The plate had one embedded delamination. The applied excitation was a sinusoidal tone-burst signal of carrier frequency 50~kHz modulated by Hann window (five periods were used). It was applied to the piezoelectric transducer located at the centre of the plate on the top surface. The size of the plate has been increased gradually so that meshes contained more and more nodes (30\(\times\)30 cm, 40\(\times\)40 cm, 50\(\times\)50 cm, 70\(\times\)70 cm, 90\(\times\)90 cm, 100\(\times\)100 cm). The total run times for the investigated meshes and the corresponding numbers of degrees of freedom (NDOF) are given in table~\ref{tab:run_time}. The computation speed-up for various meshes was calculated as follows:
 \begin{equation}
-speedup = \frac{CPU_{time}}{GPU_{time}}
-\label{eq:speedup}
+speed-up = \frac{CPU_{time}}{GPU_{time}}
+\label{eq:speed-up}
 \end{equation}
-where \(CPU_{time}\) is the average time of computation of one integration time step on a single core CPU (computations were performed on a workstation equipped with 6 quad core Intel
-Xeon X5660 2.8~GHz) and \(GPU_{time}\) is the average time of computation of one integration time step on
-GPU (computations were performed on Nvidia Tesla K20X). It can be seen in figure~\ref{fig:speedup} that parallel version of the code run on Tesla K20X GPU card about 5--12\(\times\) faster than on single CPU (depending on the size of the problem). The trend of computation speedup is non-linear, of type \(\sqrt{NDOF}\). 
+where \(CPU_{time}\) is the average time of computation of one integration time step on a single core CPU (computations were performed on a workstation equipped with 6 quad-core Intel Xeon X5660 2.8~GHz) and \(GPU_{time}\) is the average time of computation of one integration time step on GPU (computations were performed on Nvidia Tesla K20X). It can be seen in figure~\ref{fig:speed-up} that parallel version of the code run on Tesla K20X GPU card about 5--12\(\times\) faster than on single CPU (depending on the size of the problem). The trend of computation speed-up is non-linear, of type \(\sqrt{NDOF}\). 
 
 \begin{table}
 		\caption{Computation run times depending on the number of degrees of freedom (NDOF) for the wave propagation duration 400~\(\mu\)s; GPU: Nvidia Tesla K20X; CPU: Intel Xeon X5660 2.8~GHz.}
@@ -497,8 +496,8 @@ GPU (computations were performed on Nvidia Tesla K20X). It can be seen in figure
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure3.png}	
-	\caption{Computation speedup according to (\ref{eq:speedup}); NDOF - number of degrees of freedom.}
-	\label{fig:speedup}
+	\caption{Computation speed-up according to (\ref{eq:speed-up}); NDOF - number of degrees of freedom.}
+	\label{fig:speed-up}
 \end{figure}
 \newpage
 
@@ -512,25 +511,25 @@ Potential applications of the proposed model include:
 	\item benchmarking of algorithms which use full wavefield data,
 	\item a damage classification using machine learning.
 \end{itemize}
-The following differences should be noted  between the model--based and model--assisted structural health monitoring.
-In the model--based approach, numerical signals must match very well experimental signals. It is because numerical signals are used in an inverse method in which a certain objective function includes terms such as:
+The following differences should be noted between the model-based and model-assisted structural health monitoring.
+In the model-based approach, numerical signals must match very well experimental signals. It is because numerical signals are used in an inverse method in which a certain objective function includes terms such as:
 \begin{equation}
 g(t) = \sum_{i=1}^{N} \left(s(t)_i^{exp} - s(t)_i^{num}\right)^2,
 \label{eq:obj_fun}
 \end{equation}
 where \(s(t)^{exp}\) and \(s(t)^{num}\) are experimental and numerical signals (or damage indexes), respectively.
 
-In the model--assisted approach, on the other hand, the modelled phenomenon must reflect the real behaviour, e.g. the amplitude of a transmitted wave packet decreases when the size of the damage increases. But in this case, the perfect match between numerical and experimental signals is not necessary. The aim of the presented method is model--assisted structural health monitoring.
+In the model-assisted approach, on the other hand, the modelled phenomenon must reflect the real behaviour, e.g. the amplitude of a transmitted wave packet decreases when the size of the damage increases. But in this case, the perfect match between numerical and experimental signals is not necessary. The aim of the presented method is model-assisted structural health monitoring.
 
-Obviously, it is easier to incorporate damage into the model e.g. in the form of delamination at various locations, than conduct multiple experiments. Therefore, it is necessary to validate the proposed model so that it can be used for benchmark data set generation. Such data set can be used for evaluation and quantitative comparison of guided wave--based algorithms for damage detection and localisation in thin-walled structures (by using signals registered by sensors or full wavefield data acquired at the top or bottom surfaces).
+Obviously, it is easier to incorporate damage into the model e.g. in the form of delamination at various locations, than conduct multiple experiments. Therefore, it is necessary to validate the proposed model so that it can be used for benchmark data set generation. Such data set can be used for evaluation and quantitative comparison of guided wave-based algorithms for damage detection and localisation in thin-walled structures (by using signals registered by sensors or full wavefield data acquired at the top or bottom surfaces).
 
 Also due to reasonable computation times, it is possible to simulate thousands of examples which can be used for machine learning or in particular deep neural network training. Such soft computing methods can be used for damage localization, classification and size estimation. But still, it will take quite a long time, e.g. 1000 simulations run for 3 hours each gives 125 days of computations on old single Nvidia Tesla K20X GPU. However, the run time can be significantly reduced by using multiple modern GPUs.
 
 \section{Experimental validation}
 \subsection{Open Guided Waves \label{sec:ogw}}
-Numerical simulations were validated by using benchmark experimental data sets: Open Guided Waves~\footnote{\url{http://www.open-guided-waves.de}}. Open Guided Waves is an extendable online platform where high--quality and well documented datasets for guided wave--based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon--fibre--reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm \(\times\) 500 mm and a thickness of 2 mm. The diameter of piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in table~\ref{tab:mat_prop}. It should be added that 0\(^{\circ}\) fibre orientation is along the vertical edge of the specimens.
+Numerical simulations were validated by using benchmark experimental data sets: Open Guided Waves~\footnote{\url{http://www.open-guided-waves.de}}. Open Guided Waves is an extendable online platform where high-quality and well-documented datasets for guided wave-based inspections are provided~\cite{Moll2018}. The benchmark structures used for validation were quasi--isotropic carbon-fibre-reinforced polymer (CFRP) plates with embedded piezoelectric transducers. The layup was [45/0/-45/90/-45/0/45/90]\textsubscript{S}. CFRP plates had the dimensions of 500 mm \(\times\) 500 mm and a thickness of 2 mm. The diameter of the piezoelectric transducers was 10 mm and the thickness 0.2 mm. The specimens were based on prepreg material Hexply\textsuperscript{\textregistered} M21/34\%/UD134/T700/300. The established material properties for unidirectional Hexply material are given in table~\ref{tab:mat_prop}. It should be added that 0\(^{\circ}\) fibre orientation is along the vertical edge of the specimens.
 
-Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wavefield plate" and "SHM plate", respectively. The former data set consists of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometry. In this case only one quarter of the plate was measured. The latter data set consists of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see \cite{Moll2018} for more details or compare to figure~\ref{fig:quad_mesh} representing the mesh used for numerical modelling). The excitation signal was a 5-cycle Hann-filtered sine wave amplified to \(\pm\)150~V in case of the wavefield plate and  \(\pm\)100~V in case of SHM plate. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for measurements in the SHM plate.
+Two data sets were utilized for qualitative and quantitative validation of the numerical model: "wavefield plate" and "SHM plate", respectively. The former data set consists of full wavefield measurements of propagating guided waves excited by piezoelectric transducer placed in the centre of the plate and acquired by scanning laser Doppler vibrometry (SLDV). In this case, only one-quarter of the plate was measured (see figure~\ref{fig:wavefield_plate}). The latter data set consists of signals excited and registered by 12 piezoelectric sensors bonded to the surface of the plate, 6 in one row on the top and 6 in one row on the bottom (see figure~\ref{fig:shm_plate})~ \cite{Moll2018}. The excitation signal was a 5-cycle Hann-filtered sine wave amplified to \(\pm\)150~V in case of the wavefield plate and  \(\pm\)100~V in case of SHM plate. The excitation carrier frequency was 50~kHz for wavefield measurement and 40~kHz for measurements in the SHM plate.
 \begin{table}
 	\caption{Material properties of unidirectional Hexply M21/34\%/UD134/T700/300 according to~\cite{Moll2018}; Units: GPa.}
 	\begin{indented}
@@ -559,10 +558,10 @@ Two data sets were utilized for qualitative and quantitative validation of the n
 \end{figure}
 
 \subsection{Defects}
-In both experiments defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
+In both experiments, defects were simulated by an aluminium disk with a diameter of 10 mm coupled to the structure by tacky tape. The underlying idea of using this reversible damage is to provide measurement data at various places on the structure so that model-assisted probability of detection (MAPOD) techniques can be developed~\cite{Eckstein2012}. The coordinates of defects in respect to the lower-left corner of the plate which has been selected for numerical model validation are given in table~\ref{tab:defect_coordinates}.
 
 % added mass about 0.6g
-In the numerical model, two defect modelling techniques were investigated: delamination as described in Section~\ref{sec:delam_model} and added mass (an aluminum disk with a diameter of 10~mm and thickness 3~mm). The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
+In the numerical model, two defect modelling techniques were investigated: delamination as described in Section~\ref{sec:delam_model} and added mass (an aluminium disk with a diameter of 10~mm and thickness 3~mm). The delamination was modelled between 4\textsuperscript{th} and 5\textsuperscript{th} layer of composite laminate counting from the top surface.
 \begin{table}
 	\caption{Coordinates of analysed defects; Units: [m].}
 	\begin{indented}
@@ -585,7 +584,7 @@ In the numerical model, two defect modelling techniques were investigated: delam
 \end{table}	
 	
 \subsection{Meshing}
-The external meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisting of quadrilateral elements (see figure~\ref{fig:quad_mesh}). The mesh is saved in Matlab format and postprocessed by in-house code to generate spectral elements with a nodal distribution according to GLL points. A detailed view of the spectral element mesh near the defect is shown in figure~\ref{fig:spec_mesh_zoom}. 
+The external meshing software GMSH~\cite{Geuzaine2009} is used for generating a mesh consisting of quadrilateral elements (see figure~\ref{fig:quad_mesh}). The mesh is saved in Matlab format and post-processed by in-house code to generate spectral elements with a nodal distribution according to GLL points. A detailed view of the spectral element mesh near the defect is shown in figure~\ref{fig:spec_mesh_zoom}. 
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure4.png}	
@@ -595,17 +594,17 @@ The external meshing software GMSH~\cite{Geuzaine2009} is used for generating a 
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure5.png}	
-	\caption{Close up of spectral element mesh in the damage area (green) and piezoelectric transducers no. 3 and 4.}
+	\caption{Close up of spectral element mesh in the damaged area (green) and piezoelectric transducers no. 3 and 4.}
 	\label{fig:spec_mesh_zoom}
 \end{figure}
 \clearpage
 
 \subsection{Wavefield plate data set }
-A comparison of experimental and numerical full wavefield data for selected time instances is presented in figure~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (see (\ref{eq:first_derivative_scheme})) are shown only for a quarter of the plate on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that for both modelling techniques, i.e. delamination (figure~\ref{fig:num_frame72}, figure~\ref{fig:num_frame108}) and added mass (figure~\ref{fig:num_frame72_added_mass}, figure~\ref{fig:num_frame108_added_mass})	the wavefield patterns matches the experimental data very well. However, as expected, the interaction of the wave front with added mass is slightly different than with delamination: the added mass interaction with the wavefront is more pronounced compared to the case of the delamination, which is especially visible at time frame \(t=112.5\,  \mu\)s. The wave reflection pattern is the same in each case. It can be attributed to the fact that the added mass locally changes overall inertia and stiffness of the shell whereas delamination influences only stiffness. 
+A comparison of experimental and numerical full wavefield data for selected time instances is presented in figure~\ref{fig:wavefields_comparison}. The wavefield patterns in the form of transverse velocities (see (\ref{eq:first_derivative_scheme})) are shown only for a part of a quarter of the plate (see figure~\ref{fig:wavefield_plate}) on the surface opposite to the piezoelectric actuator (bottom surface). It can be noticed that the wavefield patterns match the experimental data very well. However, S0 to A0 mode conversion is more visible in numerical wavefield at the time \(t=112.5\,  \mu\)s. The direct A0 mode wave reflection pattern is almost the same in experimental and numerical wavefield.
 
 The differences between the interaction of the guided waves with the delamination in comparison to an added mass are especially visible on numerical full wavefield data collected at the top surface of the plate (see figure~\ref{fig:wave_entrapment}). The phenomenon of wave entrapment at the defect location is present only in case of the delamination (figure~\ref{fig:num_frame128_top}) whereas it is not present in case of the added mass (figure~\ref{fig:num_frame128_added_mass_top}). The results related to the wave entrapment at delamination are consistent with the experimental findings available in the literature~\cite{Glushkov2012}. 
 
-Despite these differences it seems that reversible damage in the form of added mass coupled to the structure by tacky tape is a good way for collecting benchmark data set. Such benchmark data set is a good starting point for development of algorithms based on full wavefield data for visualization of defect location even in the form of delamination.
+Despite these differences, it seems that reversible damage in the form of added mass bonded to the structure by removable double-sided adhesive tape is a good way for collecting benchmark data set. Such benchmark data set is a good starting point for the development of algorithms based on full wavefield data for visualization of defect location even in the form of delamination.
 
 \begin{figure} [h!]
 	\centering
@@ -633,11 +632,11 @@ Despite these differences it seems that reversible damage in the form of added m
 
 The comparison of experimental and numerical signals for selected transducer pairs is presented in Figs.~\ref{fig:path1_7}--\ref{fig:path4_8}. The transducer pair 1--7 means that the guided waves were excited in actuator 1 and registered in sensor 7 (see figure~\ref{fig:quad_mesh}). The first wave packet in the experimental signals should be ignored because it represents the effect of electromagnetic crosstalk.
 
-In opposite to very good qualitative wavefield results, differences between experimental and numerical signals are evident. However, these differences are related to the amplitude rather than wave velocity. It could be because of slight variations in layer thicknesses and different material damping in comparison to the numerical model. It should be also added, that both symmetric and antisymmetric wave modes are present in the signal in contrast to the wavefield measurements in which transverse wave components dominates. These wave modes overlap causing constructing or destructive interference. The wave packet positions calculated numerically match well wave packet positions in measured signals. A slight exception is observed in figure~\ref{fig:path1_7} in which in experimental signals only one wave packet exist at about 450~\(\mu\)s which is actually superposition of two wave packets as the numerical simulation suggest. Also at the same figure the wave packet at about 650~\(\mu\)s is wider in experiment than in numerical results. 
+In opposite to very good qualitative wavefield results, differences between experimental and numerical signals are evident. However, these differences are related to the amplitude rather than wave velocity. It could be because of slight variations in layer thicknesses and different material damping in comparison to the numerical model. It should be also added, that both symmetric and antisymmetric wave modes are present in the signal in contrast to the wavefield measurements in which transverse wave components dominate. These wave modes overlap causing constructing or destructive interference. The wave packet positions calculated numerically match well wave packet positions in measured signals. A slight exception is observed in figure~\ref{fig:path1_7} in which in experimental signals only one wave packet exist at about 450~\(\mu\)s which is actually a superposition of two wave packets as the numerical simulation suggest. Also at the same figure, the wave packet at about 650~\(\mu\)s is wider in the experiment than in numerical results. 
 
 The greatest difference between experimental and numerical wave packet amplitude is in figure~\ref{fig:path4_8} at about 570~\(\mu\)s. It can be attributed to the damping coefficient selected in numerical simulation. It should be underlined that the material damping is very important because it affects attenuation of guided wave modes and in turn particular wave packets in signals. It has been assumed in the model that the damping matrix is proportional to the mass matrix \(\bm{C} = \alpha \bm{M}\). In the current modelling approach, the coefficient \(\alpha\) was estimated according to the procedure described in sec.~\ref{sec:damping} as \(\alpha = 3969\). 
 
-Another important fact is that the delamination affect signals more than added mass. This effect is especially visible in figure~\ref{fig:path1_7} and figure~\ref{fig:path2_4}. Since reversible damage in the form of added mass coupled to the structure by tacky tape affect less signals of guided waves than delamination, such signals are more challenging for signal processing methods. Therefore, it can be concluded that the experimental data set provides good benchmark for development of damage detection and localization algorithms. The next step could be comparison of variety of damage detection and localization algorithms by using the same data set.
+Another important fact is that the delamination affects signals more than added mass. This effect is especially visible in figure~\ref{fig:path1_7} and figure~\ref{fig:path2_4}. Since reversible damage in the form of added mass coupled to the structure by tacky tape affect signals of guided waves less than delamination, such signals are more challenging for signal processing methods. Therefore, it can be concluded that the experimental data set provides a good benchmark for the development of damage detection and localization algorithms. The next step could be a comparison of a variety of damage detection and localization algorithms by using the same data set.
 
 \begin{figure} [h!]
 	\centering
@@ -661,7 +660,7 @@ Another important fact is that the delamination affect signals more than added m
 	\label{fig:path4_8}
 \end{figure}
 \clearpage
-The conducted signal analysis leads to the conclusion that model based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. It is because the overall wave behaviour such as wave amplitude change due to damage and interaction of elastic waves with damage is properly modelled. It especially visible in case of differential signals presented in~figure~\ref{fig:path1_7_diff}. The differential signals are calculated as 'baseline' minus 'added mass' signals. The operation is performed separately for experimental and numerical signals. It can be seen that both in experimental and numerical differential signals, wave packets at about 200~\(\mu\)s and 400~\(\mu\)s gives greatest difference due to added mass. Even the amplitude of differential signals are on the same level.
+The conducted signal analysis leads to the conclusion that a model-based approach in which numerical signals are directly compared to experimental one is not feasible with the current model. However, the developed model is perfectly suited for model--assisted approaches. It is because the overall wave behaviour such as wave amplitude change due to damage and interaction of elastic waves with damage is properly modelled. It especially visible in case of differential signals presented in~figure~\ref{fig:path1_7_diff}. The differential signals are calculated as 'baseline' minus 'added mass' signals. The operation is performed separately for experimental and numerical signals. It can be seen that both in experimental and numerical differential signals, wave packets at about 200~\(\mu\)s and 400~\(\mu\)s gives the greatest difference due to added mass. Even the amplitude of differential signals is on the same level.
 
 \begin{figure} [h!]
 	\centering
@@ -681,9 +680,64 @@ The conducted signal analysis leads to the conclusion that model based approach 
 	\caption{Comparison of experimental and numerical differential signals for transducer pairs 4--8, frequency 40~kHz.}
 	\label{fig:path4_8_diff}
 \end{figure}		
-It should be noted that with the proposed parallel implementation it is easy to perform any parametric study (e.g. the analysis of wave behaviour due to delamination of various sizes) because of relatively short computation time. The run time of simulation for the case of excitation in one actuator was about 3 hours (for the wave propagation duration 1300~\(\mu\)s and integration time step \(\Delta t = 10.6\)~ns). The total number of degrees of freedom in the investigated SHM plate was 2.23 millions. The GPU memory usage was about 925~MB.
+It should be noted that with the proposed parallel implementation it is easy to perform any parametric study (e.g. the analysis of wave behaviour due to delamination of various sizes) because of relatively short computation time. The run time of simulation for the case of excitation in one actuator was about 3 hours (for the wave propagation duration 1300~\(\mu\)s and integration time step \(\Delta t = 10.6\)~ns). The total number of degrees of freedom in the investigated SHM plate was 2.23 million. GPU memory usage was about 925~MB.
 
 \subsection{Damping effect \label{sec:damping}}
+The most common viscous damping description is the Rayleigh damping model, in which a linear combination of mass and stiffness matrices is used. This Rayleigh damping is defined as:
+\begin{equation}
+\bm{C}= \alpha \bm{M} + \beta \bm{K}
+\label{eq:rayleigh_damping}
+\end{equation}
+where \(\alpha\) and \(\beta\) are the mass and stiffness proportionality coefficients, respectively. 
+In order to estimate Rayleigh damping coefficient as an input parameter for the model, a simple method based on the full wavefield data was developed. 
+The wave attenuation consists of two components, one due to geometric spreading, \(1/\sqrt d\), and the other due to structural damping, \(\mathrm{e}^{-\eta d}\), where \(d\) is the distance between the wave source (actuator) and sensing point and \(\eta\) is the wave damping coefficient. 
+In the case of a single frequency, the behaviour of propagating waves can be described in the form:
+\begin{equation}
+s_0(d,t) = A \frac{1}{\sqrt d} \,\mathrm{e}^{-\eta d} \, \mathrm{e}^{\mathrm{i} \left( \omega t - k d \right)}
+\end{equation}
+where \(A\) is the magnitude of the signal, \(k\) is the wavenumber and \(\omega\) is the angular frequency. 
+Without going into details the relation between damping coefficient \(\eta\) and proportionality damping coefficients \(\alpha\) and \(\beta\) given in~(\ref{eq:rayleigh_damping}) can be written as~\cite{Gresil2015}:
+\begin{equation}
+\frac{1}{2} \left( \alpha + \beta \omega^2 \right) = \eta \, c_0
+\end{equation} 
+where \(c_0\) is the wave velocity. In the particular case when \(\beta = 0\), it leads to:
+\begin{equation}
+\alpha = 2 c_o \eta
+\label{eq:alpha_prop}
+\end{equation}
+which means that proportionality holds.
+The influence of geometric spreading can be eliminated by calculation of the normalized energy in the form:
+\begin{equation}
+E(t) = \left\Vert \iint  s(X,Y,t)^2 \, \ud X \ud Y \right\Vert
+\label{eq:energy}
+\end{equation}
+where \(s\) is the wavefield data. 
+Since energy is an integral over space and we consider wave packet of certain group velocity we can estimate damping coefficient by fitting a curve in the form \(f(t+\Delta t) = \mathrm{e}^{-\alpha t}\) to the normalized energy function.
+The translation \(\Delta t\) is the time duration necessary to generate maximum energy.
+In other words the following optimisation problem has to be solved:
+\begin{equation}
+\arg \min_{\alpha}   \left\Vert E(t) - f(t+\Delta t) \right\Vert
+\end{equation}
+This procedure was applied to the wavefield data measured by SLDV on a quarter of unidirectional CFRP composite laminate of dimensions 1200 \(\times\) 1200 mm and total thickness 2.85 mm.
+The signals were measured by one head of SLDV placed perpendicularly to the surface of the specimen.
+Special care was taken in order to simulate signals on the same grid of 491\(\times\)491 points.
+The following results were obtained depending on the excitation frequency:
+\begin{equation}
+\alpha =  \left \{
+\begin{array}{rl}  
+2368 & \mathrm{for\, 16.5\, kHz} \\[2pt]
+9514 &\mathrm{for\, 50\, kHz}  \\[2pt]
+27210 &\mathrm{for\, 100\, kHz} 
+\end{array} \right.
+\label{eq:determined_alpha}
+\end{equation}
+Numerical calculations were performed for the determined  \(\alpha\) values as well as an additional one in order to check under-damped and over-damped cases.
+Normalized energy was calculated according to (\ref{eq:energy}) for numerical wavefield data as well as for experimental wavefield data.
+The results are compared in figures \ref{fig:damping16_5}--\ref{fig:damping100}.
+It can be seen that the energy calculated for the experimental wavefield data best matches the energy calculated for the numerical wavefield data for \(\alpha\) values determined during optimisation as given in (\ref{eq:determined_alpha}). 
+These curves are in red colour.
+Very good match is observed for all chosen frequencies: 16.5 kHz (figure~\ref{fig:damping16_5}), 50 kHz (figure~\ref{fig:damping50}) and 100 kHz (figure~\ref{fig:damping100}), respectively.
+The over-damped case is represented by green curves whereas the under-damped case is represented by blue curves.
 \begin{figure} [h!]
 	\centering
 		\subfloat[]{\includegraphics{figure12.png}\label{fig:damping16_5}}
@@ -694,26 +748,42 @@ It should be noted that with the proposed parallel implementation it is easy to 
 	\caption{Damping effect in terms of energy.}
 	\label{fig:damping}
 \end{figure}
+
+Further validation of the proposed model was performed by comparing numerical and experimental signals at two points A(450,300) and B(300,300).
+The results are presented in figures~\ref{fig:damping_signals_16_5}--\ref{fig:damping_signals_100}.
+The particle motion velocities in the laser beam axis were registered (default option in Polytec software). 
+Hence, units of the registered amplitude in figures \ref{fig:damping_signals_16_5}--\ref{fig:damping_signals_100} was set to mm/s.
+The amplitudes of experimental signals are on a similar level as amplitudes of numerical signals calculated for determined \(\alpha\) values (\ref{eq:determined_alpha}).
+It proves that the overall attenuation behaviour is modelled properly.
+However, the relative errors in modelled amplitudes are still large: 31\% for 16.5 kHz, 
+18\% for 50 kHz and 27\% for 100 kHz.
+It can be attributed to the piezoelectric electrode placement, bonding layer, composite laminate material non-uniformity, etc. which are not taken into consideration in the model. 
+
+Also, small discrepancies of the wave velocities occur, resulting in the time shift between experimental and numerical signals.
+The time shift is equal to about 2-4 \(\mu\)s and varies depending on the measurement point and excitation frequency.
+It should be noted that for frequency 100 kHz (figure~\ref{fig:damping_signals_100}) additional modes of propagating waves appears.
+These modes cannot be represented correctly by the model due to low order theory used for the displacement representation across the thickness of the plate.
 \begin{figure} [h!]
 	\centering
 		\includegraphics{figure17.png}
-	\label{fig:damping_signals_16_5}
-	\caption{Signals at point A and B for the excitation frequency 16.5 kHz.}
+		\caption{Signals at point A and B for the excitation frequency of 16.5 kHz.}
+		\label{fig:damping_signals_16_5}
 \end{figure}
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure18.png}
+	\caption{Signals at point A and B for the excitation frequency of 50 kHz.}
 	\label{fig:damping_signals_50}
-	\caption{Signals at point A and B for the excitation frequency 50 kHz.}
 \end{figure}
 \begin{figure} [h!]
 	\centering
 	\includegraphics{figure19.png}
+	\caption{Signals at point A and B for the excitation frequency of 100 kHz.}
 	\label{fig:damping_signals_100}
-	\caption{Signals at point A and B for the excitation frequency 100 kHz.}
 \end{figure}
+\clearpage
 \section{Conclusions}
-A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows up to 12\(\times\) computation speed-up in comparison to CPU. It also does not require assembly of stiffness matrix. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
+A novel parallel implementation of the time domain spectral element method has been developed. The method utilizes flat shell spectral elements based on first-order shear deformation theory as a basis of implementation. The developed code is highly parallel and enables GPU computation. It allows up to 12\(\times\) computation speed-up in comparison to CPU. It also does not require assembly of the stiffness matrix. Therefore, larger guided wave propagation problems can be solved than in case of conventional finite element approach.
 
 The simulated wave propagation in composite laminates matches well the experimental data acquired from Open Guided Waves platform in terms of full wavefield patterns. However, the quantitative comparison of signals reveals that there are certain differences especially in the amplitudes of the wave packets. Thus, there are still challenges to overcome which are related to proper wave attenuation modelling. In future, it is also worthwhile to investigate the optimization of elastic and piezoelectric constants for further reduction of differences between experiments and simulations.
 
@@ -727,7 +797,7 @@ Economic Affairs and Energy (Grant 03SX422B). The research was partially funded 
 
 \section*{References}
 %\begin{thebibliography}{<num>}
-\bibliography{Parallel_SMS}{}
+\bibliography{Parallel_SMS_R1}{}
 
 \end{document}
 
