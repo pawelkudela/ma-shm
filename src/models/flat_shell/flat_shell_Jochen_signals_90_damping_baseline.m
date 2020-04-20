@@ -22,7 +22,7 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 % NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 11;
-tasks=[1:12];
+tasks=[1:4];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','undelam_Jochen_signals_D5_a_5mm_b_5mm_angle_0'); % 
 

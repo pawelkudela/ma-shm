@@ -38,7 +38,7 @@ copyfile(fig_source,fig_destination);
 movefile([fig_destination,figname],[fig_destination,'figure19.png'],'f');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-modelname='Parallel_SMS_Differential_Signals';
+modelname='Parallel_SMS_Differential_Signals2';
 
 figname=['path_1_7_diff.png'];
 fig_source=[figs_source_folder,modelname,'_out',filesep,figname];

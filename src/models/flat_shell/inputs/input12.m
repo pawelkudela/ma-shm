@@ -81,7 +81,7 @@ rho = repmat(rho,[lay,1]);
 
 % damping coefficient proportional to mass matrix
 etad_xy=4e2; % damping ratio
-etad_z=3969e3; % damping ratio
+etad_z=3969; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,7 +128,6 @@ epsT=   [dp(1,5)/gp(1,5)       0                         0;
 rho_pzt=7850;%[kg/m3]
 pzt_thickness =0.2/1000; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]
-
 %% added mass properties
 rho_added_mass = 2700; %[kg/m3]
 added_mass_thickness = 3/1000; % [m]

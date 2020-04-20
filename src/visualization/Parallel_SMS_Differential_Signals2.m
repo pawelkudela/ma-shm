@@ -13,15 +13,15 @@ idx = strfind( pathstr,filesep );
 modelname = name; 
 figure_output_path = prepare_figure_paths(modelname);
 modelfolder = 'flat_shell'; % name of folder
-modelname_baseline =  'flat_shell_Jochen_signals_90_damping_baseline';
-modelname_damaged = 'flat_shell_Jochen_signals_90_damping_added_mass';
+modelname_baseline =  'flat_shell_Jochen_signals_90_damping_baseline2';
+modelname_damaged = 'flat_shell_Jochen_signals_90_damping_added_mass2';
 % prepare model input paths
 model_baseline_path = prepare_model_paths('raw','num',modelfolder,modelname_baseline);
 model_damaged_path = prepare_model_paths('raw','num',modelfolder,modelname_damaged);
 %% Input for flat_shell
 tasks = [1:4]; % 
 % scaling of numerical data
-scaling=3;
+scaling=40;
 %% input for experiment
 % create path to the experimental data folder
 input_data_path = fullfile( projectroot, 'data','external','exp','Jochen-Moll-Collab', 'SHM_plate',filesep );

@@ -14,14 +14,20 @@ modelname = name;
 figure_output_path = prepare_figure_paths(modelname);
 modelfolder = 'flat_shell'; % name of folder
 modelname_baseline =  'flat_shell_Jochen_signals_90_damping_baseline';
-modelname_damaged = 'flat_shell_Jochen_signals_90_damping_added_mass';
+modelname_baseline2 =  'flat_shell_Jochen_signals_90_damping_baseline2';
+modelname_added_mass = 'flat_shell_Jochen_signals_90_damping_added_mass';
+modelname_added_mass2 = 'flat_shell_Jochen_signals_90_damping_added_mass2';
+modelname_delamination = 'flat_shell_Jochen_signals_90_damping';
 % prepare model input paths
 model_baseline_path = prepare_model_paths('raw','num',modelfolder,modelname_baseline);
-model_damaged_path = prepare_model_paths('raw','num',modelfolder,modelname_damaged);
+model_baseline_path2 = prepare_model_paths('raw','num',modelfolder,modelname_baseline2);
+model_added_mass_path = prepare_model_paths('raw','num',modelfolder,modelname_added_mass);
+model_added_mass_path2 = prepare_model_paths('raw','num',modelfolder,modelname_added_mass2);
+model_delamination_path = prepare_model_paths('raw','num',modelfolder,modelname_delamination);
 %% Input for flat_shell
 tasks = [1:4]; % 
 % scaling of numerical data
-scaling=3;
+scaling=60;
 %% input for experiment
 % create path to the experimental data folder
 input_data_path = fullfile( projectroot, 'data','external','exp','Jochen-Moll-Collab', 'SHM_plate',filesep );
@@ -46,32 +52,46 @@ test_case = 1;
     load([model_path,'time',num2str(test_case)]);
     v_baseline=voltage;
     t_baseline=t;
-    model_path = [model_damaged_path,filesep,num2str(test_case),'_output',filesep];
+    model_path = [model_baseline_path2,filesep,num2str(test_case),'_output',filesep];
+    load([model_path,'voltage',num2str(test_case)]);
+    v_baseline2=voltage;
+    model_path = [model_added_mass_path,filesep,num2str(test_case),'_output',filesep];
     load([model_path,'voltage',num2str(test_case)]);
     v_mass=voltage;
-    % differential signal
-    figname = 'path_1_7_diff';
+    model_path = [model_added_mass_path2,filesep,num2str(test_case),'_output',filesep];
+    load([model_path,'voltage',num2str(test_case)]);
+    v_mass2=voltage;
+    model_path = [model_delamination_path,filesep,num2str(test_case),'_output',filesep];
+    load([model_path,'voltage',num2str(test_case)]);
+    v_delam=voltage;
+    % 
+    figname = 'path_1_7_diff baseline';
     figfilename = fullfile(figure_output_path,figname);
     figure;
     set(gcf, 'Units','centimeters', 'Position',[10 10 fig_width fig_height],'Color','w'); % size 12cm by 4cm (1-column text)
     hold on
     box on
-    plot(time, data_all_baseline(:,signal_no)-data_all(:,signal_no),'k:','LineWidth',4*linewidth);
-    xlim([0 1200]);
-    axis([0 1200 -0.01 0.01]);
+    plot(time, data_all_baseline(:,signal_no),'k:','LineWidth',4*linewidth);
+ 
     set(gca,'FontName','Times');
     hold on
     box on
-    plot(t_baseline*1e6,v_baseline(:,7)*scaling-v_mass(:,7)*scaling,'r','LineWidth',2*linewidth);
+    plot(t_baseline*1e6,v_baseline(:,7)*scaling,'b','LineWidth',2*linewidth);
+    plot(t_baseline*1e6,v_baseline2(:,7)*40,'m','LineWidth',2*linewidth);
     xlabel('t [µs]');
     ylabel('Amplitude [V]');
     xlim([0 1200]);
-    axis([0 1200 -0.01 0.01])
+    %axis([0 1200 -0.01 0.01])
     legend('differential exp.','differential num.','Location','NorthWest');
     title('Transducer pairs 1-7');
     set(gca,'FontName','Times');
     set(gcf,'PaperPositionMode','auto');
-    print(figfilename,'-dpng', '-r600'); 
+    %print(figfilename,'-dpng', '-r600');
+    figure;
+    plot(t_baseline*1e6,v_mass(:,7)*scaling,'r','LineWidth',2*linewidth);
+    hold on;
+    plot(t_baseline*1e6,v_delam(:,7)*scaling,'g','LineWidth',2*linewidth);
+    return;
  %% actuator no 3 'path_3_10_diff';
     test_case = 3;
     actuator = 3; sensor = 10;
@@ -82,7 +102,7 @@ test_case = 1;
     load([model_path,'time',num2str(test_case)]);
     v_baseline=voltage;
     t_baseline=t;
-    model_path = [model_damaged_path,filesep,num2str(test_case),'_output',filesep];
+    model_path = [model_added_mass_path,filesep,num2str(test_case),'_output',filesep];
     load([model_path,'voltage',num2str(test_case)]);
     v_mass=voltage;
     % differential signal
@@ -118,7 +138,7 @@ test_case = 1;
     load([model_path,'time',num2str(test_case)]);
     v_baseline=voltage;
     t_baseline=t;
-    model_path = [model_damaged_path,filesep,num2str(test_case),'_output',filesep];
+    model_path = [model_added_mass_path,filesep,num2str(test_case),'_output',filesep];
     load([model_path,'voltage',num2str(test_case)]);
     v_mass=voltage;
     % differential signal
