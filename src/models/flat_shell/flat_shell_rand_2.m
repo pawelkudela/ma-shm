@@ -11,7 +11,7 @@ currentFile = mfilename('fullpath');
 idx = strfind( pathstr,filesep );
 modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
-image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam_rand'); % mesh parameters and labels
+image_label_path = prepare_model_paths('raw','num',modelfolder,'automesh_delam_rand2'); % mesh parameters and labels
 % prepare model output path
 model_output_path = prepare_model_paths('raw','num',modelfolder,modelname);
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
@@ -21,8 +21,8 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 load([image_label_path,filesep,'mesh_parameters']);
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
-input_no = 19;
-tasks=[1];
+input_no = 20;
+tasks=[257,318];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 
 %% input for post-processing

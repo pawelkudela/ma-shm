@@ -1,11 +1,11 @@
 SetFactory("OpenCASCADE");
 L=0.500000; 
 W=0.500000; 
-a=0.017718; 
-b=0.015636; 
-x=0.006902; 
-y=0.147732; 
-alpha=0.563703 *Pi; 
+a=0.019187; 
+b=0.010403; 
+x=0.042495; 
+y=0.125237; 
+alpha=0.668228 *Pi; 
 r=0.005000; 
 xpzt=0.250000; 
 ypzt=0.250000; 
@@ -34,38 +34,21 @@ Rotate {{0, 0, 1}, {x, y, 0}, alpha} {
   Curve{6}; 
 }
 //+
-BooleanDifference{ Curve{6}; Delete; }{ Curve{4}; }
+Curve Loop(1) = {4, 1, 2, 3};
 //+
-Delete {
-  Curve{6}; 
-}
-Delete {
-  Curve{8}; 
-}
+Curve Loop(2) = {6};
 //+
-Delete {
-  Curve{4}; 
-}
+Curve Loop(3) = {5};
 //+
-Line(9) = {8, 7};
+Curve Loop(4) = {6};
 //+
-Line(10) = {4, 8};
+Curve Loop(5) = {5};
 //+
-Line(11) = {7, 1};
+Plane Surface(1) = {5};
 //+
-Curve Loop(1) = {5};
+Plane Surface(2) = {4};
 //+
-Plane Surface(1) = {1};
-//+
-Curve Loop(2) = {9, 7};
-//+
-Plane Surface(2) = {2};
-//+
-Curve Loop(3) = {10, -7, 11, 1, 2, 3};
-//+
-Curve Loop(4) = {5};
-//+
-Plane Surface(3) = {3, 4};
+Plane Surface(3) = {1, 2, 3};
 //+
 Point(9) = {xpzt, ypzt, 0, 1.0};
 //+

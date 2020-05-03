@@ -22,7 +22,7 @@ load([image_label_path,filesep,'mesh_parameters']);
 NofMeshes = length(mesh_parameters);
 % input for constant parameters
 input_no = 20;
-tasks=[201:475];
+tasks=[1:256,258:317,319:475];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 
 %% input for post-processing
