@@ -37,13 +37,9 @@ nRegions = max(msh.QUADS(:,5));
 nbElements = size(msh.QUADS,1);
 colour = 'rgybmcrgybmcrgybmcrgybmcrgybmcrgybmcrgybmcrgybmcrgybmcrgybmcrgybmc';
 h=figure; hold all;
-c=1;
 for k=1:nRegions
-    c1=c;
-    while(c <= nbElements && msh.QUADS(c,5)==k)
-        c=c+1;
-    end 
-    nodes = msh.QUADS(c1:c-1,1:4);
+    IndexReg = find(msh.QUADS(:,5)==k);
+    nodes = msh.QUADS(IndexReg,1:4);
     patch('faces',nodes,'vertices',[X Y],'facecolor',colour(k));
 end
 % size 12cm by 8cm (1-column text)
