@@ -7,6 +7,7 @@ x=0.4000;
 y=0.100; 
 alpha=0.000000 *Pi; 
 r=0.005000; 
+// rivets are included in 2D mesh but are ommitted in 3D mesh
 R=0.0025; // rivet radius
 // PZT
 xpzt1=0.05; 

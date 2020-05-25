@@ -4,8 +4,8 @@ clear all; close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Prepare output directories
 % allow overwriting existing results if true
-%overwrite=false;
-overwrite=true;
+overwrite=false;
+%overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -27,7 +27,7 @@ h = [1.5/4,1.5*3/4]/1000; % thickness of layers [m]
 isDelamOn = true; % baseline
 stiffener_thickness = 1.5/1000; % [m]
 pzt_thickness=0.000254; %[m]
-rivet_head_thickness = 3/1000; % [m]
+rivet_head_thickness = 1.65/1000; % [m]
 node_separation_dist=0.0001; % 0.1 mm
 % Physical Surface in gmsh geo file
 Physical_Surface_pzt=[1:18];
@@ -37,13 +37,32 @@ Physical_Surface_rivet_head = [21:2:37];
 Physical_Surface_stiffener = [38];
 Physical_Surface_plate_left = [39];
 Physical_Surface_plate_right = [40];
+pzt_coords = [
+0.185, 0.45; 
+0.185, 0.4;
+0.185, 0.35;
+0.185, 0.3;
+0.185, 0.25;
+0.185, 0.2;
+0.185, 0.15;
+0.185, 0.1;
+0.185, 0.05;
+0.315, 0.450;
+0.315, 0.25;
+0.315, 0.05;
+0.3825, 0.450;
+0.3825, 0.25;
+0.3825, 0.05;
+0.450, 0.450;
+0.450,0.250;
+0.450, 0.05];
 %%
 
 mesh_filename = 'sensor_nonopt_pzt_stiffener_low_rivets_delam'; 
 
 figfilename = [figure_output_path,mesh_filename];
 
-if(overwrite||(~overwrite && ~exist([mesh,filesep,mesh_filename,'.mat'], 'file')))
+if(overwrite|| (~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'file') ))
          %% RUN AUTOMESH
      try
         disp(mesh_filename);
@@ -188,16 +207,31 @@ if(overwrite||(~overwrite && ~exist([mesh,filesep,mesh_filename,'.mat'], 'file')
         %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, den_under);
         
         disp('12 baskets: calculating local and global node numbers...');
+        [I_G,I_L]=parallel_LG_nodes_Modified_Zb2(nodes3D);% Zhibo implementation
+        
         %[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes); % Zhibo implementation
-        n_z=NofElNodesz; % number of nodes in thickness direction
-        [I_G,I_L]=nodesMaps_Fiborek(nodes3D,size(coords3D,1),shape_order,n_z); % Piotr Fiborek implementation
-        save([spec_mesh_output_path,mesh_filename,'.mat'],'nodes3D','coords3D','pztEl','delamEl','rivetEl','I_G','I_L','shape_order','den_under','den_above','msh');
-
+%         n_z=NofElNodesz; % number of nodes in thickness direction
+%         [I_G,I_L]=nodesMaps_Fiborek(nodes3D,size(coords3D,1),shape_order,n_z); % Piotr Fiborek implementation
+        glueEl=[];pztnum=pztElnew;
+        pztEltemp=pztEl;
+        a=1;
+        for k=1:length(pztEl)
+            b=a+length(pztEltemp{k})-1;
+            pztEl{k} = pztnum(a:b);
+            a=b+1;
+        end
+        outputs=zeros(1,length(pztEl));
+        for k=1:length(pztEl)
+            [A,o]=min(sqrt((pzt_coords(k,1)-coords3D(:,1)).^2 + (pzt_coords(k,2)-coords3D(:,2)).^2));
+            outputs(1,k)=3*o; % dof in z direction
+        end
+        save([spec_mesh_output_path,mesh_filename,'_3D.mat'],'nodes3D','coords3D','outputs','glueEl','pztEl','pztnum','delamEl','rivetEl','I_G','I_L','shape_order','den_under','den_above','msh');
+        
      catch
         fprintf(['Meshing failed:', mesh_filename,' \n']);
      end
 else
-    fprintf(['Mesh:', mesh_filename,' already exist\n']);
+    fprintf(['Mesh:', mesh_filename,'_3D already exist\n']);
 end
                 
  

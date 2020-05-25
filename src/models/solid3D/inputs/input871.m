@@ -35,6 +35,12 @@ frm_int=floor(nft/(frames)); % save displacement with interval time step frm_int
 'Poisson ratio';                           i_nim(4) = 0.34;
 'density [kg/m3]';                         i_rhom(4) = 1170;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% matrix(5) - titanium alloy
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+'Young modulus [Pa]';                      i_em(5) = 110e9;
+'Poisson ratio';                           i_nim(5) = 0.34;
+'density [kg/m3]';                         i_rhom(5) = 4430;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fibres(1) - fiber glass
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 'Young modulus [Pa]';                      i_ef(1) = 85e9; 
@@ -102,7 +108,9 @@ rho_pzt=7600;%[kg/m3]
 % global b.c. vector with blocked degrees of freedom
 BC=[];
 %% mesh
-meshfile='mesh\sensor_opt_pzt_stiffener_low_1lay_no_glue_no_stiffener_3D.mat'; % 
+meshfile='mesh\sensor_opt_pzt_stiffener_low_rivets_delam_3D.mat'; % 
+coords = coords3D;
+nodes = nodes3D;
 % meshfile contains two matrices: coords and nodes and list of vectors with
 % indices in local and global level
 % element type: number of nodes in x, y and z direction respectively
@@ -124,12 +132,12 @@ pztnum=reshape(pztEl,1,[]);
 c=0;
 PZT_actuator=[];
 PZT_sensor=[];
-for ne=5:5
+for ne=3:3
    c=c+1;
    PZT_actuator(c).pztEl=[pztEl(ne,:)]; % list of element numbers for pzt no c
 end
 c=0;
-for ne=1:18
+for ne=1:8
    c=c+1;
    PZT_sensor(c).pztEl=[pztEl(c,:)]; % 
 end

@@ -15,7 +15,7 @@ modelname = name;
 % prepare model output path
 %image_label_path = prepare_model_paths('raw','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
-mesh_filename = 'sensor_opt_pzt_stiffener_low_rivets_delam'; 
+mesh_filename = 'sensor_opt_pzt_stiffener_low_no_rivets_delam'; 
 %%  INPUT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mesh parameters
@@ -48,7 +48,6 @@ pzt_coords = [
 0.35,0.2;
 0.45,0.05];
 %%
-
 
 figfilename = [figure_output_path,mesh_filename];
 
@@ -156,8 +155,8 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
         solidEllength=length(solidEl);
         [m,n]=size(nodes3D);
         solidElnew=m-solidEllength+1:m;
-        stiffenerEl_new = solidElnew(1:length(stiffenerEl_all));
-        %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz,stiffenerEl_new);
+        stiffenerEl_new = solidElnew;
+        plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz,stiffenerEl_new);
         
         % connect pzt
         pztEl_all = pztEl_all + (Nz-1)*fen_per_lay;
@@ -166,35 +165,7 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
         pztEllength=length(pztEl_all);
         pztElnew=m-pztEllength+1:m;
         %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz,pztElnew);
-     
-        % rivet pin
-        rivet_pinEl_new = [];
-        for k=1:Nz
-             rivet_pinEl_new = [rivet_pinEl_new;(k-1)*fen_per_lay+rivet_pinEl_all]; % through host plate
-        end
-        % through stiffener
-        rivet_pinEl_stiffener = [solidElnew(length(stiffenerEl_all)+1:length(stiffenerEl_all)+length(rivet_pinEl_all))]';
-        % all rivet pins
-        rivet_pinEl_new = [rivet_pinEl_new;rivet_pinEl_stiffener];
-        % rivet head elements for extrusion
-        rivet_headEl_stiffener = [solidElnew(length(stiffenerEl_all)+length(rivet_pinEl_all)+1:length(solidElnew))]';
-        rivet_headEl_top = [rivet_pinEl_stiffener;rivet_headEl_stiffener];
-        %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, rivet_headEl_top);
-        % connect rivet top
-        [nodes3D,coords3D]=connect_3Dsolid_top(NofElNodesx,NofElNodesy,NofElNodesz,rivet_headEl_top,nodes3D,coords3D, rivet_head_thickness);
-        [m,n]=size(nodes3D);
-        rivet_headEl_top_new=m-length(rivet_headEl_top)+1:m;
-        %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, rivet_headEl_top_new);
-
-        % connect rivet bottom
-        rivet_headEl_bottom = [rivet_pinEl_all;rivet_headEl_all];
-        [nodes3D,coords3D]=connect_3Dsolid_bottom2(NofElNodesx,NofElNodesy,NofElNodesz,rivet_headEl_bottom,nodes3D,coords3D,rivet_head_thickness);
-        [m,n]=size(nodes3D);
-        rivet_headEl_bottom_new=m-length(rivet_headEl_bottom)+1:m;
-        rivetEl=[rivet_headEl_bottom_new,rivet_headEl_top_new,rivet_pinEl_new'];
-        plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, rivetEl);
-        %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, den_above);
-        %plot3Dmesh_pzt(nodes3D,coords3D,NofElNodesx,NofElNodesy,NofElNodesz, den_under);
+        rivetEl=[];
         
         disp('12 baskets: calculating local and global node numbers...');
         [I_G,I_L]=parallel_LG_nodes_Modified_Zb2(nodes3D);% Zhibo implementation

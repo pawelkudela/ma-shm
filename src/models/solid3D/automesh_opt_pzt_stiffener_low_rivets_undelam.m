@@ -15,7 +15,8 @@ modelname = name;
 % prepare model output path
 %image_label_path = prepare_model_paths('raw','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
-mesh_filename = 'sensor_opt_pzt_stiffener_low_rivets_delam'; 
+mesh_filename = 'sensor_opt_pzt_stiffener_low_rivets_undelam'; 
+
 %%  INPUT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mesh parameters
@@ -25,7 +26,7 @@ nPZT = 8; % number of piezoelectric transducers
 Nz = 2; % number of layers
 delamination_layer=1;
 h = [1.5/4,1.5*3/4]/1000; % thickness of layers [m]
-isDelamOn = true; % damaged
+isDelamOn = false; % baseline
 stiffener_thickness = 1.5/1000; % [m]
 pzt_thickness=0.000254; %[m]
 rivet_head_thickness = 1.65/1000; % [m]
@@ -105,6 +106,8 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
                 delamEl{k} = find(msh.QUADS(:,5)==Physical_Surface_delam(k));
                 delamEll_all=[delamEll_all;delamEl{k}];
             end
+        else
+              delamEl=[];den_under=[];den_above=[];
         end
         rivet_pinEl_all=[];
         for k=1:length(Physical_Surface_rivet_pin)
@@ -216,6 +219,7 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
             [A,o]=min(sqrt((pzt_coords(k,1)-coords3D(:,1)).^2 + (pzt_coords(k,2)-coords3D(:,2)).^2));
             outputs(1,k)=3*o; % dof in z direction
         end
+      
         save([spec_mesh_output_path,mesh_filename,'_3D.mat'],'nodes3D','coords3D','outputs','glueEl','pztEl','pztnum','delamEl','rivetEl','I_G','I_L','shape_order','den_under','den_above','msh');
        
      catch

@@ -6,8 +6,23 @@ figs_source_folder=[projectroot,'reports',filesep,'figures',filesep];
 paper_folder = 'IOP-SMS';
 fig_destination=[projectroot,'reports',filesep,'journal_papers',filesep,paper_folder,filesep];
 
-modelname='Parallel_SMS_num_exp_energy_comparison'; 
+modelname='Parallel_SMS_Num_Exp_Signals2'; 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figname=['path_1_7.png'];
+fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
+copyfile(fig_source,fig_destination);
+movefile([fig_destination,figname],[fig_destination,'figure8new.png'],'f');
+figname=['path_2_4.png'];
+fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
+copyfile(fig_source,fig_destination);
+movefile([fig_destination,figname],[fig_destination,'figure9new.png'],'f');
+figname=['path_4_8.png'];
+fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
+copyfile(fig_source,fig_destination);
+movefile([fig_destination,figname],[fig_destination,'figure10new.png'],'f');
 
+
+modelname='Parallel_SMS_num_exp_energy_comparison'; 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figname=['num_exp_energy16.5_kHz.png'];
 fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
@@ -43,15 +58,15 @@ modelname='Parallel_SMS_Differential_Signals2';
 figname=['path_1_7_diff.png'];
 fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
 copyfile(fig_source,fig_destination);
-movefile([fig_destination,figname],[fig_destination,'figure20.png'],'f');
+movefile([fig_destination,figname],[fig_destination,'figure20new.png'],'f');
 figname=['path_3_10_diff.png'];
 fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
 copyfile(fig_source,fig_destination);
-movefile([fig_destination,figname],[fig_destination,'figure21.png'],'f');
+movefile([fig_destination,figname],[fig_destination,'figure21new.png'],'f');
 figname=['path_4_8_diff.png'];
 fig_source=[figs_source_folder,modelname,'_out',filesep,figname];
 copyfile(fig_source,fig_destination);
-movefile([fig_destination,figname],[fig_destination,'figure22.png'],'f');
+movefile([fig_destination,figname],[fig_destination,'figure22new.png'],'f');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % experimental wavefield

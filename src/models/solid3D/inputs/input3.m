@@ -1,11 +1,12 @@
 disp('.. Reading input data');
 %% Signal definition
-nft=2^16;    % total number of samples
+%nft=2^17;    % total number of samples
+nft=100000;    % total number of samples
 tt=0.4e-3;   % total calculation time [s] % 
 t_1=0e-4;    % excitation initiation time [s]
 f_1=100e3/5;   % frequency of the modulation signal [Hz]
 f_2=5*f_1;   % frequency of the carrier signal [Hz]
-frames=512; % number of frames for movie
+frames=500; % number of frames for movie
 frm_int=floor(nft/(frames)); % save displacement with interval time step frm_int (frames)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,9 +109,7 @@ rho_pzt=7600;%[kg/m3]
 % global b.c. vector with blocked degrees of freedom
 BC=[];
 %% mesh
-meshfile='mesh\sensor_opt_pzt_stiffener_low_rivets_delam_3D.mat'; % 
-coords = coords3D;
-nodes = nodes3D;
+meshfile='mesh\sensor_opt_pzt_stiffener_low_no_rivets_delam_3D.mat'; % 
 % meshfile contains two matrices: coords and nodes and list of vectors with
 % indices in local and global level
 % element type: number of nodes in x, y and z direction respectively
@@ -126,26 +125,17 @@ prop='smeared';
 % Actuators and sensors: structure defines which element numbers belongs to
 % specific actuator and sensor
 cd ..;
-load('mesh\pztnum_sensor_opt_pzt_stiffener_low_1lay_no_glue_3D.mat'); %
-pztnum=reshape(pztEl,1,[]);
-%pztnum=[];
-c=0;
+load(meshfile); %
+
 PZT_actuator=[];
 PZT_sensor=[];
+c=0;
 for ne=3:3
    c=c+1;
-   PZT_actuator(c).pztEl=[pztEl(ne,:)]; % list of element numbers for pzt no c
+   PZT_actuator(c).pztEl=pztEl{ne}; % list of element numbers for pzt no c
 end
 c=0;
 for ne=1:8
    c=c+1;
-   PZT_sensor(c).pztEl=[pztEl(c,:)]; % 
+   PZT_sensor(c).pztEl=pztEl{ne}; % 
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% bonding layer
-load('mesh\gluenum_sensor_opt_pzt_stiffener_low_1lay_no_glue_3D.mat');
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% outputs
-load('mesh\outputs_sensor_opt_pzt_stiffener_low_1lay_no_glue_3D.mat');
-% stiffener
-load('mesh\stiffenernum_sensor_opt_pzt_stiffener_low_1lay_no_glue_3D.mat');

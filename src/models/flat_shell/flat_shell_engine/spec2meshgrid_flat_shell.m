@@ -560,7 +560,7 @@ for n=1:nFrames
 end
 [i1,j1,k1] = size(Data);
 if(i1*j1*k1 > 512*512*512)
-    save(data_filename,'Data','-v7.3');
+    save(data_filename,'Data','-v7.3');% for data files >2GB (compression is used)
 else
     save(data_filename,'Data');
 end

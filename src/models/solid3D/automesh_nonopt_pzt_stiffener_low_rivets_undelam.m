@@ -5,7 +5,7 @@ clear all; close all;
 %% Prepare output directories
 % allow overwriting existing results if true
 overwrite=false;
-overwrite=true;
+%overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -15,44 +15,54 @@ modelname = name;
 % prepare model output path
 %image_label_path = prepare_model_paths('raw','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname);
-mesh_filename = 'sensor_opt_pzt_stiffener_low_rivets_delam'; 
 %%  INPUT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mesh parameters
 shape_order = 5; % element shape function order, Number of nodes in one direction is shape_order+1
 NofElNodesz = 3; % number of nodes through thickness per layer
-nPZT = 8; % number of piezoelectric transducers
+nPZT = 18; % number of piezoelectric transducers
 Nz = 2; % number of layers
 delamination_layer=1;
 h = [1.5/4,1.5*3/4]/1000; % thickness of layers [m]
-isDelamOn = true; % damaged
+isDelamOn = false; % baseline
 stiffener_thickness = 1.5/1000; % [m]
 pzt_thickness=0.000254; %[m]
 rivet_head_thickness = 1.65/1000; % [m]
 node_separation_dist=0.0001; % 0.1 mm
 % Physical Surface in gmsh geo file
-Physical_Surface_pzt=[1:8];
-Physical_Surface_delam=9;
-Physical_Surface_rivet_pin = [10:2:26];
-Physical_Surface_rivet_head = [11:2:27];
-Physical_Surface_stiffener = [28];
-Physical_Surface_plate_left = [29];
-Physical_Surface_plate_right = [30];
+Physical_Surface_pzt=[1:18];
+Physical_Surface_delam=19;
+Physical_Surface_rivet_pin = [20:2:36];
+Physical_Surface_rivet_head = [21:2:37];
+Physical_Surface_stiffener = [38];
+Physical_Surface_plate_left = [39];
+Physical_Surface_plate_right = [40];
 pzt_coords = [
-0.05,0.45; 
-0.15,0.3;
-0.15,0.2;
-0.05,0.05;
-0.45,0.45;
-0.35,0.3;
-0.35,0.2;
-0.45,0.05];
+0.185, 0.45; 
+0.185, 0.4;
+0.185, 0.35;
+0.185, 0.3;
+0.185, 0.25;
+0.185, 0.2;
+0.185, 0.15;
+0.185, 0.1;
+0.185, 0.05;
+0.315, 0.450;
+0.315, 0.25;
+0.315, 0.05;
+0.3825, 0.450;
+0.3825, 0.25;
+0.3825, 0.05;
+0.450, 0.450;
+0.450,0.250;
+0.450, 0.05];
 %%
 
+mesh_filename = 'sensor_nonopt_pzt_stiffener_low_rivets_undelam'; 
 
 figfilename = [figure_output_path,mesh_filename];
 
-if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'file')))
+if(overwrite|| (~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'file') ))
          %% RUN AUTOMESH
      try
         disp(mesh_filename);
@@ -202,7 +212,6 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
         %[IG1,IG2,IG3,IG4,IG5,IG6,IG7,IG8,IG9,IG10,IG11,IG12,IL1,IL2,IL3,IL4,IL5,IL6,IL7,IL8,IL9,IL10,IL11,IL12]=parallel_LG_nodes_Modified_Zb(nodes); % Zhibo implementation
 %         n_z=NofElNodesz; % number of nodes in thickness direction
 %         [I_G,I_L]=nodesMaps_Fiborek(nodes3D,size(coords3D,1),shape_order,n_z); % Piotr Fiborek implementation
-        
         glueEl=[];pztnum=pztElnew;
         pztEltemp=pztEl;
         a=1;
@@ -217,7 +226,7 @@ if(overwrite||(~overwrite && ~exist(['mesh',filesep,mesh_filename,'_3D.mat'], 'f
             outputs(1,k)=3*o; % dof in z direction
         end
         save([spec_mesh_output_path,mesh_filename,'_3D.mat'],'nodes3D','coords3D','outputs','glueEl','pztEl','pztnum','delamEl','rivetEl','I_G','I_L','shape_order','den_under','den_above','msh');
-       
+        
      catch
         fprintf(['Meshing failed:', mesh_filename,' \n']);
      end
