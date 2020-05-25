@@ -34,7 +34,7 @@ load([input_data_path,'time']);
 time = time * 1e6;
 
 % size 12cm by 8cm (1-column text)
-fig_width = 12; fig_height = 4; 
+fig_width = 12; fig_height = 5; 
 linewidth = 0.5;
 %% actuator no 1 'path_1_7_diff';
 actuator = 1; sensor = 7;
@@ -67,11 +67,14 @@ test_case = 1;
     ylabel('Amplitude [V]');
     xlim([0 1200]);
     axis([0 1200 -0.01 0.01])
-    legend('differential exp.','differential num.','Location','NorthWest');
+    %legend('differential exp.','differential num.','Location','NorthWest','Orientation','horizontal');
+    legend('differential exp.','differential num.','Location','NorthOutside','Orientation','horizontal');
+    %legend('differential exp.','differential num.','Location','NorthEastOutside');
     title('Transducer pairs 1-7');
     set(gca,'FontName','Times');
     set(gcf,'PaperPositionMode','auto');
     print(figfilename,'-dpng', '-r600'); 
+    
  %% actuator no 3 'path_3_10_diff';
     test_case = 3;
     actuator = 3; sensor = 10;
@@ -103,7 +106,8 @@ test_case = 1;
     ylabel('Amplitude [V]');
     xlim([0 1200]);
     axis([0 1200 -0.02 0.02])
-    legend('differential exp.','differential num.','Location','NorthWest');
+    %legend('differential exp.','differential num.','Location','NorthWest');
+    legend('differential exp.','differential num.','Location','NorthOutside','Orientation','horizontal');
     title('Transducer pairs 3-10');
     set(gca,'FontName','Times');
     set(gcf,'PaperPositionMode','auto');
@@ -139,7 +143,8 @@ test_case = 1;
     ylabel('Amplitude [V]');
     xlim([0 1200]);
     axis([0 1200 -0.02 0.02])
-    legend('differential exp.','differential num.','Location','NorthWest');
+    %legend('differential exp.','differential num.','Location','NorthWest');
+    legend('differential exp.','differential num.','Location','NorthOutside','Orientation','horizontal');
     title('Transducer pairs 4-8');
     set(gca,'FontName','Times');
     set(gcf,'PaperPositionMode','auto');
