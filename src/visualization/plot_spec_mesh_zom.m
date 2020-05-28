@@ -1,5 +1,5 @@
 meshname = 'delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass';
-paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\Elsevier\figs\';
+paper_fig_folder = 'E:\work\projects\nawa-bekker\ma-shm\reports\journal_papers\IOP-SMS\figs\';
 meshfile = 'E:\work\projects\nawa-bekker\ma-shm\src\models\flat_shell\mesh\delam_Jochen_signals_D5_a_5mm_b_5mm_angle_0added_mass';
 figfilename1 = [paper_fig_folder,meshname];
 figfilename2 = [paper_fig_folder,meshname,'_spec_zoom'];
@@ -42,8 +42,8 @@ end
 % add delamination description
 delam_x = 0.25+0.008;
 delam_y= 0.427;
-rectangle('Position',[delam_x-0.001,delam_y-0.009,0.115,0.016],'Curvature',[0.0007,0.0007], 'FaceColor','w');
-text(delam_x,delam_y,'delamination','Color','black','FontSize',12);
+rectangle('Position',[delam_x-0.001,delam_y-0.01,0.07,0.017],'Curvature',[0.0007,0.0007], 'FaceColor','w');
+text(delam_x,delam_y,'defect','Color','black','FontSize',12);
 % size 12cm by 8cm (1-column text)
 fig_width = 12; fig_height = 12; 
 
@@ -82,8 +82,8 @@ for k=3:4
 end
 delam_x = 0.25+0.007;
 delam_y= 0.427;
-rectangle('Position',[delam_x,delam_y-0.002,0.024,0.004],'Curvature',[0.0007,0.0007], 'FaceColor','w');
-text(delam_x+0.001,delam_y,'delamination','Color','black','FontSize',12);
+rectangle('Position',[delam_x,delam_y-0.003,0.014,0.005],'Curvature',[0.0007,0.0007], 'FaceColor','w');
+text(delam_x+0.001,delam_y,'defect','Color','black','FontSize',12);
 axis equal;
 axis([msh.MIN(1) msh.MAX(1) msh.MIN(2)  msh.MAX(2)]);
 set(gca,'FontName','Times');
