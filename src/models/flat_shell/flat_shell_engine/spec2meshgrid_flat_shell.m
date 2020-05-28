@@ -234,8 +234,13 @@ clear invj11 invj12 invj21 invj22 j11 j12 j21 j22;
 % plot(xp(n),yp(n),'ro');hold on; plot(x(:,ne1),y(:,ne1),'b');plot(x(1,ne1),y(1,ne1),'go');
 [Q]=Vandermonde2D(ksi,eta,NofElNodesx,NofElNodesy);
 N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
-[indxi,indxj]=find(N);
-Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1));
+bb=repmat(1:Nx*Ny,[NofElNodesx*NofElNodesy,1]);
+indxj=reshape(bb,[NofElNodesx*NofElNodesy*Nx*Ny,1]);
+%[indxi,indxj]=find(N);
+Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1),Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+%[indxi,indxj,s]=find(N);
+%Ns=sparse(indxi,indxj,s,NofElNodesx*NofElNodesy*Nx*Ny,Nx*Ny)';
+
 % coordinates of element nodes
 xe=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
 ye=zeros(NofElNodesx*NofElNodesy,Nx*Ny);
@@ -263,10 +268,15 @@ for k=1:nIterations
     x0=x1;
     y0=y1;
     % shape function derivatives
-    [Npx,Npy]=shape_derivatives2Dp(NofElNodesx,NofElNodesy,Q,ksi0,eta0);
-    [indxi,indxj]=find(Npx);
-    Npx=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npx,NofElNodesx*NofElNodesy*Nx*Ny,1));
-    Npy=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npy,NofElNodesx*NofElNodesy*Nx*Ny,1));
+     [Npx,Npy]=shape_derivatives2Dp(NofElNodesx,NofElNodesy,Q,ksi0,eta0);
+     %[indxi,indxj]=find(Npx);
+     Npx=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npx,NofElNodesx*NofElNodesy*Nx*Ny,1),Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+    Npy=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(Npy,NofElNodesx*NofElNodesy*Nx*Ny,1),Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+ %   [indxi,indxj,sx]=find(Npx);
+  %  Npx=sparse(indxj,indxi,sx,Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+   % [indxi,indxj,sy]=find(Npy);
+    %Npy=sparse(indxj,indxi,sy,Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+    
     % jacobians
     J11=Npx*xe;
     J12=Npy*xe;
@@ -278,8 +288,11 @@ for k=1:nIterations
     eta_p=eta0+invJ21.*(xp-x0)+invJ22.*(yp-y0);
     
     N=shape2Dp(NofElNodesx,NofElNodesy,Q,ksi_p,eta_p);% shape functions at arbitrary (ksi, eta) point
-    [indxi,indxj]=find(N);
-    Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1));
+     %[indxi,indxj]=find(N);
+     Ns=sparse(indxj,[1:NofElNodesx*NofElNodesy*Nx*Ny],reshape(N,NofElNodesx*NofElNodesy*Nx*Ny,1),Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+%    [indxi,indxj,s]=find(N);
+%   Ns=sparse(indxj,indxi,s,Nx*Ny,NofElNodesx*NofElNodesy*Nx*Ny);
+    
     x1=Ns*xe;% interpolated values
     y1=Ns*ye;% interpolated values
     %plot(x1(n),y1(n),'kx');
