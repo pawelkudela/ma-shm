@@ -229,7 +229,8 @@ end
 % load mesh into matlab
 run([mesh_output_path, mesh_filename,'.m']);
 [nodes1,coords1]=change_turn_quad(msh.QUADS(:,1:4),msh.POS(:,1:2));
-[coords1,nodes1]=remove_free_nodes(coords1,nodes1);
+%[coords1,nodes1]=remove_free_nodes(coords1,nodes1); % needs to be added ?
+%max(max(nodes1))
 msh.QUADS(:,1:4) = nodes1;
 
 plot_mesh(msh,figfilename);
@@ -241,7 +242,9 @@ disp('Quad to spectral mesh conversion...');
 
 %  % Piotr Fiborek implementation
 %[nodes_pl,coords_pl]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);
-[nodes,coords,boundary_nodes]= quad2spectral_Fiborek(nodes1,coords1,shape_order);
+
+[nodes,coords,boundary_nodes]= quad2spectral_Fiborek(msh.QUADS(:,1:4),msh.POS,shape_order);% requires x y z coordinates
+%[nodes,coords,boundary_nodes]= quad2spectral_Fiborek(nodes1,coords1,shape_order);
 % plot(coords(boundary_nodes,1),coords(boundary_nodes,2),'m.');
 
 % delete gmsh out m file

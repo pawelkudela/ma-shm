@@ -1,6 +1,6 @@
 close all;clear all;
 % only for bottom surface
-for k_test=[5:6]
+for k_test=[7:8]
 
 %Nx=400; %Nx=152;% grid size
 %Ny=400; %Ny=300;

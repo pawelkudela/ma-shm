@@ -3,8 +3,8 @@ clear all;close all;   warning off;clc;
 load project_paths projectroot src_path;
 %% Prepare output directories
 % allow overwriting existing results if true
-%overwrite=false;
-overwrite=true;
+overwrite=false;
+%overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -26,7 +26,7 @@ field_variable='velocity';
 motion=[3,8];
 tasks=[1:475];
 %tasks=[1];
-for m=1:2 % flat_shell_rand1, flat_shell_rand2 
+for m=1:3 % flat_shell_rand1, flat_shell_rand2 
 % prepare input output paths
 model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell_rand_',num2str(m)]);      
         %%

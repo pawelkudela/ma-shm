@@ -35,9 +35,8 @@ motion=[3];%
 %    7) Uy+h/2*UFiy
 %    8) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2)
 %    9) sqrt((Ux+h/2.*UFix).^2+(Uy+h/2.*UFiy).^2 + Uz.^2)
-%tasks=[1:475];
-tasks=[6];
-for m=1%:2 % flat_shell_rand_1, flat_shell_rand_2 
+tasks=[1:475];
+for m=1:3 % flat_shell_rand_1, flat_shell_rand_2 
 % prepare input output paths
 model_input_path = prepare_model_paths('interim','num','flat_shell',['flat_shell_rand_',num2str(m)]);      
         %%

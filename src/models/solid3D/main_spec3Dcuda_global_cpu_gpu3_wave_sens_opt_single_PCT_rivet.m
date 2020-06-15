@@ -1,5 +1,5 @@
 clear all;close all;clc;warning off; clc;
-tasks = [5:6];
+tasks = [7:8];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 for k_test=tasks
 

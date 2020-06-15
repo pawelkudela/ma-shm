@@ -4,7 +4,7 @@ load project_paths projectroot src_path;
 %% Prepare output directories
 % allow overwriting existing results if true
 overwrite=false;
-%overwrite=true;
+overwrite=true;
 % retrieve model name based on running file and folder
 currentFile = mfilename('fullpath');
 [pathstr,name,ext] = fileparts( currentFile );
@@ -13,6 +13,7 @@ modelfolder = pathstr(idx(end)+1:end); % name of folder
 modelname = name; 
 image_label_path1 = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand'); % mesh parameters and labels
 image_label_path2 = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand2'); % mesh parameters and labels
+image_label_path3 = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand3'); % mesh parameters and labels
 % prepare output paths
 dataset_output_path = prepare_data_processing_paths('processed','num',modelname);
 %% prepare csv labels based on mesh parameters
@@ -41,6 +42,15 @@ for k=[257,318]
     b(k) = mesh_parameters(k).b;
     rotAngle(k) = mesh_parameters(k).rotAngle;
 end
+load([image_label_path3,filesep,'mesh_parameters']);
+for k=[109,153,354]
+    position_no(k) = mesh_parameters(k).position_no;
+    xCenter(k) = mesh_parameters(k).xCenter;
+    yCenter(k) = mesh_parameters(k).yCenter;
+    a(k) = mesh_parameters(k).a;
+    b(k) = mesh_parameters(k).b;
+    rotAngle(k) = mesh_parameters(k).rotAngle;
+end
 
 position_no=cellstr(num2str(position_no,'%d'));
 xCenter=cellstr(num2str(xCenter,'%.4f'));
@@ -60,6 +70,13 @@ else
 end
 
 status=movefile([image_label_path2,filesep,'*.png'],[dataset_output_path,filesep]);
+if (status)
+    fprintf('Image label files has been moved succesfully\n');
+else
+    fprintf('Failed to move image labels\n');
+end
+
+status=movefile([image_label_path3,filesep,'*.png'],[dataset_output_path,filesep]);
 if (status)
     fprintf('Image label files has been moved succesfully\n');
 else

@@ -18,7 +18,7 @@ model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 figure_output_path = prepare_figure_paths(modelfolder,modelname_out);
 %% Input for flat_shell
 
-tasks=[1:6];
+tasks=[7:8];
 
 %% input for post-processing
 
