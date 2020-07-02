@@ -9,6 +9,8 @@ function delam_image_label(N,xCenter,yCenter,a,b,rotAngle,filename)
 %    xCenter -  delamination x coordinate in pixel scale, integer
 %    yCenter -  delamination y coordinate in pixel scale, integer
 %    rotAngle - delamination rotation angle [0:180), Units: deg
+%    a - semi-major axis
+%    b - semi-minor axis
 %    filename - name of image label file, string
 % 
 % Outputs: 

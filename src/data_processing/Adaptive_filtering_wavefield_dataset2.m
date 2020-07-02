@@ -24,8 +24,8 @@ fig_height=5; % figure height in cm
 %% Input for signal processing
 
 WL = [0.5 0.5];
-mask_thr = 0.85;
-PLT = 0.5;
+mask_thr = 0.85; % percentage of points removed by filter mask, should be in range 0.5 - 5 
+PLT = 0.5; % if PLT = 0 do no create plots; 0<PLT<=0.5 only ERMSF plot ;0.5<PLT<=1 - RMS plots;  1<PLT - all plots
 %threshold = 0.012; % threshold for binarization
 %threshold = 0.008; % threshold for binarization
 threshold = 0.0075; % threshold for binarization
