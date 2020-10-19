@@ -15,7 +15,10 @@ image_label_path1 = prepare_model_paths('raw','num','flat_shell','automesh_delam
 image_label_path2 = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand2'); % mesh parameters and labels
 image_label_path3 = prepare_model_paths('raw','num','flat_shell','automesh_delam_rand3'); % mesh parameters and labels
 % prepare output paths
-dataset_output_path = prepare_data_processing_paths('processed','num',modelname);
+figure_output_path = prepare_figure_paths(modelname);
+fig_width =5; % figure widht in cm
+fig_height=5; % figure height in cm
+figfilename = name;
 %% prepare csv labels based on mesh parameters
 % load mesh parameters
 load([image_label_path1,filesep,'mesh_parameters']);
@@ -53,33 +56,22 @@ for k=[109,153,354]
     rotAngle(k) = mesh_parameters(k).rotAngle;
 end
 
-position_no=cellstr(num2str(position_no,'%d'));
-xCenter=cellstr(num2str(xCenter,'%.4f'));
-yCenter=cellstr(num2str(yCenter,'%.4f'));
-a=cellstr(num2str(a,'%.4f'));
-b=cellstr(num2str(b,'%.4f'));
-rotAngle=cellstr(num2str(rotAngle,'%.4f'));
-
-T = table(position_no,xCenter,yCenter,a,b,rotAngle);
-writetable(T,[dataset_output_path,filesep,'dataset2_labels.csv']);
-%% move labels in the form of figures
-status=movefile([image_label_path1,filesep,'*.png'],[dataset_output_path,filesep]);
-if (status)
-    fprintf('Image label files has been moved succesfully\n');
-else
-    fprintf('Failed to move image labels\n');
+%% plot ellipses
+A=0.5;
+for k=1:475
+    
+    xRadius=a(k);
+    yRadius=b(k);
+    plot_ellipse2(xCenter(k),yCenter(k),xRadius,yRadius,rotAngle(k),A);
+    hold on;
 end
 
-status=movefile([image_label_path2,filesep,'*.png'],[dataset_output_path,filesep]);
-if (status)
-    fprintf('Image label files has been moved succesfully\n');
-else
-    fprintf('Failed to move image labels\n');
-end
-
-status=movefile([image_label_path3,filesep,'*.png'],[dataset_output_path,filesep]);
-if (status)
-    fprintf('Image label files has been moved succesfully\n');
-else
-    fprintf('Failed to move image labels\n');
-end
+set(gca, 'Position',[0 0 1. 1.]); % figure without axis and white border
+    set(gcf, 'Units','centimeters', 'Position',[10 10 fig_width fig_height]); 
+    % remove unnecessary white space
+    %set(gca,'LooseInset', max(get(gca,'TightInset'), 0.02));
+    %fig.PaperPositionMode   = 'auto';
+    set(gcf,'PaperPositionMode','auto');
+        
+    print([figure_output_path,figfilename],'-dpng', '-r600'); 
+    

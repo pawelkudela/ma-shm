@@ -26,19 +26,19 @@ for cm=1:nx*ny
 % mechanical properties of composite material components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 gm=em./(1+nim)/2; gf=ef./(1+nif)/2;
-rho=rhof.*vol+rhom.*(1-vol)
-e11=ef.*vol+em.*(1-vol)
-e22=((ef+em)+(ef-em).*vol)./((ef+em)-(ef-em).*vol).*em
+rho=rhof.*vol+rhom.*(1-vol);
+e11=ef.*vol+em.*(1-vol);
+e22=((ef+em)+(ef-em).*vol)./((ef+em)-(ef-em).*vol).*em;
 e33=e22;
-ni12=nif.*vol+nim.*(1-vol)
+ni12=nif.*vol+nim.*(1-vol);
 ni13=ni12;
-ni21=e22./e11.*ni12
-ni31=e33./e11.*ni13
-ni23=nif.*vol+nim.*(1-vol) .*(1.+nim-ni12.*em./e11) ./(1.-nim.^2 +nim.*ni12.*em./e11)
-ni32=e33./e22.*ni23
-g12=((gf+gm)+(gf-gm).*vol)./((gf+gm)-(gf-gm).*vol).*gm
-g23=e22./2./(1+ni23)
-g13=g12
+ni21=e22./e11.*ni12;
+ni31=e33./e11.*ni13;
+ni23=nif.*vol+nim.*(1-vol) .*(1.+nim-ni12.*em./e11) ./(1.-nim.^2 +nim.*ni12.*em./e11);
+ni32=e33./e22.*ni23;
+g12=((gf+gm)+(gf-gm).*vol)./((gf+gm)-(gf-gm).*vol).*gm;
+g23=e22./2./(1+ni23);
+g13=g12;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Sierakowski page 46 eq. 2.33
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

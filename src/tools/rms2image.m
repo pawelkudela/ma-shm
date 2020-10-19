@@ -1,4 +1,4 @@
-function A=frame2image(frame, filename)
+function A=rms2image(frame, filename)
 
 % function converts frame of propagating waves (double values)
 % to grayscale image: values [0, 255] and saves it to disc

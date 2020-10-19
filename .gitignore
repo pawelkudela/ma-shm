@@ -144,6 +144,10 @@ data/processed/num/**
 data/raw/exp/**
 data/raw/num/**
 
+# exclude gmsh output files from source control by default
+src/models/solid3D/gmsh_out/**
+src/models/flat_shell/gmsh_out/**
+
 # exclude external models from source control
 src/external/**
 

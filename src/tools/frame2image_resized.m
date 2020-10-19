@@ -24,4 +24,4 @@ Ny=desired_size_in_pixels;
 %  A=uint8(((1+A)/2)*255);
  % correct flipping
  A=flipud(A);
- imwrite(A,[filename,'.png'],'png');
+ imwrite(A,[filename,'.png'],'png','XResolution',600,'YResolution',600);
