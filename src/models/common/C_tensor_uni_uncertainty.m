@@ -1,6 +1,7 @@
 % input
 clc;
 clear all; 
+% data from article by Jochen Moll and others (Open Guided Waves)
 e11 = 125.5;
 delta_e11 = 2.4;
 ni12=0.37;
@@ -120,7 +121,7 @@ end;
 lay=12;
 lh = [1,1,1,1,1,1,1,1,1,1,1,1]*1.5/1000/lay;
 alpha2 = [-45,0,90,45,90,-45,-45,90,45,90,0,-45];
-rho=zeros(lay,1)+1571;
+rho=zeros(lay,1)+1580;
 h=sum(lh);
 h2=zeros(1,lay);
 h1=zeros(1,lay);

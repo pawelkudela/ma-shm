@@ -1,13 +1,5 @@
 function [t,st]=Hanning_signal(dt,nft,f_1,f_2,t_1)
 
-% calculate Hann windowed signal
-% dt - time step
-% nft - number of sampling points (signal will be zero padded)
-% f_1 - frequency of the modulation signal [Hz]
-% f_2 - frequency of the carrier signal [Hz]
-% t_1 - excitation initiation time [s]
-% 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 t_t=1/f_1;   % total duration time of the excitation [s]
 t_2=t_1+t_t; % excitation termiation time [s]
