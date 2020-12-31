@@ -22,8 +22,8 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 input_file_no = [21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]; 
 % inputs 36, 37, 38 - optimized
 % inputs 39,40,41 - homogenized
-% inputs 42, 343, 44 - optimized (swap q44 - q66)
-tasks=[16:18];% frequency = [16.5e3/5,50e3/5,100e3/5];no damping
+% inputs 42, 43, 44 - optimized (swap q44 - q66)
+tasks=[19:21];% frequency = [16.5e3/5,50e3/5,100e3/5];no damping
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','single_pzt_single_delam_large_plate_EWSHM2020'); % plate 1200x1200 mm pzt at the centre
 %% input for post-processing

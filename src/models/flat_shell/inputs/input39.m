@@ -74,10 +74,18 @@ field_variable = 'velocity'; % field_variable for saving output data, string: 'd
 'number of material layers';                 lay = length(lalpha);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % single lamina mechanical properties (C tensor)
+% homogenization for vol_bundle=0.6;
+% q11 = 129.07e9; % [Pa]
+% q12 = 2.51e9; % [Pa]
+% q22 = 11.07e9; % [Pa]
+% q44 = 4.35e9; % [Pa]
+% q55 = 4.51e9; % [Pa]
+% q66 = 4.51e9; % [Pa]
+% homogenization for vol_bundle=1;
 q11 = 129.07e9; % [Pa]
-q12 = 2.51e9; % [Pa]
-q22 = 11.07e9; % [Pa]
-q44 = 4.35e9; % [Pa]
+q12 = 2.59e9; % [Pa]
+q22 = 11.40e9; % [Pa]
+q44 = 4.48e9; % [Pa]
 q55 = 4.51e9; % [Pa]
 q66 = 4.51e9; % [Pa]
 rho = 1531.2; % [kg/m^3]
