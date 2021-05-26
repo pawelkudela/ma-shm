@@ -13,8 +13,8 @@ idx = strfind( pathstr,filesep );
 modelname = name; 
 figure_output_path = prepare_figure_paths(modelname);
 modelfolder = 'flat_shell'; % name of folder
-modelname =  'flat_shell_damping';
-%modelname =  'flat_shell_damping2';
+modelname =  'flat_shell_damping';m=1;
+%modelname =  'flat_shell_damping2';m=2;
 % prepare model input/output paths
 model_interim_path = prepare_model_paths('interim','num',modelfolder,modelname);
 
@@ -39,6 +39,7 @@ lc='rgbm';
 tasks=[1,3,5];% 50 kHz
 c=0;
 alphaz=zeros(length(tasks),1);
+alphaphi=zeros(length(tasks),1);
 alphaxy=zeros(length(tasks),1);
 E=zeros(1024,length(tasks)+1)+NaN;
 t=zeros(1024,length(tasks)+1);
@@ -47,6 +48,7 @@ for test_case = tasks
     input_no = input_file_no(test_case);
     run(fullfile('inputs',['input',num2str(input_no)]));
     alphaz(c) = etad_z;
+    alphaphi(c) = etad_z2;
     alphaxy(c) = etad_xy;
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
 
@@ -84,8 +86,20 @@ xlabel('t [ms]','Fontsize',12);
 ylabel('E [-]','Fontsize',12);
 hold on;
 title(['Frequency ',num2str(f_2/1000),' [kHz]'],'Fontsize',12); 
-legend({['$\alpha_{z}=$ ',num2str(alphaz(1)),', $\alpha_{xy}=$ ',num2str(alphaxy(1))],['$\alpha_{z}=$ ',num2str(alphaz(2)),', $\alpha_{xy}=$ ',num2str(alphaxy(2))],['$\alpha_{z}=$ ',num2str(alphaz(3)),', $\alpha_{xy}=$ ',num2str(alphaxy(3))],'experiment'},'Fontsize',12,'interpreter','latex');
-figfilename = ['num_exp_energy_uni',num2str(f_2/1000),'_kHz.png'];
+if(m ==  2)
+    legend({['$\alpha_{z}=$ ',num2str(alphaz(1))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(2))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(3))],...
+        'experiment'},'Fontsize',12,'interpreter','latex');
+    figfilename = ['num_exp_energy_uni2_',num2str(f_2/1000),'_kHz.png'];
+else
+    alphaphi=zeros(length(tasks),1);
+    legend({['$\alpha_{z}=$ ',num2str(alphaz(1)),', $\alpha_{xy}=$ ',num2str(alphaxy(1)),', $\alpha_{\phi}=$ ',num2str(alphaphi(1))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(2)),', $\alpha_{xy}=$ ',num2str(alphaxy(2)),', $\alpha_{\phi}=$ ',num2str(alphaphi(2))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(3)),', $\alpha_{xy}=$ ',num2str(alphaxy(3)),', $\alpha_{\phi}=$ ',num2str(alphaphi(3))],...
+        'experiment'},'Fontsize',12,'interpreter','latex');
+    figfilename = ['num_exp_energy_uni',num2str(f_2/1000),'_kHz.png'];
+end
 print([figure_output_path,figfilename],'-dpng', '-r600'); 
 close all;
 % errors calculation
@@ -101,14 +115,20 @@ for c=1:length(tasks)
     L2er_relative(c)=sqrt(sum((En(1:2:2*length(t_frames))-E(1:length(t_frames),c)).^2)/sum(En(1:length(t_frames)).^2));   
 end
 [L2er_relative]
+% v1
 % 0.1686
 % 0.2061
 % 0.1430
+%v2
+%  0.1545
+%  0.1879
+%  0.1341
 %% 100 kHz unidirectional
 % numerical
 tasks=[2,4,6];% 100 kHz
 c=0;
 alphaz=zeros(length(tasks),1);
+alphaphi=zeros(length(tasks),1);
 alphaxy=zeros(length(tasks),1);
 E=zeros(1024,length(tasks)+1)+NaN;
 t=zeros(1024,length(tasks)+1);
@@ -118,6 +138,7 @@ for test_case = tasks
     run(fullfile('inputs',['input',num2str(input_no)]));
     alphaz(c) = etad_z;
     alphaxy(c) = etad_xy;
+    alphaphi(c) = etad_z2;
     interim_output_name = [model_interim_path,filesep,num2str(test_case),'_output',filesep];
 
       if(overwrite)
@@ -154,8 +175,20 @@ xlabel('t [ms]','Fontsize',12);
 ylabel('E [-]','Fontsize',12);
 hold on;
 title(['Frequency ',num2str(f_2/1000),' [kHz]'],'Fontsize',12); 
-legend({['$\alpha_{z}=$ ',num2str(alphaz(1)),', $\alpha_{xy}=$ ',num2str(alphaxy(1))],['$\alpha_{z}=$ ',num2str(alphaz(2)),', $\alpha_{xy}=$ ',num2str(alphaxy(2))],['$\alpha_{z}=$ ',num2str(alphaz(3)),', $\alpha_{xy}=$ ',num2str(alphaxy(3))],'experiment'},'Fontsize',12,'interpreter','latex');
-figfilename = ['num_exp_energy_uni',num2str(f_2/1000),'_kHz.png'];
+if(m ==  2)
+    legend({['$\alpha_{z}=$ ',num2str(alphaz(1))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(2))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(3))],...
+        'experiment'},'Fontsize',12,'interpreter','latex');
+    figfilename = ['num_exp_energy_uni2_',num2str(f_2/1000),'_kHz.png'];
+else
+    alphaphi=zeros(length(tasks),1);
+    legend({['$\alpha_{z}=$ ',num2str(alphaz(1)),', $\alpha_{xy}=$ ',num2str(alphaxy(1)),', $\alpha_{\phi}=$ ',num2str(alphaphi(1))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(2)),', $\alpha_{xy}=$ ',num2str(alphaxy(2)),', $\alpha_{\phi}=$ ',num2str(alphaphi(2))],...
+        ['$\alpha_{z}=$ ',num2str(alphaz(3)),', $\alpha_{xy}=$ ',num2str(alphaxy(3)),', $\alpha_{\phi}=$ ',num2str(alphaphi(3))],...
+        'experiment'},'Fontsize',12,'interpreter','latex');
+    figfilename = ['num_exp_energy_uni',num2str(f_2/1000),'_kHz.png'];
+end
 print([figure_output_path,figfilename],'-dpng', '-r600'); 
 
 % errors calculation
@@ -171,3 +204,13 @@ for c=1:length(tasks)
     L2er_relative(c)=sqrt(sum((En(1:2:2*length(t_frames))-E(1:length(t_frames),c)).^2)/sum(En(1:length(t_frames)).^2));   
 end
 [L2er_relative]
+%v1
+%  0.1686
+%  0.2061
+%  0.1430
+%v2
+%  0.1184
+%  0.1378
+%  0.1170
+
+
