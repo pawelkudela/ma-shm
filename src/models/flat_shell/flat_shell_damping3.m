@@ -19,9 +19,9 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 %% Input for flat_shell
 
 % input for constant parameters
-input_file_no = [47,48,49,50,51,52,53,54]; 
-
-tasks=[7,8];
+input_file_no = [53,54]; 
+factor=1.7; % damping factor at pzt actuator location
+tasks=[1,2];
 mode='gpu'; % options: mode='cpu';mode='gpu';
 meshfile=fullfile('mesh','single_pzt_single_delam_large_plate_EWSHM2020'); % plate 1200x1200 mm pzt at the centre
 %% input for post-processing
@@ -64,7 +64,7 @@ for test_case=tasks
              
             %% RUN MODEL
             actuator_no = 1;
-            t_frames=main_flat_shell_multi_pzt_c2(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks);
+            t_frames=main_flat_shell_multi_pzt_c3(actuator_no,test_case,input_no,meshfile,mode,output_name,tasks,factor);
             %
             t_frames_filename=fullfile(interim_output_name,'t_frames');
             save(t_frames_filename,'t_frames');
