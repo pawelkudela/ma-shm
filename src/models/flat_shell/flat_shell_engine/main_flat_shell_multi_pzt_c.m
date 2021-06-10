@@ -857,7 +857,7 @@ save(outfile_voltage,'voltage');
 save(outfile_displ,'displ');
 % t_frames_filename=fullfile(output_name,'t_frames');
 % save(t_frames_filename,'t_frames');
-TotalNofNodes=dof/3;
+TotalNofNodes=dof/5;
 save(outfile_time,'minTime','averageTime','TotalNofNodes','t');
 switch mode
     case 'gpu'

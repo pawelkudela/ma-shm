@@ -2,6 +2,7 @@ clear all;close all;   warning off;clc;
 
 load project_paths projectroot src_path;
 %% Prepare output directories
+gpuDevice(1)
 % allow overwriting existing results if true
 %overwrite=false;
 overwrite=true;
