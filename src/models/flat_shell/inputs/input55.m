@@ -99,7 +99,8 @@ etad_z2=0; % damping ratio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % geometry definition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-V0=100; %[V] peak voltage 
+%V0=100; %[V] peak voltage 
+V0=1; %[N] peak force 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% boundary conditions
@@ -142,3 +143,11 @@ epsT=   [dp(1,5)/gp(1,5)       0                         0;
 rho_pzt=7850;%[kg/m3]
 pzt_thickness =0.5/1000; % pzt thickness [m]
 theta_pzt = 0; % rotation angle of pzt [deg]
+
+% output coordinates
+output_coords=[0.25, 0.25;
+               0.35, 0.25;
+               0.25, 0.35;
+               0.32, 0.32];
+% excitation force coordinates
+force_coords=[0.25, 0.25];

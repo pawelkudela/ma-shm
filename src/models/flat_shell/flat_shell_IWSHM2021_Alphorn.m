@@ -22,12 +22,13 @@ figure_output_path = prepare_figure_paths(modelfolder,modelname);
 % input for constant parameters
 input_file_no = [55,55,55]; 
 
-tasks=[1];% frequency = [50e3];3 cycles, no damping
+tasks=[1:3];% frequency = [50e3];3 cycles, no damping
 mode='gpu'; % options: mode='cpu';mode='gpu';
 % plate 500x500 mm transverse force applied at the centre  
 meshfile={fullfile('mesh','delam1_plate_50x50_Alphorn'),...
           fullfile('mesh','delam2_plate_50x50_Alphorn'),...
           fullfile('mesh','undelam1_plate_50x50_Alphorn')};
+
 %% input for post-processing
 Nx=500;
 Ny=500;
@@ -68,7 +69,8 @@ for test_case=tasks
              
             %% RUN MODEL
             actuator_no = 1;
-            t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,meshfile{test_case},mode,output_name,tasks);
+            %t_frames=main_flat_shell_multi_pzt_c(actuator_no,test_case,input_no,meshfile{test_case},mode,output_name,tasks);
+            t_frames=main_flat_shell_force_excit_c(test_case,input_no,meshfile{test_case},mode,output_name,tasks);
             %
             t_frames_filename=fullfile(interim_output_name,'t_frames');
             save(t_frames_filename,'t_frames');
