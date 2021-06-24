@@ -866,7 +866,10 @@ end
 %%  END OF MAIN LOOP
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 averageTime = toc/(nft-1);
-save(outfile_voltage,'voltage');   
+if(isempty(pztEl))
+else
+    save(outfile_voltage,'voltage'); 
+end
 save(outfile_displ,'displ');
 % t_frames_filename=fullfile(output_name,'t_frames');
 % save(t_frames_filename,'t_frames');

@@ -63,7 +63,7 @@ h=sum(lh);
 [variable_name] = flat_shell_variable_names(field_variable,motion);
 
 %data_filename=fullfile('outputs',['\output',num2str(test_case)],['\flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
-data_filename=fullfile(output_name,['\flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
+data_filename=fullfile(output_name,['flat_shell_',variable_name,'_',num2str(test_case),'_',num2str(Nx),'x',num2str(Ny),shell_surface,'.mat']);
 % corner nodes
 NofElNodesx = shape_order +1;
 NofElNodesy = shape_order +1;
